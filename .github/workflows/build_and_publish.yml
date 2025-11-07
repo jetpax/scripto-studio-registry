@@ -1,4 +1,4 @@
-name: Build and Publish ScriptOs Registry
+name: Build and Publish ScriptO Registry
 
 on:
   push:
@@ -75,7 +75,7 @@ jobs:
         
         echo ""
         echo "=========================================="
-        echo "ScriptOs Registry Published!"
+        echo "ScriptO Registry Published!"
         echo "=========================================="
         echo ""
         echo "Index URL: ${INDEX_URL}"

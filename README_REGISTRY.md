@@ -1,4 +1,4 @@
-# ScriptOs Registry
+# ScriptO Registry
 
 A browsable registry of ScriptOs for MicroPython, automatically built and published to GitHub Pages.
 

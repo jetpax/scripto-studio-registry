@@ -47,7 +47,7 @@ def generate_list_page(scriptos, all_tags, index, output_path):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScriptOs Registry - Browse & Install</title>
+    <title>ScriptO Registry - Browse & Install</title>
     <style>
         * {{
             margin: 0;
@@ -238,7 +238,7 @@ def generate_list_page(scriptos, all_tags, index, output_path):
 </head>
 <body>
     <div class="header">
-        <h1>📦 ScriptOs Registry</h1>
+        <h1>📦 ScriptO Registry</h1>
         <p>Browse and install ScriptOs for MicroPython</p>
     </div>
     
@@ -457,7 +457,7 @@ def generate_detail_page(scripto, output_path):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{scripto['name']} - ScriptOs Registry</title>
+    <title>{scripto['name']} - ScriptO Registry</title>
     <style>
         * {{
             margin: 0;
@@ -617,7 +617,7 @@ def generate_detail_page(scripto, output_path):
 </head>
 <body>
     <div class="header">
-        <a href="../index.html">← Back to ScriptOs Registry</a>
+        <a href="../index.html">← Back to ScriptO Registry</a>
     </div>
     
     <div class="container">

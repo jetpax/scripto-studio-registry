@@ -449,8 +449,8 @@ def generate_detail_page(scripto, output_path):
     url = scripto.get('url', '')
     license = scripto.get('license', 'MIT')
     
-    # Install URL for ScriptO Studio
-    install_url = f"http://localhost:5174/?install={quote(url)}" if url else "#"
+    # Configure URL for ScriptO Studio
+    configure_url = f"http://localhost:5174/?configure={quote(url)}" if url else "#"
     
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -654,14 +654,14 @@ def generate_detail_page(scripto, output_path):
             </div>
             
             <div class="detail-actions">
-                <a href="{install_url}" class="btn btn-primary">Open in ScriptO Studio</a>
+                <a href="{configure_url}" class="btn btn-primary">Open in ScriptO Studio</a>
                 {f'<a href="{docs}" target="_blank" class="btn btn-secondary">Documentation</a>' if docs else ''}
                 <a href="{url}" target="_blank" class="btn btn-secondary">View Source</a>
             </div>
             
             <div class="install-note">
                 <strong>Note:</strong> The "Open in ScriptO Studio" button will only work if ScriptO Studio is running on localhost:5174. 
-                Otherwise, copy the ScriptO URL and paste it into ScriptO Studio manually.
+                Otherwise, copy the ScriptO URL and paste it into ScriptO Studio manually to configure it.
             </div>
         </div>
     </div>

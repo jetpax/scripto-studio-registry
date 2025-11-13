@@ -2,7 +2,7 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [0, 1, 10],
+//   "version": [0, 2, 0],
 //   "author": "JetPax",
 //   "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
 //   "icon": "sliders",
@@ -12,7 +12,7 @@
 //     { "id": "canmapping", "label": "CAN Mapping", "icon": "radio" },
 //     { "id": "plot", "label": "Live Plot", "icon": "trending-up" }
 //   ],
-//   "styles": ".oi-compact-header { padding: 16px 20px !important; min-height: auto !important; display: flex; justify-content: space-between; align-items: center; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap; align-items: center; } .oi-button-row .secondary-button, .oi-button-row .primary-button { padding: 6px 12px !important; font-size: 12px !important; font-weight: 600; text-transform: none; letter-spacing: normal; display: flex; align-items: center; gap: 6px; } .oi-button-row .secondary-button svg, .oi-button-row .primary-button svg { width: 14px; height: 14px; flex-shrink: 0; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 600; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 6px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-value-input, .oi-enum-select { width: 100%; padding: 6px 0px; border: 1px solid #34495e; border-radius: 4px; background: #2c3e50; color: #0fdb0f; font-size: 14px; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; } .oi-value-input:focus, .oi-enum-select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 24px; font-weight: 700; font-family: 'Menlo', Monaco, 'Courier New', monospace; color: white; }"
+//   "styles": ".oi-compact-header { padding: 16px 20px !important; min-height: auto !important; display: flex; justify-content: space-between; align-items: center; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap; align-items: center; } .oi-button-row .secondary-button, .oi-button-row .primary-button { padding: 6px 12px !important; font-size: 12px !important; font-weight: 600; text-transform: none; letter-spacing: normal; display: flex; align-items: center; gap: 6px; } .oi-button-row .secondary-button svg, .oi-button-row .primary-button svg { width: 14px; height: 14px; flex-shrink: 0; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 600; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 6px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-value-input, .oi-enum-select { width: 100%; padding: 6px 0px; border: 1px solid #34495e; border-radius: 4px; background: #2c3e50; color: #0fdb0f; font-size: 14px; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; } .oi-value-input:focus, .oi-enum-select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 24px; font-weight: 700; font-family: 'Menlo', Monaco, 'Courier New', monospace; color: white; } .oi-plot-container { display: flex; height: calc(100vh - 180px); gap: 20px; padding: 20px; } .oi-plot-sidebar { width: 280px; flex-shrink: 0; border-right: 1px solid var(--border-color); padding-right: 20px; overflow-y: auto; } .oi-plot-section-title { font-size: 14px; font-weight: 600; color: var(--scheme-primary); margin: 16px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; } .oi-plot-signal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; } .oi-plot-signal { padding: 8px; border-radius: 4px; transition: background 0.2s; } .oi-plot-signal:hover { background: var(--bg-tertiary); } .oi-plot-signal label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; } .oi-plot-signal input[type=\"checkbox\"] { width: 16px; height: 16px; cursor: pointer; } .oi-plot-signal-name { font-weight: 600; color: var(--text-primary); } .oi-plot-signal-unit { color: var(--text-secondary); font-size: 12px; margin-left: auto; } .oi-plot-settings { display: flex; flex-direction: column; gap: 12px; } .oi-plot-settings label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); } .oi-plot-settings input[type=\"number\"] { padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; } .oi-plot-settings input[type=\"number\"]:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-plot-chart-area { flex: 1; position: relative; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; }"
 // }
 // === END_APP_CONFIG ===
 
@@ -415,18 +415,305 @@ class OpenInverterApp {
    * Real-time plotting of selected parameters
    */
   renderPlot() {
+    // Initialize plot state if needed
+    if (!this.state.plotState) {
+      this.state.plotState = {
+        isPlotting: false,
+        isPaused: false,
+        selectedVars: [],
+        chart: null,
+        maxDataPoints: 100,
+        updateInterval: 100 // ms
+      }
+    }
+
     return this.html`
       <div class="system-panel">
-        <div class="panel-header">
+        <div class="panel-header oi-compact-header">
           <h2>Live Plot</h2>
+          <div class="panel-actions oi-button-row">
+            ${this.state.plotState.isPlotting ? this.html`
+              <button 
+                class="secondary-button" 
+                onclick=${() => this.pauseResumePlot()}
+                title="${this.state.plotState.isPaused ? 'Resume' : 'Pause'} plotting">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  ${this.state.plotState.isPaused ? this.html`
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  ` : this.html`
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                  `}
+                </svg>
+                <span>${this.state.plotState.isPaused ? 'Resume' : 'Pause'}</span>
+              </button>
+              <button 
+                class="secondary-button" 
+                onclick=${() => this.stopPlot()}
+                title="Stop plotting">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="6" y="6" width="12" height="12"/>
+                </svg>
+                <span>Stop</span>
+              </button>
+            ` : this.html`
+              <button 
+                class="primary-button" 
+                onclick=${() => this.startPlot()}
+                disabled=${!this.state.isConnected || this.state.plotState.selectedVars.length === 0}
+                title="Start plotting selected variables">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                <span>Start Plot</span>
+              </button>
+            `}
+          </div>
+        </div>
+
+        ${this.renderPlotContent()}
+      </div>
+    `
+  }
+
+  renderPlotContent() {
+    if (!this.state.isConnected) {
+      return this.html`
+        <div class="panel-message">
+          <p>Connect to device to use live plotting</p>
+        </div>
+      `
+    }
+
+    if (!this.state.oiSpotValues) {
+      return this.html`
+        <div class="panel-message">
+          <p>Loading spot values...</p>
+          <p>Please wait while we fetch available signals.</p>
+        </div>
+      `
+    }
+
+    return this.html`
+      <div class="oi-plot-container">
+        <div class="oi-plot-sidebar">
+          <h3 class="oi-plot-section-title">Select Signals</h3>
+          <div class="oi-plot-signal-list">
+            ${Object.entries(this.state.oiSpotValues).map(([name, spot]) => this.renderPlotSignal(name, spot))}
+          </div>
+          
+          <h3 class="oi-plot-section-title">Plot Settings</h3>
+          <div class="oi-plot-settings">
+            <label>
+              Max Data Points:
+              <input 
+                type="number" 
+                value="${this.state.plotState.maxDataPoints}" 
+                min="50" 
+                max="1000" 
+                step="50"
+                onchange=${(e) => { this.state.plotState.maxDataPoints = parseInt(e.target.value) }}
+              />
+            </label>
+            <label>
+              Update Interval (ms):
+              <input 
+                type="number" 
+                value="${this.state.plotState.updateInterval}" 
+                min="50" 
+                max="1000" 
+                step="50"
+                onchange=${(e) => { this.state.plotState.updateInterval = parseInt(e.target.value) }}
+              />
+            </label>
+          </div>
         </div>
         
-        <div class="panel-message">
-          <p>Live plotting interface coming soon...</p>
-          <p>This panel will display real-time graphs of motor parameters.</p>
+        <div class="oi-plot-chart-area">
+          <canvas id="oi-plot-canvas"></canvas>
         </div>
       </div>
     `
+  }
+
+  renderPlotSignal(name, spot) {
+    const isSelected = this.state.plotState.selectedVars.includes(name)
+    
+    return this.html`
+      <div class="oi-plot-signal">
+        <label>
+          <input 
+            type="checkbox" 
+            checked=${isSelected}
+            onchange=${(e) => this.togglePlotVariable(name, e.target.checked)}
+            disabled=${this.state.plotState.isPlotting}
+          />
+          <span class="oi-plot-signal-name">${name}</span>
+          <span class="oi-plot-signal-unit">${spot.unit || ''}</span>
+        </label>
+      </div>
+    `
+  }
+
+  togglePlotVariable(varName, isChecked) {
+    if (isChecked) {
+      if (!this.state.plotState.selectedVars.includes(varName)) {
+        this.state.plotState.selectedVars.push(varName)
+      }
+    } else {
+      this.state.plotState.selectedVars = this.state.plotState.selectedVars.filter(v => v !== varName)
+    }
+    this.emit('render')
+  }
+
+  async startPlot() {
+    if (this.state.plotState.selectedVars.length === 0) {
+      alert('Please select at least one variable to plot')
+      return
+    }
+
+    this.state.plotState.isPlotting = true
+    this.state.plotState.isPaused = false
+    this.emit('render')
+
+    // Wait for render to complete and canvas to be available
+    setTimeout(() => this.initializeChart(), 100)
+  }
+
+  initializeChart() {
+    const canvas = document.getElementById('oi-plot-canvas')
+    if (!canvas) {
+      console.error('[OI Plot] Canvas not found')
+      return
+    }
+
+    // Destroy existing chart if any
+    if (this.state.plotState.chart) {
+      this.state.plotState.chart.destroy()
+    }
+
+    const ctx = canvas.getContext('2d')
+    const colors = [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)', 
+      'rgb(255, 159, 64)',
+      'rgb(153, 102, 255)',
+      'rgb(255, 205, 86)',
+      'rgb(75, 192, 192)'
+    ]
+
+    const datasets = this.state.plotState.selectedVars.map((varName, idx) => ({
+      label: varName,
+      data: [],
+      borderColor: colors[idx % colors.length],
+      backgroundColor: colors[idx % colors.length],
+      fill: false,
+      pointRadius: 0,
+      borderWidth: 2
+    }))
+
+    this.state.plotState.chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          x: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Time (s)'
+            }
+          },
+          y: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Value'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        }
+      }
+    })
+
+    // Start data acquisition
+    this.state.plotState.dataTime = 0
+    this.acquirePlotData()
+  }
+
+  async acquirePlotData() {
+    if (!this.state.plotState.isPlotting || this.state.plotState.isPaused) {
+      return
+    }
+
+    try {
+      const varNames = this.state.plotState.selectedVars
+      const argsStr = JSON.stringify(varNames)
+      const result = await this.device.execute(`from lib.OI_helpers import getPlotData; getPlotData(${argsStr})`)
+      const parsed = this.device.parseJSON(result)
+      const data = parsed.ARG || parsed
+
+      if (data && data.values) {
+        // Add new data point
+        this.state.plotState.dataTime++
+        this.state.plotState.chart.data.labels.push(this.state.plotState.dataTime)
+
+        // Update each dataset
+        for (const varName of varNames) {
+          const dataset = this.state.plotState.chart.data.datasets.find(d => d.label === varName)
+          if (dataset && data.values[varName] !== undefined) {
+            dataset.data.push(data.values[varName])
+          }
+        }
+
+        // Trim old data
+        const maxPoints = this.state.plotState.maxDataPoints
+        if (this.state.plotState.chart.data.labels.length > maxPoints) {
+          this.state.plotState.chart.data.labels.shift()
+          this.state.plotState.chart.data.datasets.forEach(dataset => dataset.data.shift())
+        }
+
+        this.state.plotState.chart.update('none') // Update without animation
+      }
+
+      // Schedule next acquisition
+      setTimeout(() => this.acquirePlotData(), this.state.plotState.updateInterval)
+    } catch (error) {
+      console.error('[OI Plot] Failed to acquire data:', error)
+      this.stopPlot()
+    }
+  }
+
+  pauseResumePlot() {
+    this.state.plotState.isPaused = !this.state.plotState.isPaused
+    this.emit('render')
+    
+    if (!this.state.plotState.isPaused) {
+      this.acquirePlotData()
+    }
+  }
+
+  stopPlot() {
+    this.state.plotState.isPlotting = false
+    this.state.plotState.isPaused = false
+    
+    if (this.state.plotState.chart) {
+      this.state.plotState.chart.destroy()
+      this.state.plotState.chart = null
+    }
+    
+    this.emit('render')
   }
 }
 

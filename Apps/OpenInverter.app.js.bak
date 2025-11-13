@@ -2,7 +2,7 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [0, 1, 9],
+//   "version": [0, 1, 8],
 //   "author": "JetPax",
 //   "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
 //   "icon": "sliders",
@@ -66,7 +66,7 @@ class OpenInverterApp {
       setTimeout(() => this.refreshParameters(), 0)
     }
 
-    return this.html`
+    return html`
       <div class="system-panel">
         <div class="panel-header oi-compact-header">
           <h2>Parameters</h2>
@@ -119,7 +119,7 @@ class OpenInverterApp {
 
   renderParametersContent() {
     if (!this.state.isConnected) {
-      return this.html`
+      return html`
         <div class="panel-message">
           <p>Connect to device to view parameters</p>
         </div>
@@ -127,7 +127,7 @@ class OpenInverterApp {
     }
     
     if (this.state.isLoadingOiParameters) {
-      return this.html`
+      return html`
         <div class="panel-message">
           <p>Loading parameters...</p>
         </div>
@@ -135,7 +135,7 @@ class OpenInverterApp {
     }
     
     if (!this.state.oiParameters || Object.keys(this.state.oiParameters).length === 0) {
-      return this.html`
+      return html`
         <div class="panel-message">
           <p>No parameters available. Click "Load from Device" to fetch parameters.</p>
         </div>
@@ -150,9 +150,9 @@ class OpenInverterApp {
       categories[cat].push({ name, ...param })
     })
     
-    return this.html`
+    return html`
       <div class="oi-parameters-container">
-        ${Object.entries(categories).map(([category, params]) => this.html`
+        ${Object.entries(categories).map(([category, params]) => html`
           <div class="oi-category-section">
             <h3 class="oi-category-title">${category}</h3>
             <div class="oi-parameters-table">
@@ -175,7 +175,7 @@ class OpenInverterApp {
     const hasEnum = param.enums && Object.keys(param.enums).length > 0
     const hasRange = param.minimum !== undefined || param.maximum !== undefined
     
-    return this.html`
+    return html`
       <div class="oi-table-row" data-param="${param.name}">
         <div class="oi-col-name">
           <strong>${param.name}</strong>
@@ -193,7 +193,7 @@ class OpenInverterApp {
   }
 
   renderValueInput(param) {
-    return this.html`
+    return html`
       <input 
         class="oi-value-input"
         type="number" 
@@ -207,13 +207,13 @@ class OpenInverterApp {
   }
 
   renderEnumSelect(param) {
-    return this.html`
+    return html`
       <select 
         class="oi-enum-select"
         value="${param.value}"
         onchange=${(e) => this.updateParameter(param.name, parseInt(e.target.value))}
       >
-        ${Object.entries(param.enums).map(([value, label]) => this.html`
+        ${Object.entries(param.enums).map(([value, label]) => html`
           <option value="${value}" ${param.value == value ? 'selected' : ''}>
             ${label}
           </option>
@@ -275,7 +275,7 @@ class OpenInverterApp {
       setTimeout(() => this.refreshSpotValues(), 0)
     }
 
-    return this.html`
+    return html`
       <div class="system-panel">
         <div class="panel-header oi-compact-header">
           <h2>Spot Values</h2>
@@ -309,7 +309,7 @@ class OpenInverterApp {
     })
     
     if (!this.state.isConnected) {
-      return this.html`
+      return html`
         <div class="panel-message">
           <p>Connect to device to view spot values</p>
         </div>
@@ -317,7 +317,7 @@ class OpenInverterApp {
     }
     
     if (this.state.isLoadingOiSpotValues) {
-      return this.html`
+      return html`
         <div class="panel-message">
           <p>Loading spot values...</p>
         </div>
@@ -325,7 +325,7 @@ class OpenInverterApp {
     }
     
     if (!this.state.oiSpotValues || Object.keys(this.state.oiSpotValues).length === 0) {
-      return this.html`
+      return html`
         <div class="panel-message">
           <p>No spot values available. Click "Refresh" to fetch values.</p>
         </div>
@@ -340,13 +340,13 @@ class OpenInverterApp {
       categories[cat].push({ name, ...spot })
     })
     
-    return this.html`
+    return html`
       <div class="oi-spotvalues-container">
-        ${Object.entries(categories).map(([category, spots]) => this.html`
+        ${Object.entries(categories).map(([category, spots]) => html`
           <div class="oi-category-section">
             <h3 class="oi-category-title">${category}</h3>
             <div class="oi-spotvalues-grid">
-              ${spots.map(spot => this.html`
+              ${spots.map(spot => html`
                 <div class="oi-spotvalue-card">
                   <div class="oi-spotvalue-name">${spot.name}</div>
                   <div class="oi-spotvalue-value">
@@ -388,7 +388,7 @@ class OpenInverterApp {
    * Configure CAN bus mapping for parameters
    */
   renderCanmapping() {
-    return this.html`
+    return html`
       <div class="system-panel">
         <div class="panel-header">
           <h2>CAN Mapping</h2>
@@ -407,7 +407,7 @@ class OpenInverterApp {
    * Real-time plotting of selected parameters
    */
   renderPlot() {
-    return this.html`
+    return html`
       <div class="system-panel">
         <div class="panel-header">
           <h2>Live Plot</h2>

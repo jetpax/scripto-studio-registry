@@ -58,7 +58,8 @@ class OpenInverterApp {
   renderParameters() {
     // Load parameters if not already loaded
     if (!this.state.oiParameters && !this.state.isLoadingOiParameters && this.state.isConnected) {
-      this.refreshParameters()
+      // Use setTimeout to avoid blocking render
+      setTimeout(() => this.refreshParameters(), 0)
     }
 
     return html`
@@ -227,6 +228,11 @@ class OpenInverterApp {
   }
 
   async refreshParameters() {
+    if (this.state.isLoadingOiParameters) {
+      console.log('[OI App] Already loading parameters, skipping')
+      return
+    }
+    
     this.state.isLoadingOiParameters = true
     this.emit('render')
     
@@ -259,7 +265,8 @@ class OpenInverterApp {
    */
   renderSpotvalues() {
     if (!this.state.oiSpotValues && !this.state.isLoadingOiSpotValues && this.state.isConnected) {
-      this.refreshSpotValues()
+      // Use setTimeout to avoid blocking render
+      setTimeout(() => this.refreshSpotValues(), 0)
     }
 
     return html`
@@ -342,6 +349,11 @@ class OpenInverterApp {
   }
 
   async refreshSpotValues() {
+    if (this.state.isLoadingOiSpotValues) {
+      console.log('[OI App] Already loading spot values, skipping')
+      return
+    }
+    
     this.state.isLoadingOiSpotValues = true
     this.emit('render')
     

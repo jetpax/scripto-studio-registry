@@ -174,6 +174,7 @@ def parse_app_file(file_path, repo_url=None, branch='main'):
         description = config.get('description', '')
         icon = config.get('icon', 'sliders')
         menu = config.get('menu', [])
+        styles = config.get('styles', '')
         
         # Generate URL
         if repo_url:
@@ -195,6 +196,7 @@ def parse_app_file(file_path, repo_url=None, branch='main'):
             "description": description,
             "icon": icon,
             "menu": menu,
+            "styles": styles,
             "url": url
         }
         

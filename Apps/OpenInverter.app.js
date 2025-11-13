@@ -29,6 +29,27 @@ class OpenInverterApp {
     this.state = state
   }
 
+  // === Helper Methods for OI_helpers.py ===
+
+  async getOiParams() {
+    const result = await this.device.execute('from lib.OI_helpers import getOiParams; getOiParams()')
+    const parsed = this.device.parseJSON(result)
+    return parsed.ARG || parsed
+  }
+
+  async setParameter(args) {
+    const argsStr = JSON.stringify(args)
+    const result = await this.device.execute(`from lib.OI_helpers import setParameter; setParameter(${argsStr})`)
+    const parsed = this.device.parseJSON(result)
+    return parsed.ARG || parsed
+  }
+
+  async getSpotValues() {
+    const result = await this.device.execute('from lib.OI_helpers import getSpotValues; getSpotValues()')
+    const parsed = this.device.parseJSON(result)
+    return parsed.ARG || parsed
+  }
+
   /**
    * Render Parameters panel
    * Displays editable motor control parameters with load/save functionality
@@ -195,7 +216,7 @@ class OpenInverterApp {
 
   async updateParameter(name, value) {
     try {
-      await this.device.setParameter({ NAME: name, VALUE: value })
+      await this.setParameter({ NAME: name, VALUE: value })
       // Refresh parameters to show updated value
       await this.refreshParameters()
     } catch (error) {
@@ -209,7 +230,7 @@ class OpenInverterApp {
     this.emit('render')
     
     try {
-      const params = await this.device.getOiParams()
+      const params = await this.getOiParams()
       this.state.oiParameters = params
       this.state.isLoadingOiParameters = false
       this.emit('render')
@@ -324,7 +345,7 @@ class OpenInverterApp {
     this.emit('render')
     
     try {
-      const spots = await this.device.getSpotValues()
+      const spots = await this.getSpotValues()
       this.state.oiSpotValues = spots
       this.state.isLoadingOiSpotValues = false
       this.emit('render')

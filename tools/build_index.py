@@ -14,9 +14,12 @@ from urllib.parse import quote
 
 # Configuration
 SCRIPTOS_DIR = 'ScriptOs'
+APPS_DIR = 'Apps'
 OUTPUT_FILE = 'index.json'
 START_MARKER = '# === START_CONFIG_PARAMETERS ==='
 END_MARKER = '# === END_CONFIG_PARAMETERS ==='
+APP_START_MARKER = '// === START_APP_CONFIG ==='
+APP_END_MARKER = '// === END_APP_CONFIG ==='
 
 def parse_python_dict(content):
     """Parse Python dict syntax to Python dict object"""
@@ -123,6 +126,84 @@ def extract_config_block(file_content):
     
     return None
 
+def extract_app_config_block(file_content):
+    """Extract config block from App .js file"""
+    start_idx = file_content.find(APP_START_MARKER)
+    end_idx = file_content.find(APP_END_MARKER)
+    
+    if start_idx == -1 or end_idx == -1:
+        return None
+    
+    # Extract the JSON block (between comment markers)
+    config_block = file_content[start_idx + len(APP_START_MARKER):end_idx].strip()
+    
+    # Remove comment prefixes (// or //) from each line
+    lines = []
+    for line in config_block.split('\n'):
+        line = line.strip()
+        if line.startswith('//'):
+            line = line[2:].strip()
+        lines.append(line)
+    
+    json_content = '\n'.join(lines)
+    
+    try:
+        return json.loads(json_content)
+    except json.JSONDecodeError as e:
+        print(f"Warning: Failed to parse app config JSON: {e}")
+        return None
+
+def parse_app_file(file_path, repo_url=None, branch='main'):
+    """Parse an App .js file and extract metadata"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        config = extract_app_config_block(content)
+        if not config:
+            print(f"  ⚠ No config block found in {file_path.name}")
+            return None
+        
+        filename = file_path.name
+        
+        # Extract metadata
+        name = config.get('name', filename.replace('.app.js', ''))
+        app_id = config.get('id', name.lower().replace(' ', '-'))
+        version = config.get('version', [1, 0, 0])
+        author = config.get('author', '')
+        description = config.get('description', '')
+        icon = config.get('icon', 'sliders')
+        menu = config.get('menu', [])
+        
+        # Generate URL
+        if repo_url:
+            # GitHub raw URL
+            if 'raw.githubusercontent.com' in repo_url:
+                url = f"{repo_url}/{branch}/Apps/{quote(filename)}"
+            else:
+                url = f"{repo_url}/raw/{branch}/Apps/{quote(filename)}"
+        else:
+            url = f"/Apps/{quote(filename)}"
+        
+        # Build App entry
+        app_entry = {
+            "name": name,
+            "id": app_id,
+            "filename": filename,
+            "version": version,
+            "author": author,
+            "description": description,
+            "icon": icon,
+            "menu": menu,
+            "url": url
+        }
+        
+        return app_entry
+        
+    except Exception as e:
+        print(f"  ✗ Error parsing {file_path.name}: {e}")
+        return None
+
 def parse_scripto_file(file_path, repo_url=None, branch='main'):
     """Parse a ScriptO file and extract metadata"""
     try:
@@ -188,17 +269,17 @@ def parse_scripto_file(file_path, repo_url=None, branch='main'):
         print(f"  ✗ Error parsing {file_path.name}: {e}")
         return None
 
-def build_index(scriptos_dir=SCRIPTOS_DIR, output_file=OUTPUT_FILE, repo_url=None, branch='main'):
-    """Build index.json from ScriptOs directory"""
+def build_index(scriptos_dir=SCRIPTOS_DIR, apps_dir=APPS_DIR, output_file=OUTPUT_FILE, repo_url=None, branch='main'):
+    """Build index.json from ScriptOs and Apps directories"""
     scriptos_path = Path(scriptos_dir)
+    apps_path = Path(apps_dir)
     
     if not scriptos_path.exists():
         print(f"Error: ScriptOs directory not found: {scriptos_dir}")
         return False
     
+    # Scan ScriptOs
     print(f"Scanning {scriptos_dir}...")
-    
-    # Find all .py files
     py_files = list(scriptos_path.glob('*.py'))
     
     if not py_files:
@@ -214,11 +295,31 @@ def build_index(scriptos_dir=SCRIPTOS_DIR, output_file=OUTPUT_FILE, repo_url=Non
         if entry:
             scriptos.append(entry)
     
+    # Scan Apps
+    apps = []
+    if apps_path.exists():
+        print(f"\nScanning {apps_dir}...")
+        js_files = list(apps_path.glob('*.app.js'))
+        
+        if js_files:
+            print(f"Found {len(js_files)} App files")
+            
+            for js_file in sorted(js_files):
+                print(f"Processing {js_file.name}...")
+                entry = parse_app_file(js_file, repo_url, branch)
+                if entry:
+                    apps.append(entry)
+        else:
+            print(f"No .app.js files found in {apps_dir}")
+    else:
+        print(f"\nApps directory not found: {apps_dir} (skipping)")
+    
     # Build index
     index = {
         "v": 1,
         "updated": int(time.time()),
-        "scriptos": scriptos
+        "scriptos": scriptos,
+        "apps": apps
     }
     
     # Write index.json
@@ -228,14 +329,15 @@ def build_index(scriptos_dir=SCRIPTOS_DIR, output_file=OUTPUT_FILE, repo_url=Non
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
     
-    print(f"\n✓ Generated {output_file} with {len(scriptos)} ScriptOs")
+    print(f"\n✓ Generated {output_file} with {len(scriptos)} ScriptOs and {len(apps)} Apps")
     return True
 
 def main():
     import argparse
     
-    parser = argparse.ArgumentParser(description='Build ScriptOs index.json')
+    parser = argparse.ArgumentParser(description='Build ScriptOs and Apps index.json')
     parser.add_argument('--scriptos-dir', default=SCRIPTOS_DIR, help='ScriptOs directory')
+    parser.add_argument('--apps-dir', default=APPS_DIR, help='Apps directory')
     parser.add_argument('--output', default=OUTPUT_FILE, help='Output index.json file')
     parser.add_argument('--repo-url', help='GitHub repository URL (e.g., https://github.com/user/repo)')
     parser.add_argument('--branch', default='main', help='Git branch name')
@@ -251,7 +353,7 @@ def main():
         # Remove any duplicate /raw/ in the path
         repo_url = repo_url.replace('/raw/raw/', '/raw/')
     
-    success = build_index(args.scriptos_dir, args.output, repo_url, args.branch)
+    success = build_index(args.scriptos_dir, args.apps_dir, args.output, repo_url, args.branch)
     exit(0 if success else 1)
 
 if __name__ == '__main__':

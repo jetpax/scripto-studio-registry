@@ -2,7 +2,7 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [0, 1, 3],
+//   "version": [0, 1, 5],
 //   "author": "JetPax",
 //   "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
 //   "icon": "sliders",
@@ -12,7 +12,7 @@
 //     { "id": "canmapping", "label": "CAN Mapping", "icon": "radio" },
 //     { "id": "plot", "label": "Live Plot", "icon": "trending-up" }
 //   ],
-//   "styles": ".oi-compact-header { padding: 12px 20px !important; min-height: auto !important; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; gap: 8px; flex-wrap: wrap; } .oi-compact-button { padding: 8px 16px !important; font-size: 13px !important; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 600; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 8px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-col-name { font-weight: 600; color: var(--text-primary); } .oi-col-unit, .oi-col-range, .oi-col-default { color: var(--text-secondary); font-size: 13px; } .oi-col-value input, .oi-col-value select { width: 100%; padding: 6px 0px; background: #2c3e50; border: 1px solid #34495e; border-radius: 4px; color: #0fdb0f; font-family: 'Menlo', Monaco, 'Courier New', monospace; font-size: 14px; } .oi-col-value input:focus, .oi-col-value select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 24px; font-weight: 700; font-family: 'Menlo', Monaco, 'Courier New', monospace; color: white; }"
+//   "styles": ".oi-compact-header { padding: 16px 20px !important; min-height: auto !important; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; flex-direction: row; gap: 12px; flex-wrap: wrap; align-items: center; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 600; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 6px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-value-input, .oi-enum-select { width: 100%; padding: 6px 0px; border: 1px solid #34495e; border-radius: 4px; background: #2c3e50; color: #0fdb0f; font-size: 14px; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; } .oi-value-input:focus, .oi-enum-select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 24px; font-weight: 700; font-family: 'Menlo', Monaco, 'Courier New', monospace; color: white; }"
 // }
 // === END_APP_CONFIG ===
 
@@ -68,42 +68,42 @@ class OpenInverterApp {
           <h2>Parameters</h2>
           <div class="panel-actions oi-button-row">
             <button 
-              class="secondary-button oi-compact-button" 
+              class="secondary-button" 
               onclick=${() => this.loadParametersFromFile()}
               title="Load parameters from local JSON file"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Load from File
+              <span>Load from File</span>
             </button>
             <button 
-              class="secondary-button oi-compact-button" 
+              class="secondary-button" 
               onclick=${() => this.refreshParameters()}
               disabled=${!this.state.isConnected}
               title="Load parameters from connected device"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="23 4 23 10 17 10"/>
                 <polyline points="1 20 1 14 7 14"/>
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
               </svg>
-              Load from Device
+              <span>Load from Device</span>
             </button>
             <button 
-              class="primary-button oi-compact-button" 
+              class="primary-button" 
               onclick=${() => this.saveParametersToFile()}
               disabled=${!this.state.oiParameters}
               title="Save parameters to local JSON file"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 10 12 15 7 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
               </svg>
-              Save to File
+              <span>Save to File</span>
             </button>
           </div>
         </div>
@@ -191,6 +191,7 @@ class OpenInverterApp {
   renderValueInput(param) {
     return html`
       <input 
+        class="oi-value-input"
         type="number" 
         value="${param.value}"
         step="0.1"
@@ -204,6 +205,7 @@ class OpenInverterApp {
   renderEnumSelect(param) {
     return html`
       <select 
+        class="oi-enum-select"
         value="${param.value}"
         onchange=${(e) => this.updateParameter(param.name, parseInt(e.target.value))}
       >

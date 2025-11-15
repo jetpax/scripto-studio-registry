@@ -2,7 +2,7 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [0, 5, 3],
+//   "version": [0, 5, 4],
 //   "author": "JetPax",
 //   "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
 //   "icon": "sliders",
@@ -878,12 +878,16 @@ class OpenInverterExtension {
     if (!this.state.selectedNodeId) {
       this.state.selectedNodeId = 1
     }
-    if (!this.state.oiDeviceConnected) {
+    if (this.state.oiDeviceConnected === undefined) {
       this.state.oiDeviceConnected = false
+    }
+    if (this.state.isScanning === undefined) {
+      this.state.isScanning = false
     }
     
     // DEBUG: Log connection state
     console.log('[OI Device Control] Render - WebREPL connected:', this.state.isConnected)
+    console.log('[OI Device Control] isScanning:', this.state.isScanning)
 
     return this.html`
       <div class="oi-parameters-container">

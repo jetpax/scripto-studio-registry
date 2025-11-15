@@ -1665,12 +1665,34 @@ def scanCanBus(args=None):
         node_ids: List of node IDs to scan (default: 1-10 for quick scan, or 1-127 for full)
         timeout: Timeout per node in milliseconds (default: 100ms)
         quick: If True, only scan common node IDs 1-10 (default: True)
+        tx_pin: CAN TX pin (default: 5)
+        rx_pin: CAN RX pin (default: 4)
+        bitrate: CAN bitrate (default: 500000)
     
     Returns list of detected nodes with their SDO responses.
     """
-    if not CAN_AVAILABLE or can_dev is None:
-        _send_error("CAN not available", 'CAN-SCAN-ERROR')
+    global can_dev
+    
+    if not CAN_AVAILABLE:
+        _send_error("CAN module not available", 'CAN-SCAN-ERROR')
         return
+    
+    # Initialize CAN if not already initialized
+    if can_dev is None:
+        if args is None:
+            args = {}
+        tx_pin = args.get('tx_pin', 5)
+        rx_pin = args.get('rx_pin', 4)
+        bitrate = args.get('bitrate', 500000)
+        
+        try:
+            print(f"[OI] Auto-initializing CAN for scan: tx={tx_pin}, rx={rx_pin}, bitrate={bitrate}")
+            can_dev = CAN(0, extframe=False, tx=tx_pin, rx=rx_pin, mode=CAN.NORMAL, bitrate=bitrate, auto_restart=True)
+            print("[OI] CAN initialized successfully")
+        except Exception as e:
+            print(f"[OI] Failed to initialize CAN: {e}")
+            _send_error(f"Failed to initialize CAN: {e}", 'CAN-SCAN-ERROR')
+            return
     
     # Default to quick scan (nodes 1-10) for better UX
     quick_scan = args.get('quick', True) if args else True

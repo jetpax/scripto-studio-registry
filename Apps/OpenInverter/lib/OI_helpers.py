@@ -67,8 +67,8 @@ except ImportError as e:
         pass
     # Define dummy classes/functions
     SDOClient = None
-    fixed_to_float = lambda x, bits: x
-    float_to_fixed = lambda x, bits: int(x)
+    fixed_to_float = lambda x: x
+    float_to_fixed = lambda x: int(x)
     param_id_to_sdo = lambda x: (0, 0)
 
 # --- Global CAN and Device State ---

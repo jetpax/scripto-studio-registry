@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1763233500,
+  "updated": 1763237623,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -673,8 +673,8 @@
       "filename": "OpenInverter.app.js",
       "version": [
         0,
-        4,
-        5
+        5,
+        0
       ],
       "author": "JetPax",
       "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
@@ -697,7 +697,7 @@
         },
         {
           "id": "commands",
-          "label": "Commands",
+          "label": "Device Control",
           "icon": "zap"
         },
         {
@@ -709,6 +709,11 @@
           "id": "plot",
           "label": "Live Plot",
           "icon": "trending-up"
+        },
+        {
+          "id": "firmware",
+          "label": "Firmware Upgrade",
+          "icon": "download"
         }
       ],
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Extensions/OpenInverter/OpenInverter.app.js",

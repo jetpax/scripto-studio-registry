@@ -881,6 +881,9 @@ class OpenInverterExtension {
     if (!this.state.oiDeviceConnected) {
       this.state.oiDeviceConnected = false
     }
+    
+    // DEBUG: Log connection state
+    console.log('[OI Device Control] Render - WebREPL connected:', this.state.isConnected)
 
     return this.html`
       <div class="oi-parameters-container">

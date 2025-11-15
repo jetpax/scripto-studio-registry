@@ -174,7 +174,7 @@ def parse_extension_file(file_path, repo_url=None, branch='main', extensions_bas
             extension_dir = Path('.')
         
         # Extract metadata
-        name = config.get('name', filename.replace('.app.js', ''))
+        name = config.get('name', filename.replace('.js', ''))
         extension_id = config.get('id', name.lower().replace(' ', '-'))
         version = config.get('version', [1, 0, 0])
         author = config.get('author', '')
@@ -196,7 +196,7 @@ def parse_extension_file(file_path, repo_url=None, branch='main', extensions_bas
         
         # Build Extension entry
         # Note: styles are excluded from index.json as they're unused
-        # The actual CSS is loaded from the full .app.js file when the extension is installed
+        # The actual CSS is loaded from the full .js file when the extension is installed
         extension_entry = {
             "name": name,
             "id": extension_id,
@@ -334,8 +334,10 @@ def build_index(scriptos_dir=SCRIPTOS_DIR, extensions_dir=EXTENSIONS_DIR, output
     extensions = []
     if extensions_path.exists():
         print(f"\nScanning {extensions_dir}...")
-        # Search recursively for .app.js files in subdirectories
-        js_files = list(extensions_path.glob('**/*.app.js'))
+        # Search recursively for .js files in subdirectories (excluding lib directories)
+        all_js_files = list(extensions_path.glob('**/*.js'))
+        # Filter out files in lib/ directories
+        js_files = [f for f in all_js_files if 'lib' not in f.parts]
         
         if js_files:
             print(f"Found {len(js_files)} Extension files")
@@ -346,7 +348,7 @@ def build_index(scriptos_dir=SCRIPTOS_DIR, extensions_dir=EXTENSIONS_DIR, output
                 if entry:
                     extensions.append(entry)
         else:
-            print(f"No .app.js files found in {extensions_dir}")
+            print(f"No extension files found in {extensions_dir}")
     else:
         print(f"\nExtensions directory not found: {extensions_dir} (skipping)")
     

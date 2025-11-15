@@ -2,7 +2,7 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [0, 4, 3],
+//   "version": [0, 4, 4],
 //   "author": "JetPax",
 //   "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
 //   "icon": "sliders",
@@ -280,7 +280,7 @@ class OpenInverterApp {
           <h2>Spot Values</h2>
           <div class="panel-actions oi-button-row">
             <button 
-              class="secondary-button oi-compact-button" 
+              class="refresh-button" 
               onclick=${() => this.refreshSpotValues()}
               disabled=${!this.state.isConnected}
             >

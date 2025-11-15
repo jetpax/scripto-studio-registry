@@ -7,7 +7,7 @@ dict(
     
     info = dict(
         name        = 'NTP Time Sync',
-        version     = [1, 1, 0],
+        version     = [1, 1, 1],
         category    = 'Network',
         description = ''' This tool synchronizes the UTC date and time from an NTP server.
                           You can choose the NTP server host to connect to and configure

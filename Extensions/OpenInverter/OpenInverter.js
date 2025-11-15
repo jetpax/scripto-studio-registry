@@ -886,10 +886,11 @@ class OpenInverterExtension {
       <div class="oi-parameters-container">
         <h2 style="color: var(--scheme-primary); margin-bottom: 20px;">Device Control</h2>
         
-        <!-- Device Connection -->
+        <!-- Device Connection Status & Control -->
         <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 24px;">
           <h3 style="font-size: 16px; margin-bottom: 16px;">OpenInverter Connection</h3>
           
+          <!-- Connection Status -->
           ${this.state.oiDeviceConnected ? this.html`
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
               <div style="width: 12px; height: 12px; border-radius: 50%; background: #4ade80;"></div>
@@ -904,51 +905,33 @@ class OpenInverterExtension {
           ` : this.html`
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
               <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
-              <span style="color: #ef4444; font-weight: 600;">Not Connected</span>
-            </div>
-            
-            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
-              <label style="display: flex; flex-direction: column; gap: 4px;">
-                <span style="font-size: 13px; color: var(--text-secondary);">Node ID</span>
-                <input 
-                  type="number" 
-                  min="1" 
-                  max="127" 
-                  value=${this.state.selectedNodeId}
-                  style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); width: 100px;"
-                  oninput=${(e) => this.state.selectedNodeId = parseInt(e.target.value)}
-                />
-              </label>
-              
-              <button 
-                class="primary-button" 
-                style="margin-top: 20px;"
-                onclick=${() => this.connectToDevice()}
-                disabled=${!this.state.isConnected}>
-                Connect
-              </button>
+              <span style="color: #ef4444; font-weight: 600;">Not Connected to OpenInverter Device</span>
             </div>
             
             <!-- CAN Bus Scanner -->
-            <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 16px;">
+            <div style="margin-bottom: 20px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h4 style="font-size: 14px; margin: 0; color: var(--text-secondary);">Scan for Devices</h4>
+                <h4 style="font-size: 14px; margin: 0; color: var(--text-secondary);">Scan CAN Bus for Devices</h4>
                 <button 
                   class="refresh-button" 
                   onclick=${() => this.scanCanBus()}
                   disabled=${!this.state.isConnected || this.state.isScanning}
                   style="padding: 6px 12px; font-size: 13px;">
-                  ${this.state.isScanning ? 'Scanning...' : 'Scan'}
+                  ${this.state.isScanning ? 'Scanning...' : 'Scan CAN Bus'}
                 </button>
               </div>
               
-              ${this.state.isScanning ? this.html`
+              ${!this.state.isConnected ? this.html`
+                <div style="text-align: center; padding: 16px; color: #ef4444; font-size: 13px; background: rgba(239, 68, 68, 0.1); border-radius: 4px;">
+                  <p>⚠️ Please connect to ESP32 device via WebREPL first</p>
+                </div>
+              ` : this.state.isScanning ? this.html`
                 <div style="text-align: center; padding: 16px; color: var(--text-secondary); font-size: 13px;">
-                  <p>Scanning CAN bus...</p>
+                  <p>Scanning CAN bus for OpenInverter devices...</p>
                 </div>
               ` : this.state.canScanResults.length === 0 ? this.html`
                 <div style="text-align: center; padding: 16px; color: var(--text-secondary); font-size: 13px;">
-                  <p>Click Scan to find devices</p>
+                  <p>Click "Scan CAN Bus" to find OpenInverter devices</p>
                 </div>
               ` : this.html`
                 <div style="border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; font-size: 13px;">
@@ -981,6 +964,32 @@ class OpenInverterExtension {
                   </table>
                 </div>
               `}
+            </div>
+            
+            <!-- Manual Connection (alternative to scanning) -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+              <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">Or Connect Manually</h4>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <label style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 13px; color: var(--text-secondary);">Node ID</span>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    max="127" 
+                    value=${this.state.selectedNodeId}
+                    style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); width: 100px;"
+                    oninput=${(e) => this.state.selectedNodeId = parseInt(e.target.value)}
+                  />
+                </label>
+                
+                <button 
+                  class="primary-button" 
+                  style="margin-top: 20px;"
+                  onclick=${() => this.connectToDevice()}
+                  disabled=${!this.state.isConnected}>
+                  Connect
+                </button>
+              </div>
             </div>
           `}
         </div>
@@ -1205,20 +1214,33 @@ class OpenInverterExtension {
   // === Connection Management Methods ===
 
   async scanCanBus() {
+    console.log('[OI Connection] Starting CAN bus scan...')
+    console.log('[OI Connection] isConnected:', this.state.isConnected)
+    
     this.state.isScanning = true
     this.state.canScanResults = []
     this.emit('render')
 
     try {
+      console.log('[OI Connection] Executing scanCanBus command...')
       const result = await this.device.execute('from lib.OI_helpers import scanCanBus; scanCanBus({})')
+      console.log('[OI Connection] Raw scan result:', result)
+      
       const parsed = this.device.parseJSON(result)
+      console.log('[OI Connection] Parsed scan result:', parsed)
+      
       const devices = parsed.ARG || parsed
+      console.log('[OI Connection] Devices found:', devices)
       
       if (Array.isArray(devices)) {
         this.state.canScanResults = devices
+        console.log('[OI Connection] Scan complete, found', devices.length, 'devices')
+      } else {
+        console.warn('[OI Connection] Scan result is not an array:', devices)
       }
     } catch (error) {
       console.error('[OI Connection] Scan failed:', error)
+      alert('Scan failed: ' + error.message)
       this.state.canScanResults = []
     } finally {
       this.state.isScanning = false

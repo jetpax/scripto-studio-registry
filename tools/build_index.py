@@ -14,12 +14,12 @@ from urllib.parse import quote
 
 # Configuration
 SCRIPTOS_DIR = 'ScriptOs'
-APPS_DIR = 'Apps'
+EXTENSIONS_DIR = 'Extensions'
 OUTPUT_FILE = 'index.json'
 START_MARKER = '# === START_CONFIG_PARAMETERS ==='
 END_MARKER = '# === END_CONFIG_PARAMETERS ==='
-APP_START_MARKER = '// === START_APP_CONFIG ==='
-APP_END_MARKER = '// === END_APP_CONFIG ==='
+EXTENSION_START_MARKER = '// === START_EXTENSION_CONFIG ==='
+EXTENSION_END_MARKER = '// === END_EXTENSION_CONFIG ==='
 
 def parse_python_dict(content):
     """Parse Python dict syntax to Python dict object"""
@@ -126,16 +126,16 @@ def extract_config_block(file_content):
     
     return None
 
-def extract_app_config_block(file_content):
-    """Extract config block from App .js file"""
-    start_idx = file_content.find(APP_START_MARKER)
-    end_idx = file_content.find(APP_END_MARKER)
+def extract_extension_config_block(file_content):
+    """Extract config block from Extension .js file"""
+    start_idx = file_content.find(EXTENSION_START_MARKER)
+    end_idx = file_content.find(EXTENSION_END_MARKER)
     
     if start_idx == -1 or end_idx == -1:
         return None
     
     # Extract the JSON block (between comment markers)
-    config_block = file_content[start_idx + len(APP_START_MARKER):end_idx].strip()
+    config_block = file_content[start_idx + len(EXTENSION_START_MARKER):end_idx].strip()
     
     # Remove comment prefixes (// or //) from each line
     lines = []
@@ -150,32 +150,32 @@ def extract_app_config_block(file_content):
     try:
         return json.loads(json_content)
     except json.JSONDecodeError as e:
-        print(f"Warning: Failed to parse app config JSON: {e}")
+        print(f"Warning: Failed to parse extension config JSON: {e}")
         return None
 
-def parse_app_file(file_path, repo_url=None, branch='main', apps_base_dir=None):
-    """Parse an App .js file and extract metadata"""
+def parse_extension_file(file_path, repo_url=None, branch='main', extensions_base_dir=None):
+    """Parse an Extension .js file and extract metadata"""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        config = extract_app_config_block(content)
+        config = extract_extension_config_block(content)
         if not config:
             print(f"  ⚠ No config block found in {file_path.name}")
             return None
         
         filename = file_path.name
         
-        # Determine the app's directory structure (relative to Apps/)
-        if apps_base_dir:
-            rel_path = file_path.relative_to(apps_base_dir)
-            app_dir = rel_path.parent
+        # Determine the extension's directory structure (relative to Extensions/)
+        if extensions_base_dir:
+            rel_path = file_path.relative_to(extensions_base_dir)
+            extension_dir = rel_path.parent
         else:
-            app_dir = Path('.')
+            extension_dir = Path('.')
         
         # Extract metadata
         name = config.get('name', filename.replace('.app.js', ''))
-        app_id = config.get('id', name.lower().replace(' ', '-'))
+        extension_id = config.get('id', name.lower().replace(' ', '-'))
         version = config.get('version', [1, 0, 0])
         author = config.get('author', '')
         description = config.get('description', '')
@@ -184,22 +184,22 @@ def parse_app_file(file_path, repo_url=None, branch='main', apps_base_dir=None):
         mip_package = config.get('mipPackage', None)
         # Note: styles are not extracted for index.json (loaded from full .app.js instead)
         
-        # Generate URL for main app file
+        # Generate URL for main extension file
         if repo_url:
             # GitHub raw URL
             if 'raw.githubusercontent.com' in repo_url:
-                url = f"{repo_url}/{branch}/Apps/{str(rel_path).replace(os.sep, '/')}"
+                url = f"{repo_url}/{branch}/Extensions/{str(rel_path).replace(os.sep, '/')}"
             else:
-                url = f"{repo_url}/raw/{branch}/Apps/{str(rel_path).replace(os.sep, '/')}"
+                url = f"{repo_url}/raw/{branch}/Extensions/{str(rel_path).replace(os.sep, '/')}"
         else:
-            url = f"/Apps/{str(rel_path).replace(os.sep, '/')}"
+            url = f"/Extensions/{str(rel_path).replace(os.sep, '/')}"
         
-        # Build App entry
+        # Build Extension entry
         # Note: styles are excluded from index.json as they're unused
-        # The actual CSS is loaded from the full .app.js file when the app is installed
-        app_entry = {
+        # The actual CSS is loaded from the full .app.js file when the extension is installed
+        extension_entry = {
             "name": name,
-            "id": app_id,
+            "id": extension_id,
             "filename": filename,
             "version": version,
             "author": author,
@@ -211,9 +211,9 @@ def parse_app_file(file_path, repo_url=None, branch='main', apps_base_dir=None):
         
         # Add mipPackage if specified
         if mip_package:
-            app_entry["mipPackage"] = mip_package
+            extension_entry["mipPackage"] = mip_package
         
-        return app_entry
+        return extension_entry
         
     except Exception as e:
         print(f"  ✗ Error parsing {file_path.name}: {e}")
@@ -304,10 +304,10 @@ def parse_scripto_file(file_path, repo_url=None, branch='main'):
         print(f"  ✗ Error parsing {file_path.name}: {e}")
         return None
 
-def build_index(scriptos_dir=SCRIPTOS_DIR, apps_dir=APPS_DIR, output_file=OUTPUT_FILE, repo_url=None, branch='main'):
-    """Build index.json from ScriptOs and Apps directories"""
+def build_index(scriptos_dir=SCRIPTOS_DIR, extensions_dir=EXTENSIONS_DIR, output_file=OUTPUT_FILE, repo_url=None, branch='main'):
+    """Build index.json from ScriptOs and Extensions directories"""
     scriptos_path = Path(scriptos_dir)
-    apps_path = Path(apps_dir)
+    extensions_path = Path(extensions_dir)
     
     if not scriptos_path.exists():
         print(f"Error: ScriptOs directory not found: {scriptos_dir}")
@@ -330,32 +330,32 @@ def build_index(scriptos_dir=SCRIPTOS_DIR, apps_dir=APPS_DIR, output_file=OUTPUT
         if entry:
             scriptos.append(entry)
     
-    # Scan Apps (including subdirectories)
-    apps = []
-    if apps_path.exists():
-        print(f"\nScanning {apps_dir}...")
+    # Scan Extensions (including subdirectories)
+    extensions = []
+    if extensions_path.exists():
+        print(f"\nScanning {extensions_dir}...")
         # Search recursively for .app.js files in subdirectories
-        js_files = list(apps_path.glob('**/*.app.js'))
+        js_files = list(extensions_path.glob('**/*.app.js'))
         
         if js_files:
-            print(f"Found {len(js_files)} App files")
+            print(f"Found {len(js_files)} Extension files")
             
             for js_file in sorted(js_files):
                 print(f"Processing {js_file.name}...")
-                entry = parse_app_file(js_file, repo_url, branch, apps_base_dir=apps_path)
+                entry = parse_extension_file(js_file, repo_url, branch, extensions_base_dir=extensions_path)
                 if entry:
-                    apps.append(entry)
+                    extensions.append(entry)
         else:
-            print(f"No .app.js files found in {apps_dir}")
+            print(f"No .app.js files found in {extensions_dir}")
     else:
-        print(f"\nApps directory not found: {apps_dir} (skipping)")
+        print(f"\nExtensions directory not found: {extensions_dir} (skipping)")
     
     # Build index
     index = {
         "v": 1,
         "updated": int(time.time()),
         "scriptos": scriptos,
-        "apps": apps
+        "extensions": extensions
     }
     
     # Write index.json
@@ -365,15 +365,15 @@ def build_index(scriptos_dir=SCRIPTOS_DIR, apps_dir=APPS_DIR, output_file=OUTPUT
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
     
-    print(f"\n✓ Generated {output_file} with {len(scriptos)} ScriptOs and {len(apps)} Apps")
+    print(f"\n✓ Generated {output_file} with {len(scriptos)} ScriptOs and {len(extensions)} Extensions")
     return True
 
 def main():
     import argparse
     
-    parser = argparse.ArgumentParser(description='Build ScriptOs and Apps index.json')
+    parser = argparse.ArgumentParser(description='Build ScriptOs and Extensions index.json')
     parser.add_argument('--scriptos-dir', default=SCRIPTOS_DIR, help='ScriptOs directory')
-    parser.add_argument('--apps-dir', default=APPS_DIR, help='Apps directory')
+    parser.add_argument('--extensions-dir', default=EXTENSIONS_DIR, help='Extensions directory')
     parser.add_argument('--output', default=OUTPUT_FILE, help='Output index.json file')
     parser.add_argument('--repo-url', help='GitHub repository URL (e.g., https://github.com/user/repo)')
     parser.add_argument('--branch', default='main', help='Git branch name')
@@ -389,7 +389,7 @@ def main():
         # Remove any duplicate /raw/ in the path
         repo_url = repo_url.replace('/raw/raw/', '/raw/')
     
-    success = build_index(args.scriptos_dir, args.apps_dir, args.output, repo_url, args.branch)
+    success = build_index(args.scriptos_dir, args.extensions_dir, args.output, repo_url, args.branch)
     exit(0 if success else 1)
 
 if __name__ == '__main__':

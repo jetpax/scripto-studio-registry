@@ -29,6 +29,7 @@ jobs:
       run: |
         python3 tools/build_index.py \
           --scriptos-dir ScriptOs \
+          --apps-dir Apps \
           --output ${{ env.OUTPUT_DIR }}/index.json \
           --repo-url https://github.com/${{ github.repository }} \
           --branch ${{ github.ref_name }}
@@ -56,11 +57,6 @@ jobs:
       run: |
         # Copy generated files to gh-pages
         cp -r ${{ env.OUTPUT_DIR }}/* gh-pages/
-        
-        # Copy cache control headers file if it exists
-        if [ -f _headers ]; then
-          cp _headers gh-pages/
-        fi
         
         cd gh-pages
         git config user.name "github-actions[bot]"

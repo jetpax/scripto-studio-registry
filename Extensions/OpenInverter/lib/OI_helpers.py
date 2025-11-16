@@ -57,8 +57,7 @@ try:
     from lib.canopen_sdo import SDOTimeoutError, SDOAbortError
     CAN_AVAILABLE = True
 except ImportError as e:
-    print(f"[OI] Warning: CAN/SDO modules not available - {e}")
-    print("[OI] Using demo data only. To enable device support, upload lib/canopen_sdo.py")
+    # Don't print - it interferes with M2M JSON responses in silent mode
     CAN_AVAILABLE = False
     # Define dummy exception classes so code doesn't break
     class SDOTimeoutError(Exception):
@@ -123,13 +122,16 @@ parameters = {
 def _send_response(cmd, arg):
     """Internal helper to send JSON response to WebREPL client"""
     response = json.dumps({'CMD': cmd, 'ARG': arg})
-    webrepl.send(response)
+    result = webrepl.send(response)
+    # Debug: print returns True/False indicating if send succeeded
+    print(f"[OI_DEBUG] _send_response: cmd={cmd}, sent={result}, len={len(response)}")
 
 
 def _send_error(message, cmd):
     """Internal helper to send error response"""
     response = json.dumps({'CMD': cmd, 'ARG': {'error': message}})
-    webrepl.send(response)
+    result = webrepl.send(response)
+    print(f"[OI_DEBUG] _send_error: cmd={cmd}, sent={result}, msg={message}")
 
 
 def _send_success(message, cmd):
@@ -1671,103 +1673,99 @@ def scanCanBus(args=None):
     
     Returns list of detected nodes with their SDO responses.
     """
-    global can_dev
-    
-    if not CAN_AVAILABLE:
-        _send_error("CAN module not available", 'CAN-SCAN-ERROR')
-        return
-    
-    # Initialize CAN if not already initialized
-    if can_dev is None:
-        if args is None:
-            args = {}
-        tx_pin = args.get('tx_pin', 5)
-        rx_pin = args.get('rx_pin', 4)
-        bitrate = args.get('bitrate', 500000)
+    try:
+        global can_dev
         
-        try:
-            print(f"[OI] Auto-initializing CAN for scan: tx={tx_pin}, rx={rx_pin}, bitrate={bitrate}")
-            can_dev = CAN(0, extframe=False, tx=tx_pin, rx=rx_pin, mode=CAN.NORMAL, bitrate=bitrate, auto_restart=False)
-            print("[OI] CAN initialized successfully")
-        except Exception as e:
-            print(f"[OI] Failed to initialize CAN: {e}")
-            _send_error(f"Failed to initialize CAN: {e}", 'CAN-SCAN-ERROR')
+        if not CAN_AVAILABLE:
+            _send_error("CAN module not available", 'CAN-SCAN-ERROR')
             return
-    
-    # Default to quick scan (nodes 1-10) for better UX
-    quick_scan = args.get('quick', True) if args else True
-    default_range = range(1, 11) if quick_scan else range(1, 128)
-    node_ids = args.get('node_ids', list(default_range)) if args else list(default_range)
-    timeout = args.get('timeout', 0.1) if args else 0.1
-    
-    total_nodes = len(node_ids)
-    print(f"[OI] Scanning CAN bus for {total_nodes} node IDs (timeout: {timeout*1000}ms per node)")
-    
-    found_nodes = []
-    
-    for index, node_id in enumerate(node_ids):
-        # Don't send progress updates during execute() as they interfere with JSON parsing
-        # Progress updates would need to be handled differently (via streaming/websocket)
-        # if index % 10 == 0 or index == 0:
-        #     progress = int((index / total_nodes) * 100)
-        #     _send_response('CAN-SCAN-PROGRESS', {
-        #         'progress': progress,
-        #         'current': node_id,
-        #         'total': total_nodes,
-        #         'found': len(found_nodes)
-        #     })
         
-        try:
-            # Create temporary SDO client for this node
-            temp_sdo = SDOClient(can_dev, node_id=node_id, timeout=timeout)
+        # Initialize CAN if not already initialized
+        if can_dev is None:
+            if args is None:
+                args = {}
+            tx_pin = args.get('tx_pin', 5)
+            rx_pin = args.get('rx_pin', 4)
+            bitrate = args.get('bitrate', 500000)
             
-            # Try to read a standard parameter (e.g., index 0x1000 - device type)
-            # This is a CANopen standard object that should exist
             try:
-                device_type = temp_sdo.read(0x1000, 0)
-                
-                # Try to read serial number too
-                serial_number = None
+                can_dev = CAN(0, extframe=False, tx=tx_pin, rx=rx_pin, mode=CAN.NORMAL, bitrate=bitrate, auto_restart=False)
+            except Exception as e:
+                _send_error(f"Failed to initialize CAN: {e}", 'CAN-SCAN-ERROR')
+                return
+        
+        # Default to quick scan (nodes 1-10) for better UX
+        quick_scan = args.get('quick', True) if args else True
+        default_range = range(1, 11) if quick_scan else range(1, 128)
+        node_ids = args.get('node_ids', list(default_range)) if args else list(default_range)
+        timeout = args.get('timeout', 0.1) if args else 0.1
+        
+        total_nodes = len(node_ids)
+        found_nodes = []
+        
+        for index, node_id in enumerate(node_ids):
+            # Don't send progress updates during execute() as they interfere with JSON parsing
+            # Progress updates would need to be handled differently (via streaming/websocket)
+            # if index % 10 == 0 or index == 0:
+            #     progress = int((index / total_nodes) * 100)
+            #     _send_response('CAN-SCAN-PROGRESS', {
+            #         'progress': progress,
+            #         'current': node_id,
+            #         'total': total_nodes,
+            #         'found': len(found_nodes)
+            #     })
+            
+            try:
+                # Create temporary SDO client for this node
+                temp_sdo = SDOClient(can_dev, node_id=node_id, timeout=timeout)
+            
+                # Try to read a standard parameter (e.g., index 0x1000 - device type)
+                # This is a CANopen standard object that should exist
                 try:
-                    # Try reading from OpenInverter serial number location
-                    serial_raw = temp_sdo.read(0x5000, 0)
-                    serial_number = f"{serial_raw:08X}"
-                except:
+                    device_type = temp_sdo.read(0x1000, 0)
+                    
+                    # Try to read serial number too
+                    serial_number = None
+                    try:
+                        # Try reading from OpenInverter serial number location
+                        serial_raw = temp_sdo.read(0x5000, 0)
+                        serial_number = f"{serial_raw:08X}"
+                    except:
+                        pass
+                    
+                    # Node responded, add to list
+                    found_nodes.append({
+                        'nodeId': node_id,
+                        'serialNumber': serial_number,
+                        'deviceType': device_type,
+                        'responding': True
+                    })
+                    
+                    # Don't send progress updates during execute() as they interfere with JSON parsing
+                    # progress = int(((index + 1) / total_nodes) * 100)
+                    # _send_response('CAN-SCAN-PROGRESS', {
+                    #     'progress': progress,
+                    #     'current': node_id,
+                    #     'total': total_nodes,
+                    #     'found': len(found_nodes),
+                    #     'lastFound': node_id
+                    # })
+                    
+                except (SDOTimeoutError, SDOAbortError):
+                    # Node didn't respond or doesn't have this object
                     pass
-                
-                # Node responded, add to list
-                found_nodes.append({
-                    'nodeId': node_id,
-                    'serialNumber': serial_number,
-                    'deviceType': device_type,
-                    'responding': True
-                })
-                
-                print(f"[OI] Found node {node_id} (device type: 0x{device_type:08X}, serial: {serial_number})")
-                
-                # Don't send progress updates during execute() as they interfere with JSON parsing
-                # progress = int(((index + 1) / total_nodes) * 100)
-                # _send_response('CAN-SCAN-PROGRESS', {
-                #     'progress': progress,
-                #     'current': node_id,
-                #     'total': total_nodes,
-                #     'found': len(found_nodes),
-                #     'lastFound': node_id
-                # })
-                
-            except (SDOTimeoutError, SDOAbortError):
-                # Node didn't respond or doesn't have this object
-                pass
-                
-        except Exception as e:
-            print(f"[OI] Error scanning node {node_id}: {e}")
+                    
+            except Exception as e:
+                pass  # Ignore errors for individual nodes
     
-    # Send final result
-    scan_type = "quick" if quick_scan else "full"
-    print(f"[OI] {scan_type.capitalize()} scan complete. Found {len(found_nodes)} device(s).")
-    _send_response('CAN-SCAN-RESULT', {
-        'devices': found_nodes,
-        'scanned': total_nodes,
-        'scanType': scan_type
-    })
+        # Send final result
+        scan_type = "quick" if quick_scan else "full"
+        _send_response('CAN-SCAN-RESULT', {
+            'devices': found_nodes,
+            'scanned': total_nodes,
+            'scanType': scan_type
+        })
+    except Exception as e:
+        # Send error via M2M channel (no print to avoid stdout interference)
+        _send_error(f"Scan failed: {str(e)}", 'CAN-SCAN-ERROR')
 

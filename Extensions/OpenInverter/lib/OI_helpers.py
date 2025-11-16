@@ -122,16 +122,13 @@ parameters = {
 def _send_response(cmd, arg):
     """Internal helper to send JSON response to WebREPL client"""
     response = json.dumps({'CMD': cmd, 'ARG': arg})
-    result = webrepl.send(response)
-    # Debug: print returns True/False indicating if send succeeded
-    print(f"[OI_DEBUG] _send_response: cmd={cmd}, sent={result}, len={len(response)}")
+    webrepl.send(response)
 
 
 def _send_error(message, cmd):
     """Internal helper to send error response"""
     response = json.dumps({'CMD': cmd, 'ARG': {'error': message}})
-    result = webrepl.send(response)
-    print(f"[OI_DEBUG] _send_error: cmd={cmd}, sent={result}, msg={message}")
+    webrepl.send(response)
 
 
 def _send_success(message, cmd):
@@ -1673,26 +1670,30 @@ def scanCanBus(args=None):
     
     Returns list of detected nodes with their SDO responses.
     """
-    try:
-        global can_dev
+    # try:
+    global can_dev
+    
+    if not CAN_AVAILABLE:
+        # _send_error("CAN module not available", 'CAN-SCAN-ERROR')
+        # return
+        # Temporarily comment out to test - just send response and return
+        _send_error("CAN module not available", 'CAN-SCAN-ERROR')
+        return
         
-        if not CAN_AVAILABLE:
-            _send_error("CAN module not available", 'CAN-SCAN-ERROR')
+    # Initialize CAN if not already initialized
+    if can_dev is None:
+        if args is None:
+            args = {}
+        
+        tx_pin = args.get('tx_pin', 5)
+        rx_pin = args.get('rx_pin', 4)
+        bitrate = args.get('bitrate', 500000)
+        
+        try:
+            can_dev = CAN(0, extframe=False, tx=tx_pin, rx=rx_pin, mode=CAN.NORMAL, bitrate=bitrate, auto_restart=False)
+        except Exception as e:
+            _send_error(f"Failed to initialize CAN: {e}", 'CAN-SCAN-ERROR')
             return
-        
-        # Initialize CAN if not already initialized
-        if can_dev is None:
-            if args is None:
-                args = {}
-            tx_pin = args.get('tx_pin', 5)
-            rx_pin = args.get('rx_pin', 4)
-            bitrate = args.get('bitrate', 500000)
-            
-            try:
-                can_dev = CAN(0, extframe=False, tx=tx_pin, rx=rx_pin, mode=CAN.NORMAL, bitrate=bitrate, auto_restart=False)
-            except Exception as e:
-                _send_error(f"Failed to initialize CAN: {e}", 'CAN-SCAN-ERROR')
-                return
         
         # Default to quick scan (nodes 1-10) for better UX
         quick_scan = args.get('quick', True) if args else True
@@ -1765,7 +1766,12 @@ def scanCanBus(args=None):
             'scanned': total_nodes,
             'scanType': scan_type
         })
-    except Exception as e:
-        # Send error via M2M channel (no print to avoid stdout interference)
-        _send_error(f"Scan failed: {str(e)}", 'CAN-SCAN-ERROR')
+    # except Exception as e:
+    #     # Send error via M2M channel (no print to avoid stdout interference)
+    #     try:
+    #         _send_error(f"Scan failed: {str(e)}", 'CAN-SCAN-ERROR')
+    #     except:
+    #         # If _send_error() itself fails, there's nothing we can do
+    #         # The exception will be logged in UART but won't crash the REPL
+    #         pass
 

@@ -94,32 +94,8 @@ Or use the test script:
    )
    # === END_CONFIG_PARAMETERS ===
    ```
-3. Commit and push - the registry will auto-update!
+3. Commit and push - the registry will auto-update
 
-### Converting from Awesome MicroPython
-
-To convert libraries from [Awesome MicroPython](https://awesome-micropython.com/):
-
-```bash
-cd tools
-python3 convert_awesome_mp.py
-```
-
-The converter will:
-- Fetch library metadata from GitHub
-- Extract README description and license
-- Generate proper ScriptO config block
-- Add source tracking fields (`source_url`, `source_repo`, `upstream_version`)
-- Tag with `untested` and `awesome-micropython`
-- Use Awesome MicroPython categories as tags
-- Output converted file to `ScriptOs/` directory
-
-**Example:**
-```bash
-python3 convert_awesome_mp.py
-# Enter repo URL: https://github.com/adafruit/Adafruit_CircuitPython_SSD1306
-# Enter category: Display
-```
 
 **Checking for Updates:**
 ```bash
@@ -129,7 +105,7 @@ python3 check_updates.py --update-available  # Show only outdated
 
 **Tag System:**
 - `untested` - Library hasn't been tested on hardware yet
-- `awesome-micropython` - Converted from Awesome MicroPython
+
 - Category tags (e.g., `display`, `sensor`, `communications`)
 - Custom tags from ScriptO config
 

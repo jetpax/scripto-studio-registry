@@ -2,7 +2,7 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [0, 5, 10],
+//   "version": [0, 5, 11],
 //   "author": "JetPax",
 //   "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
 //   "icon": "sliders",
@@ -1240,11 +1240,14 @@ class OpenInverterExtension {
 
     try {
       const scanArgs = JSON.stringify({ quick: !fullScan })
-      const result = await this.device.execute(`from lib.OI_helpers import scanCanBus; scanCanBus(${scanArgs})`, false) // false = not silent, show output
-      
+      const result = await this.device.execute(`from lib.OI_helpers import scanCanBus; scanCanBus(${scanArgs})`) // silent=true (default) to capture JSON response via webrepl.send()
       const parsed = this.device.parseJSON(result)
       
-      if (parsed.ARG && parsed.ARG.devices) {
+      // Check if we got an error response
+      if (parsed.ARG && parsed.ARG.error) {
+        this.state.scanMessage = `Error: ${parsed.ARG.error}`
+        this.state.canScanResults = []
+      } else if (parsed.ARG && parsed.ARG.devices) {
         this.state.canScanResults = parsed.ARG.devices
         
         if (this.state.canScanResults.length === 0) {

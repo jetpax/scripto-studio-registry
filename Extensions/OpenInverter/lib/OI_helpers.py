@@ -1670,13 +1670,9 @@ def scanCanBus(args=None):
     
     Returns list of detected nodes with their SDO responses.
     """
-    # try:
     global can_dev
     
     if not CAN_AVAILABLE:
-        # _send_error("CAN module not available", 'CAN-SCAN-ERROR')
-        # return
-        # Temporarily comment out to test - just send response and return
         _send_error("CAN module not available", 'CAN-SCAN-ERROR')
         return
         
@@ -1705,30 +1701,17 @@ def scanCanBus(args=None):
     found_nodes = []
     
     for index, node_id in enumerate(node_ids):
-        # Don't send progress updates during execute() as they interfere with JSON parsing
-        # Progress updates would need to be handled differently (via streaming/websocket)
-        # if index % 10 == 0 or index == 0:
-        #     progress = int((index / total_nodes) * 100)
-        #     _send_response('CAN-SCAN-PROGRESS', {
-        #         'progress': progress,
-        #         'current': node_id,
-        #         'total': total_nodes,
-        #         'found': len(found_nodes)
-        #     })
-        
         try:
             # Create temporary SDO client for this node
             temp_sdo = SDOClient(can_dev, node_id=node_id, timeout=timeout)
         
             # Try to read a standard parameter (e.g., index 0x1000 - device type)
-            # This is a CANopen standard object that should exist
             try:
                 device_type = temp_sdo.read(0x1000, 0)
                 
                 # Try to read serial number too
                 serial_number = None
                 try:
-                    # Try reading from OpenInverter serial number location
                     serial_raw = temp_sdo.read(0x5000, 0)
                     serial_number = f"{serial_raw:08X}"
                 except:
@@ -1742,18 +1725,7 @@ def scanCanBus(args=None):
                     'responding': True
                 })
                 
-                # Don't send progress updates during execute() as they interfere with JSON parsing
-                # progress = int(((index + 1) / total_nodes) * 100)
-                # _send_response('CAN-SCAN-PROGRESS', {
-                #     'progress': progress,
-                #     'current': node_id,
-                #     'total': total_nodes,
-                #     'found': len(found_nodes),
-                #     'lastFound': node_id
-                # })
-                
             except (SDOTimeoutError, SDOAbortError):
-                # Node didn't respond or doesn't have this object
                 pass
                 
         except Exception as e:
@@ -1766,12 +1738,4 @@ def scanCanBus(args=None):
         'scanned': total_nodes,
         'scanType': scan_type
     })
-    # except Exception as e:
-    #     # Send error via M2M channel (no print to avoid stdout interference)
-    #     try:
-    #         _send_error(f"Scan failed: {str(e)}", 'CAN-SCAN-ERROR')
-    #     except:
-    #         # If _send_error() itself fails, there's nothing we can do
-    #         # The exception will be logged in UART but won't crash the REPL
-    #         pass
 

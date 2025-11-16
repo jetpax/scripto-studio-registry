@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1763311021,
+  "updated": 1763332566,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -113,6 +113,24 @@
       "license": "MIT",
       "docs": "https://github.com/straga/micropython-esp32-twai",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/CAN%20Loopback%20Test.py"
+    },
+    {
+      "name": "CANopen Bus Scanner",
+      "filename": "CANopen Bus Scanner.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "Scriptomatic Team",
+      "description": "Scan CANopen network for devices by sending SDO (Service Data Object) requests. This tool discovers CANopen nodes on the bus by attempting to read the device type (object 0x1000) from each possible node ID. Useful for identifying OpenInverter devices and other CANopen-compatible equipment.",
+      "category": "CAN/TWAI",
+      "tags": [
+        "can/twai"
+      ],
+      "license": "MIT",
+      "docs": "https://github.com/straga/micropython-esp32-twai",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/CANopen%20Bus%20Scanner.py"
     },
     {
       "name": "DAC Output",

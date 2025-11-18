@@ -2,7 +2,7 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [0, 6, 7],
+//   "version": [0, 7, 0],
 //   "author": "JetPax",
 //   "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
 //   "icon": "sliders",
@@ -16,7 +16,7 @@
 //     { "id": "plot", "label": "Live Plot", "icon": "trending-up" },
 //     { "id": "firmware", "label": "Firmware Upgrade", "icon": "download" }
 //   ],
-//   "styles": ".oi-compact-header { padding: 16px 20px !important; min-height: auto !important; display: flex; justify-content: space-between; align-items: center; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap; align-items: center; } .oi-button-row .secondary-button, .oi-button-row .primary-button { padding: 6px 12px !important; font-size: 12px !important; font-weight: 600; text-transform: none; letter-spacing: normal; display: flex; align-items: center; gap: 6px; } .oi-button-row .secondary-button svg, .oi-button-row .primary-button svg { width: 14px; height: 14px; flex-shrink: 0; } .oi-plot-controls { display: flex; gap: 20px; align-items: center; } .oi-plot-controls .button { display: flex; flex-direction: column; align-items: center; } .oi-plot-controls .codicon { font-size: 20px; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 400; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 6px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-value-input, .oi-enum-select { width: 100%; padding: 6px 0px; border: 1px solid #34495e; border-radius: 4px; background: #121212; color: #0fdb0f; font-size: 14px; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; } .oi-value-input:focus, .oi-enum-select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(#121212); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 24px; font-weight: 700; font-family: 'Menlo', Monaco, 'Courier New', monospace; color: white; } .oi-plot-container { display: flex; height: 500px; max-height: calc(100vh - 260px); gap: 20px; padding: 20px; overflow: hidden; } .oi-plot-sidebar { width: 140px; flex-shrink: 0; border-right: 1px solid var(--border-color); padding-right: 20px; overflow-y: auto; } .oi-plot-section-title { font-size: 14px; font-weight: 600; color: var(--scheme-primary); margin: 16px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; } .oi-plot-signal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; } .oi-plot-signal { padding: 8px; border-radius: 4px; transition: background 0.2s; } .oi-plot-signal:hover { background: var(--bg-tertiary); } .oi-plot-signal label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; } .oi-plot-signal input[type=\"checkbox\"] { width: 16px; height: 16px; cursor: pointer; } .oi-plot-signal-name { font-weight: 600; color: var(--text-primary); } .oi-plot-signal-unit { color: var(--text-secondary); font-size: 12px; margin-left: auto; } .oi-plot-settings { display: flex; flex-direction: column; gap: 12px; } .oi-plot-settings label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); } .oi-plot-settings input[type=\"number\"] { padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; } .oi-plot-settings input[type=\"number\"]:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-plot-chart-area { flex: 1; position: relative; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; min-height: 0; min-width: 0; display: flex; flex-direction: column; } .oi-plot-chart-area canvas { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; }"
+//   "styles": ".oi-compact-header { padding: 16px 20px !important; min-height: auto !important; display: flex; justify-content: space-between; align-items: center; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap; align-items: center; } .oi-button-row .secondary-button, .oi-button-row .primary-button { padding: 6px 12px !important; font-size: 12px !important; font-weight: 600; text-transform: none; letter-spacing: normal; display: flex; align-items: center; gap: 6px; } .oi-button-row .secondary-button svg, .oi-button-row .primary-button svg { width: 14px; height: 14px; flex-shrink: 0; } .oi-plot-controls { display: flex; gap: 20px; align-items: center; } .oi-plot-controls .button { display: flex; flex-direction: column; align-items: center; } .oi-plot-controls .codicon { font-size: 20px; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 400; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 6px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-value-input, .oi-enum-select { width: 100%; padding: 6px 0px; border: 1px solid #34495e; border-radius: 4px; background: #121212; color: #0fdb0f; font-size: 14px; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; } .oi-value-input:focus, .oi-enum-select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(#121212); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 24px; font-weight: 700; font-family: 'Menlo', Monaco, 'Courier New', monospace; color: white; } .oi-plot-container { display: flex; height: 500px; max-height: calc(100vh - 260px); gap: 20px; padding: 20px; overflow: hidden; } .oi-plot-sidebar { width: 140px; flex-shrink: 0; border-right: 1px solid var(--border-color); padding-right: 20px; overflow-y: auto; } .oi-plot-section-title { font-size: 14px; font-weight: 600; color: var(--scheme-primary); margin: 16px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; } .oi-plot-signal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; } .oi-plot-signal { padding: 8px; border-radius: 4px; transition: background 0.2s; } .oi-plot-signal:hover { background: var(--bg-tertiary); } .oi-plot-signal label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; } .oi-plot-signal input[type=\"checkbox\"] { width: 16px; height: 16px; cursor: pointer; } .oi-plot-signal-name { font-weight: 600; color: var(--text-primary); } .oi-plot-signal-unit { color: var(--text-secondary); font-size: 12px; margin-left: auto; } .oi-plot-settings { display: flex; flex-direction: column; gap: 12px; } .oi-plot-settings label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); } .oi-plot-settings input[type=\"number\"] { padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; } .oi-plot-settings input[type=\"number\"]:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-plot-chart-area { flex: 1; position: relative; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; min-height: 0; min-width: 0; display: flex; flex-direction: column; } .oi-plot-chart-area canvas { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; } .oi-button-row .primary-button { width: auto; background: var(--scheme-primary); color: white; font-family: inherit; font-size: 14px; } .oi-button-row .primary-button:hover { background: var(--scheme-primary-light); } .oi-button-row .secondary-button { width: auto; background: var(--bg-tertiary); color: var(--text-primary); font-family: inherit; font-size: 14px; } .oi-button-row .secondary-button:hover { background: var(--button-hover); }"
 // }
 // === END_EXTENSION_CONFIG ===
 
@@ -114,7 +114,7 @@ class OpenInverterExtension {
         </div>
       `
     }
-    
+
     if (this.state.isLoadingOiParameters) {
       return this.html`
         <div class="panel-message">
@@ -122,7 +122,7 @@ class OpenInverterExtension {
         </div>
       `
     }
-    
+
     if (!this.state.oiParameters || Object.keys(this.state.oiParameters).length === 0) {
       return this.html`
         <div class="panel-message">
@@ -130,7 +130,7 @@ class OpenInverterExtension {
         </div>
       `
     }
-    
+
     // Group parameters by category
     const categories = {}
     Object.entries(this.state.oiParameters).forEach(([name, param]) => {
@@ -138,7 +138,7 @@ class OpenInverterExtension {
       if (!categories[cat]) categories[cat] = []
       categories[cat].push({ name, ...param })
     })
-    
+
     return this.html`
       <div class="oi-parameters-container">
         ${Object.entries(categories).map(([category, params]) => this.html`
@@ -163,7 +163,7 @@ class OpenInverterExtension {
   renderParameter(param) {
     const hasEnum = param.enums && Object.keys(param.enums).length > 0
     const hasRange = param.minimum !== undefined || param.maximum !== undefined
-    
+
     return this.html`
       <div class="oi-table-row" data-param="${param.name}">
         <div class="oi-col-name">
@@ -227,10 +227,10 @@ class OpenInverterExtension {
       console.log('[OI App] Already loading parameters, skipping')
       return
     }
-    
+
     this.state.isLoadingOiParameters = true
     this.emit('render')
-    
+
     try {
       const params = await this.getOiParams()
       this.state.oiParameters = params
@@ -296,7 +296,7 @@ class OpenInverterExtension {
       hasSpotValues: !!this.state.oiSpotValues,
       spotValuesKeys: this.state.oiSpotValues ? Object.keys(this.state.oiSpotValues) : []
     })
-    
+
     if (!this.state.isConnected) {
       return this.html`
         <div class="panel-message">
@@ -304,7 +304,7 @@ class OpenInverterExtension {
         </div>
       `
     }
-    
+
     if (this.state.isLoadingOiSpotValues) {
       return this.html`
         <div class="panel-message">
@@ -312,7 +312,7 @@ class OpenInverterExtension {
         </div>
       `
     }
-    
+
     if (!this.state.oiSpotValues || Object.keys(this.state.oiSpotValues).length === 0) {
       return this.html`
         <div class="panel-message">
@@ -320,7 +320,7 @@ class OpenInverterExtension {
         </div>
       `
     }
-    
+
     // Group by category
     const categories = {}
     Object.entries(this.state.oiSpotValues).forEach(([name, spot]) => {
@@ -328,14 +328,14 @@ class OpenInverterExtension {
       if (!categories[cat]) categories[cat] = []
       categories[cat].push({ name, ...spot })
     })
-    
+
     return this.html`
       <div class="oi-spotvalues-container">
         ${Object.entries(categories).map(([category, spots]) => this.renderSpotValueCategory(category, spots))}
       </div>
     `
   }
-  
+
   renderSpotValueCategory(category, spots) {
     return this.html`
       <div class="oi-category-section">
@@ -346,7 +346,7 @@ class OpenInverterExtension {
       </div>
     `
   }
-  
+
   renderSpotValueCard(spot) {
     return this.html`
       <div class="oi-spotvalue-card">
@@ -363,10 +363,10 @@ class OpenInverterExtension {
       console.log('[OI App] Already loading spot values, skipping')
       return
     }
-    
+
     this.state.isLoadingOiSpotValues = true
     this.emit('render')
-    
+
     try {
       const spots = await this.getSpotValues()
       this.state.oiSpotValues = spots
@@ -674,7 +674,7 @@ class OpenInverterExtension {
 
   renderPlotSignal(name, spot) {
     const isSelected = this.state.plotState.selectedVars.includes(name)
-    
+
     return this.html`
       <div class="oi-plot-signal">
         <label>
@@ -731,7 +731,7 @@ class OpenInverterExtension {
     const ctx = canvas.getContext('2d')
     const colors = [
       'rgb(255, 99, 132)',
-      'rgb(54, 162, 235)', 
+      'rgb(54, 162, 235)',
       'rgb(255, 159, 64)',
       'rgb(153, 102, 255)',
       'rgb(255, 205, 86)',
@@ -795,13 +795,13 @@ class OpenInverterExtension {
 
     try {
       const varNames = this.state.plotState.selectedVars
-      
+
       if (!varNames || varNames.length === 0) {
         console.error('[OI Plot] No variables selected!')
         this.stopPlot()
         return
       }
-      
+
       const argsStr = JSON.stringify(varNames)
       const result = await this.device.execute(`from lib.OI_helpers import getPlotData; getPlotData(${argsStr})`)
       const parsed = this.device.parseJSON(result)
@@ -848,7 +848,7 @@ class OpenInverterExtension {
   pauseResumePlot() {
     this.state.plotState.isPaused = !this.state.plotState.isPaused
     this.emit('render')
-    
+
     if (!this.state.plotState.isPaused) {
       this.acquirePlotData()
     }
@@ -857,12 +857,12 @@ class OpenInverterExtension {
   stopPlot() {
     this.state.plotState.isPlotting = false
     this.state.plotState.isPaused = false
-    
+
     if (this.state.plotState.chart) {
       this.state.plotState.chart.destroy()
       this.state.plotState.chart = null
     }
-    
+
     this.emit('render')
   }
 
@@ -884,7 +884,7 @@ class OpenInverterExtension {
     if (this.state.isScanning === undefined) {
       this.state.isScanning = false
     }
-    
+
     return this.html`
       <div class="oi-parameters-container">
         <h2 style="color: var(--scheme-primary); margin-bottom: 20px;">Device Control</h2>
@@ -1242,17 +1242,17 @@ class OpenInverterExtension {
       const scanArgs = JSON.stringify({ quick: !fullScan })
       const result = await this.device.execute(`from lib.OI_helpers import scanCanBus; scanCanBus('${scanArgs}')`) // Pass as JSON string, function will parse it
       const parsed = this.device.parseJSON(result)
-      
+
       // Check if we got an error response
       if (parsed.ARG && parsed.ARG.error) {
         this.state.scanMessage = `Error: ${parsed.ARG.error}`
         this.state.canScanResults = []
       } else if (parsed.ARG && parsed.ARG.devices) {
         this.state.canScanResults = parsed.ARG.devices
-        
+
         if (this.state.canScanResults.length === 0) {
           // Show helpful message when no devices found
-          this.state.scanMessage = fullScan 
+          this.state.scanMessage = fullScan
             ? `No devices found (scanned all 127 node IDs)`
             : `No devices found (scanned node IDs 1-10). Try "Full Scan" to check all 127 node IDs.`
         } else {
@@ -1277,7 +1277,7 @@ class OpenInverterExtension {
       const args = JSON.stringify({ node_id: this.state.selectedNodeId })
       const result = await this.device.execute(`from lib.OI_helpers import initializeDevice; initializeDevice(${args})`)
       const parsed = this.device.parseJSON(result)
-      
+
       if (parsed.success || (parsed.ARG && parsed.ARG.success)) {
         this.state.oiDeviceConnected = true
       } else {
@@ -1288,7 +1288,7 @@ class OpenInverterExtension {
       console.error('[OI Connection] Connection error:', error)
       alert('Failed to connect: ' + error.message)
     }
-    
+
     this.emit('render')
   }
 
@@ -1304,7 +1304,7 @@ class OpenInverterExtension {
     } catch (error) {
       console.error('[OI Connection] Disconnect error:', error)
     }
-    
+
     this.emit('render')
   }
 
@@ -1321,7 +1321,7 @@ class OpenInverterExtension {
 
   async startFirmwareUpgrade() {
     const fw = this.state.firmwareUpgrade
-    
+
     if (!fw.selectedFile) {
       alert('Please select a firmware file')
       return
@@ -1348,7 +1348,7 @@ class OpenInverterExtension {
     try {
       // Read file as bytes
       const fileData = await this.readFileAsBytes(fw.selectedFile)
-      
+
       fw.status = 'Uploading firmware to device...'
       this.emit('render')
 
@@ -1406,10 +1406,10 @@ class OpenInverterExtension {
       const start = i * chunkSize
       const end = Math.min(start + chunkSize, bytes.length)
       const chunk = Array.from(bytes.slice(start, end))
-      
+
       const args = JSON.stringify({ chunk, offset: start })
       await this.device.execute(`from lib.OI_helpers import uploadFirmwareChunk; uploadFirmwareChunk(${args})`)
-      
+
       fw.progress = (i / totalChunks) * 30 // First 30% is upload
       fw.status = `Uploading firmware... ${fw.progress.toFixed(0)}%`
       this.emit('render')
@@ -1423,7 +1423,7 @@ class OpenInverterExtension {
 
     while (polls < maxPolls) {
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       try {
         const result = await this.device.execute('from lib.OI_helpers import getFirmwareUpgradeStatus; getFirmwareUpgradeStatus()')
         const parsed = this.device.parseJSON(result)

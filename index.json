@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1763505535,
+  "updated": 1763509301,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -647,8 +647,8 @@
       "filename": "OVMS.js",
       "version": [
         0,
-        1,
-        8
+        2,
+        0
       ],
       "author": "JetPax",
       "description": "Send OpenInverter metrics to OVMS v2 server",
@@ -679,8 +679,8 @@
       "filename": "OpenInverter.js",
       "version": [
         0,
-        6,
-        7
+        7,
+        0
       ],
       "author": "JetPax",
       "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",

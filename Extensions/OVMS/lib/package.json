@@ -1,11 +1,14 @@
 {
   "urls": [
     ["OVMS_helpers.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/OVMS_helpers.py"],
+    ["vehicles.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/vehicles.py"],
+    ["obd2_client.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/obd2_client.py"],
+    ["vehicles/zombie_vcu/zombie_vcu.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/vehicles/zombie_vcu/zombie_vcu.py"],
+    ["vehicles/obdii/obdii.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/vehicles/obdii/obdii.py"],
+    ["vehicles/tesla_model3/tesla_model3.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/vehicles/tesla_model3/tesla_model3.py"],
     ["hmac.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/hmac.py"],    
     ["base64.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/base64.py"],
     ["binascii.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/binascii.py"]
-
   ],
-  "version": "0.1.7"
+  "version": "0.5.0"
 }
-

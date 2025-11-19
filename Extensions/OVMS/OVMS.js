@@ -2,7 +2,7 @@
 // {
 //   "name": "OVMS",
 //   "id": "ovms",
-//   "version": [0, 2, 1],
+//   "version": [0, 5, 0],
 //   "author": "JetPax",
 //   "description": "Send OpenInverter metrics to OVMS v2 server",
 //   "icon": "cloud",
@@ -263,6 +263,21 @@ class OVMSExtension {
               oninput=${(e) => this.handleConfigChange('pollinterval', parseInt(e.target.value) || 5)}
               disabled=${!this.state.isConnected}
             />
+          </div>
+
+          <div class="ovms-field">
+            <label>Vehicle Type</label>
+            <select 
+              value="${config.vehicle_type || 'zombie_vcu'}"
+              onchange=${(e) => this.handleConfigChange('vehicle_type', e.target.value)}
+              disabled=${!this.state.isConnected}
+            >
+              ${config.available_vehicles ? Object.entries(config.available_vehicles).map(([id, name]) => this.html`
+                <option value="${id}" ${config.vehicle_type === id ? 'selected' : ''}>${name}</option>
+              `) : this.html`
+                <option value="zombie_vcu" ${config.vehicle_type === 'zombie_vcu' ? 'selected' : ''}>ZombieVerter VCU</option>
+              `}
+            </select>
           </div>
 
           <div style="display: flex; gap: 12px; margin-top: 24px;">

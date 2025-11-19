@@ -38,13 +38,18 @@ except Exception as e:
 # Import hmac module from local lib directory
 import lib.hmac as hmac
 
-# Import OpenInverter helpers to reuse spot value queries
-try:
-    from lib.OI_helpers import getSpotValues
-    OI_AVAILABLE = True
-except ImportError:
-    OI_AVAILABLE = False
-    print("[OVMS] Warning: OpenInverter helpers not available")
+# CAN and OBD2 imports - will be imported when needed
+CAN_AVAILABLE = None
+CAN = None
+OBD2Client = None
+OBD2TimeoutError = None
+OBD2AbortError = None
+
+# OVMS CAN connection state
+_ovms_can_dev = None
+_ovms_obd2_client = None
+_ovms_can_connected = False
+_vehicle_config = None  # Loaded from vehicles.py
 
 # Configuration storage
 _config = {
@@ -54,7 +59,8 @@ _config = {
     'vehicleid': '',
     'password': '',
     'tls': False,
-    'pollinterval': 5
+    'pollinterval': 5,
+    'vehicle_type': 'zombie_vcu'  # Default vehicle type
 }
 
 # Metrics store
@@ -70,6 +76,9 @@ _ovms_crypto_rx = None
 _ovms_crypto_tx = None
 _poll_task = None
 _last_poll_time = 0
+
+# Vehicle configuration will be loaded from vehicles.py module
+# This allows support for multiple vehicle types (ZombieVerter, Tesla, etc.)
 
 
 def _send_response(cmd, arg):
@@ -151,7 +160,15 @@ def _save_config():
 def getOVMSConfig():
     """Get current OVMS configuration"""
     _load_config()
-    _send_response('OVMS-CONFIG', _config.copy())
+    try:
+        from vehicles import list_vehicles
+        available_vehicles = list_vehicles()
+    except ImportError:
+        available_vehicles = {'zombie_vcu': 'ZombieVerter VCU'}
+    
+    config_with_vehicles = _config.copy()
+    config_with_vehicles['available_vehicles'] = available_vehicles
+    _send_response('OVMS-CONFIG', config_with_vehicles)
 
 
 def setOVMSConfig(args):
@@ -174,9 +191,14 @@ def setOVMSConfig(args):
         return
     
     # Update config with provided values
-    for key in ['enabled', 'server', 'port', 'vehicleid', 'password', 'tls', 'pollinterval']:
+    for key in ['enabled', 'server', 'port', 'vehicleid', 'password', 'tls', 'pollinterval', 'vehicle_type']:
         if key in args:
             _config[key] = args[key]
+    
+    # Reload vehicle config if vehicle type changed
+    if 'vehicle_type' in args:
+        global _vehicle_config
+        _vehicle_config = None  # Force reload
     
     _save_config()
     
@@ -196,57 +218,172 @@ def getOVMSMetrics():
     _send_response('OVMS-METRICS', _metrics.copy())
 
 
-def _get_spot_values_direct():
-    """Get spot values directly from OpenInverter without WebREPL response"""
-    global OI_AVAILABLE
+def _load_vehicle_config():
+    """Load vehicle configuration based on configured vehicle type"""
+    global _vehicle_config
     
-    if not OI_AVAILABLE:
-        return {}
+    if _vehicle_config is not None:
+        return _vehicle_config
     
     try:
-        # Import OI_helpers to access parameters directly
-        from lib.OI_helpers import parameters, device_connected, sdo_client, _check_can_available
-        from lib.OI_helpers import param_id_to_sdo, fixed_to_float
-        from canopen_sdo import SDOTimeoutError, SDOAbortError
-        
-        spot_list = {}
-        
-        # If connected to device, read actual values
-        if device_connected and sdo_client and _check_can_available():
-            try:
-                for key, item in parameters.items():
-                    if item.get('isparam') != True:
-                        # Read current value from device
-                        param_id = item.get('id')
-                        if param_id is not None:
-                            try:
-                                index, subindex = param_id_to_sdo(param_id)
-                                raw_value = sdo_client.read(index, subindex)
-                                item['value'] = fixed_to_float(raw_value)
-                            except (SDOTimeoutError, SDOAbortError) as e:
-                                print(f"[OVMS] Warning: Failed to read {key}: {e}")
-                                # Keep existing value
-                        
-                        spot_list[key] = item
-            except Exception as e:
-                print(f"[OVMS] Error reading spot values: {e}")
-                # Fall back to cached values
-                for key, item in parameters.items():
-                    if item.get('isparam') != True:
-                        spot_list[key] = item
-        else:
-            # Use demo/cached data
-            for key, item in parameters.items():
-                if item.get('isparam') != True:
-                    spot_list[key] = item
-        
-        return spot_list
+        from vehicles import get_vehicle_config, list_vehicles
+        vehicle_type = _config.get('vehicle_type', 'zombie_vcu')
+        _vehicle_config = get_vehicle_config(vehicle_type)
+        if _vehicle_config is None:
+            print(f"[OVMS] Warning: Vehicle type '{vehicle_type}' not found, using 'zombie_vcu'")
+            _vehicle_config = get_vehicle_config('zombie_vcu')
+        return _vehicle_config
+    except ImportError as e:
+        print(f"[OVMS] Error loading vehicle config: {e}")
+        return None
+
+
+def _init_can_for_ovms():
+    """Initialize CAN bus for OVMS based on vehicle configuration"""
+    global _ovms_can_dev, _ovms_obd2_client, _ovms_can_connected, CAN, CAN_AVAILABLE
+    global OBD2Client, OBD2TimeoutError, OBD2AbortError, _vehicle_config
+    
+    if _ovms_can_connected:
+        return True
+    
+    # Load vehicle configuration
+    _vehicle_config = _load_vehicle_config()
+    if _vehicle_config is None:
+        print("[OVMS] No vehicle configuration available")
+        return False
+    
+    # Import CAN module
+    try:
+        from machine import CAN
+        CAN_AVAILABLE = True
     except ImportError:
-        print("[OVMS] OpenInverter helpers not available")
-        return {}
+        print("[OVMS] CAN module not available")
+        CAN_AVAILABLE = False
+        return False
+    
+    # Import OBD2 client
+    try:
+        from obd2_client import OBD2Client, OBD2TimeoutError, OBD2AbortError
+    except ImportError:
+        print("[OVMS] obd2_client library not available")
+        return False
+    
+    # Stop GVRET if running (it uses TWAI directly and conflicts with CAN module)
+    try:
+        import gvret
+        try:
+            gvret.stop()
+            print("[OVMS] Stopped GVRET to free TWAI for CAN module")
+            time.sleep_ms(100)
+        except:
+            pass
+    except ImportError:
+        pass
+    
+    # Read CAN configuration from /config/can.json (with fallback to main.py)
+    try:
+        import os
+        config_dir = '/config'
+        if not os.path.exists(config_dir):
+            config_dir = '/store/config'
+        config_file = config_dir + '/can.json'
+        
+        if os.path.exists(config_file):
+            with open(config_file, 'r') as f:
+                can_config = json.load(f)
+            tx_pin = can_config.get('txPin', 5)
+            rx_pin = can_config.get('rxPin', 4)
+            bitrate = can_config.get('bitrate', 500000)
+        else:
+            # Fallback to main.py
+            import sys
+            sys.path.insert(0, '/device scripts')
+            from main import CAN_TX_PIN, CAN_RX_PIN, CAN_BITRATE
+            tx_pin = CAN_TX_PIN
+            rx_pin = CAN_RX_PIN
+            bitrate = CAN_BITRATE
     except Exception as e:
-        print(f"[OVMS] Error getting spot values: {e}")
+        print(f"[OVMS] Warning: Could not load CAN config, using defaults: {e}")
+        tx_pin = 5
+        rx_pin = 4
+        bitrate = 500000
+    
+    # Initialize CAN device
+    try:
+        _ovms_can_dev = CAN(0, extframe=False, tx=tx_pin, rx=rx_pin, mode=CAN.NORMAL, bitrate=bitrate, auto_restart=False)
+        
+        # Initialize OBD2 client based on vehicle config
+        tx_id = _vehicle_config.get('can_tx_id', 0x7DF)
+        rx_id = _vehicle_config.get('can_rx_id', 0x7E8)
+        _ovms_obd2_client = OBD2Client(_ovms_can_dev, tx_id=tx_id, rx_id=rx_id, timeout=1.0)
+        
+        _ovms_can_connected = True
+        print(f"[OVMS] CAN initialized: tx={tx_pin}, rx={rx_pin}, bitrate={bitrate}, vehicle={_vehicle_config.get('name', 'unknown')}")
+        return True
+    except Exception as e:
+        print(f"[OVMS] Failed to initialize CAN: {e}")
+        _ovms_can_connected = False
+        return False
+
+
+def _get_spot_values_direct():
+    """Get spot values directly from vehicle via OBD2 (independent of OpenInverter extension)"""
+    global _ovms_can_connected, _ovms_obd2_client, _vehicle_config
+    global OBD2TimeoutError, OBD2AbortError
+    
+    # Initialize CAN if not already done
+    if not _init_can_for_ovms():
         return {}
+    
+    # Load vehicle config if not loaded
+    if _vehicle_config is None:
+        _vehicle_config = _load_vehicle_config()
+        if _vehicle_config is None:
+            return {}
+    
+    spot_list = {}
+    protocol = _vehicle_config.get('protocol', 'obd2')
+    metrics = _vehicle_config.get('metrics', {})
+    poll_type = _vehicle_config.get('poll_type', 0x2A)
+    
+    try:
+        # Import parse functions from vehicles module
+        from vehicles import PARSE_FUNCTIONS
+        
+        # Read each metric via OBD2
+        for name, metric_config in metrics.items():
+            pid = metric_config.get('pid')
+            parse_func_name = metric_config.get('parse_func')
+            
+            if pid is not None and parse_func_name is not None:
+                parse_func = PARSE_FUNCTIONS.get(parse_func_name)
+                if parse_func is None:
+                    print(f"[OVMS] Warning: Parse function '{parse_func_name}' not found for {name}")
+                    continue
+                
+                try:
+                    # Send OBD2 request
+                    response_data = _ovms_obd2_client.read_parameter(poll_type, pid)
+                    
+                    # Parse response using vehicle-specific parse function
+                    value = parse_func(response_data)
+                    
+                    spot_list[name] = {
+                        'value': value,
+                        'unit': metric_config.get('unit', ''),
+                        'timestamp': time.time()
+                    }
+                except (OBD2TimeoutError, OBD2AbortError) as e:
+                    print(f"[OVMS] Warning: Failed to read {name} (pid=0x{pid:04X}): {e}")
+                    # Skip this value
+                except Exception as e:
+                    print(f"[OVMS] Error reading {name}: {e}")
+                    # Skip this value
+    
+    except Exception as e:
+        print(f"[OVMS] Error reading spot values: {e}")
+    
+    return spot_list
 
 
 def _update_metrics_from_spot_values():
@@ -579,6 +716,11 @@ def startOVMS():
 def stopOVMS():
     """Stop OVMS client connection"""
     global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status, _poll_task
+    global _ovms_can_dev, _ovms_sdo_client, _ovms_can_connected
+    
+    if _poll_task:
+        # Stop polling task if running
+        _poll_task = None
     
     if _ovms_socket:
         try:
@@ -587,12 +729,24 @@ def stopOVMS():
             pass
         _ovms_socket = None
     
+    # Clean up CAN connection
+    if _ovms_can_dev:
+        try:
+            _ovms_can_dev.deinit()
+        except:
+            pass
+        _ovms_can_dev = None
+        _ovms_obd2_client = None
+        _ovms_can_connected = False
+    
     _ovms_connected = False
     _ovms_state = 'disconnected'
     _ovms_status = 'Disconnected'
-    _poll_task = None
+    _ovms_token = ''
+    _ovms_crypto_rx = None
+    _ovms_crypto_tx = None
     
-    _send_response('OVMS-STOPPED', {'status': 'disconnected'})
+    _send_response('OVMS-STOPPED', {'status': 'stopped'})
 
 
 def getOVMSStatus():
@@ -653,4 +807,3 @@ except Exception as e:
         sys.print_exception(e)
     except:
         print(f"[OVMS] Could not print exception traceback")
-

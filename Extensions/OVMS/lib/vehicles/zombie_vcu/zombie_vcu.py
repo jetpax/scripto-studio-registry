@@ -8,11 +8,7 @@ Uses OBD2 Mode 0x2A protocol to read OpenInverter parameters.
 Based on OVMS v3 vehicle_zombie_vcu module.
 """
 
-import sys
-import os
-# Add parent directory to path to import vehicles framework
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from vehicles import PROTOCOL_OBD2
+from vehicle import PROTOCOL_OBD2
 
 # ZombieVerter VCU configuration
 VEHICLE_CONFIG = {
@@ -104,6 +100,5 @@ VEHICLE_CONFIG = {
     }
 }
 
-# No custom parse functions needed - uses standard ones from vehicles.py
+# No custom parse functions needed - uses standard ones from vehicle.py
 PARSE_FUNCTIONS = {}
-

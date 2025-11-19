@@ -6,7 +6,7 @@ This directory contains documentation for each vehicle module supported by the O
 
 The OVMS extension follows the same modular structure as OVMS v3:
 
-- **`vehicles.py`** - Base vehicle framework (analogous to `vehicle.h/vehicle.cpp` in OVMS v3)
+- **`vehicle.py`** - Base vehicle framework (analogous to `vehicle.h/vehicle.cpp` in OVMS v3)
   - Defines protocol types, common parsing functions, and vehicle discovery system
   - Provides base infrastructure for all vehicle modules
 
@@ -28,7 +28,7 @@ To add a new vehicle module:
    - Create module file: `vehicles/<vehicle_name>/<vehicle_name>.py`
    
    ```python
-   from vehicles import PROTOCOL_OBD2  # or PROTOCOL_CAN_RAW, etc.
+   from vehicle import PROTOCOL_OBD2  # or PROTOCOL_CAN_RAW, etc.
    
    VEHICLE_CONFIG = {
        'name': 'Vehicle Display Name',
@@ -76,7 +76,7 @@ To add a new vehicle module:
 
 ## Common Parse Functions
 
-Available in `vehicles.py`:
+Available in `vehicle.py`:
 - `parse_16bit_high` - Parse 16-bit value from bytes 2-3
 - `parse_32bit` - Parse 32-bit value from bytes 4-7
 - `parse_32bit_negative` - Parse 32-bit value and negate (for current)
@@ -85,4 +85,3 @@ Available in `vehicles.py`:
 - `parse_24bit_millivolt` - Parse 24-bit millivolt value
 
 Custom parse functions can be added per vehicle module.
-

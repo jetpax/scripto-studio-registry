@@ -6,11 +6,7 @@ Vehicle-specific configuration for Tesla Model 3.
 Uses raw CAN frames (not OBD2) - listens to CAN bus messages directly.
 """
 
-import sys
-import os
-# Add parent directory to path to import vehicles framework
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from vehicles import PROTOCOL_CAN_RAW
+from vehicle import PROTOCOL_CAN_RAW
 
 # Tesla Model 3 uses raw CAN frames, not OBD2 polling
 # This is a placeholder - actual implementation would need CAN frame handlers
@@ -54,9 +50,8 @@ def parse_tesla_speed(can_frame_data):
     return 0.0
 
 
-# Register parse functions (would be imported by vehicles.py)
+# Register parse functions (would be imported by vehicle.py)
 PARSE_FUNCTIONS = {
     'parse_tesla_soc': parse_tesla_soc,
     'parse_tesla_speed': parse_tesla_speed,
 }
-

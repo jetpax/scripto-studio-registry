@@ -49,7 +49,7 @@ OBD2AbortError = None
 _ovms_can_dev = None
 _ovms_obd2_client = None
 _ovms_can_connected = False
-_vehicle_config = None  # Loaded from vehicles.py
+_vehicle_config = None  # Loaded from vehicle.py
 
 # Configuration storage
 _config = {
@@ -77,7 +77,7 @@ _ovms_crypto_tx = None
 _poll_task = None
 _last_poll_time = 0
 
-# Vehicle configuration will be loaded from vehicles.py module
+# Vehicle configuration will be loaded from vehicle.py module
 # This allows support for multiple vehicle types (ZombieVerter, Tesla, etc.)
 
 
@@ -161,7 +161,7 @@ def getOVMSConfig():
     """Get current OVMS configuration"""
     _load_config()
     try:
-        from vehicles import list_vehicles
+        from vehicle import list_vehicles
         available_vehicles = list_vehicles()
     except ImportError:
         available_vehicles = {'zombie_vcu': 'ZombieVerter VCU'}
@@ -226,7 +226,7 @@ def _load_vehicle_config():
         return _vehicle_config
     
     try:
-        from vehicles import get_vehicle_config, list_vehicles
+        from vehicle import get_vehicle_config, list_vehicles
         vehicle_type = _config.get('vehicle_type', 'zombie_vcu')
         _vehicle_config = get_vehicle_config(vehicle_type)
         if _vehicle_config is None:
@@ -348,7 +348,7 @@ def _get_spot_values_direct():
     
     try:
         # Import parse functions from vehicles module
-        from vehicles import PARSE_FUNCTIONS
+        from vehicle import PARSE_FUNCTIONS
         
         # Read each metric via OBD2
         for name, metric_config in metrics.items():

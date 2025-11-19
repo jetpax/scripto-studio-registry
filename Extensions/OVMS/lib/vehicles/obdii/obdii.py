@@ -8,11 +8,7 @@ Uses standard OBD-II PIDs over CAN bus.
 Based on OVMS v3 vehicle_obdii module.
 """
 
-import sys
-import os
-# Add parent directory to path to import vehicles framework
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from vehicles import PROTOCOL_OBD2
+from vehicle import PROTOCOL_OBD2
 
 # Generic OBDII configuration
 VEHICLE_CONFIG = {

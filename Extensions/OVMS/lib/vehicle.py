@@ -9,8 +9,8 @@ This module provides:
 - Common parsing functions
 - Vehicle discovery and registration system
 
-Vehicle-specific configurations should be in separate vehicle_*.py files
-(e.g., vehicle_zombie_vcu.py, vehicle_obdii.py) to match OVMS v3's modular structure.
+Vehicle-specific configurations should be in separate files in the vehicles/ subdirectory
+(e.g., vehicles/zombie_vcu/zombie_vcu.py, vehicles/obdii/obdii.py) to match OVMS v3's modular structure.
 
 Each vehicle module should define:
 - VEHICLE_CONFIG dict with protocol, CAN IDs, metrics, etc.
@@ -102,7 +102,7 @@ def get_vehicle_config(vehicle_type):
     
     # Try to load external vehicle module from vehicles/ subdirectory
     try:
-        # Module is in vehicles/vehicle_type/vehicle_type.py
+        # Use proper package import: vehicles.vehicle_type.vehicle_type
         module_name = f'vehicles.{vehicle_type}.{vehicle_type}'
         vehicle_module = __import__(module_name, fromlist=['VEHICLE_CONFIG'])
         config = getattr(vehicle_module, 'VEHICLE_CONFIG', None)
@@ -137,6 +137,7 @@ def list_vehicles():
                         vehicle_id = item
                         if vehicle_id not in vehicle_list:
                             try:
+                                # Use proper package import: vehicles.vehicle_id.vehicle_id
                                 module_name = f'vehicles.{vehicle_id}.{vehicle_id}'
                                 vehicle_module = __import__(module_name, fromlist=['VEHICLE_CONFIG'])
                                 config = getattr(vehicle_module, 'VEHICLE_CONFIG', None)
@@ -144,7 +145,7 @@ def list_vehicles():
                                     vehicle_list[vehicle_id] = config.get('name', vehicle_id.replace('_', ' ').title())
                             except ImportError:
                                 pass
-    except Exception as e:
+    except Exception:
         # Silently fail - vehicle discovery is optional
         pass
     

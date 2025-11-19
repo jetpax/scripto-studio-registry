@@ -137,15 +137,30 @@ def extract_extension_config_block(file_content):
     # Extract the JSON block (between comment markers)
     config_block = file_content[start_idx + len(EXTENSION_START_MARKER):end_idx].strip()
     
-    # Remove comment prefixes (// or //) from each line
+    # Remove comment prefixes (//) from each line and filter out empty lines
     lines = []
     for line in config_block.split('\n'):
         line = line.strip()
         if line.startswith('//'):
             line = line[2:].strip()
-        lines.append(line)
+        # Only add non-empty lines
+        if line:
+            lines.append(line)
     
     json_content = '\n'.join(lines)
+    
+    # Find the start of the JSON object/array (skip any non-JSON lines at the beginning)
+    json_start = -1
+    for i, char in enumerate(json_content):
+        if char in '{[':
+            json_start = i
+            break
+    
+    if json_start == -1:
+        print(f"Warning: No JSON object/array found in extension config")
+        return None
+    
+    json_content = json_content[json_start:]
     
     try:
         return json.loads(json_content)

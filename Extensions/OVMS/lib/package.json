@@ -1,4 +1,5 @@
 {
+  "_comment": "IMPORTANT: This version must match the version in OVMS.js extension config. ScriptO Studio checks OVMS.js version for extension updates, but mip uses this version for Python package updates.",
   "urls": [
     ["OVMS_helpers.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/OVMS_helpers.py"],
     ["vehicles.py", "github:jetpax/scripto-studio-registry/Extensions/OVMS/lib/vehicles.py"],

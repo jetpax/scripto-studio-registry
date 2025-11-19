@@ -1,8 +1,10 @@
 // === START_EXTENSION_CONFIG ===
+// IMPORTANT: Version must match package.json version (currently 0.6.0)
+// ScriptO Studio checks this version for extension updates
 // {
 //   "name": "OVMS",
 //   "id": "ovms",
-//   "version": [0, 5, 0],
+//   "version": [0, 6, 0],
 //   "author": "JetPax",
 //   "description": "Send OpenInverter metrics to OVMS v2 server",
 //   "icon": "cloud",

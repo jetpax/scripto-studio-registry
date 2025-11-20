@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1763593631,
+  "updated": 1763598127,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -674,7 +674,7 @@
       "version": [
         0,
         6,
-        0
+        2
       ],
       "author": "JetPax",
       "description": "Send OpenInverter metrics to OVMS v2 server",

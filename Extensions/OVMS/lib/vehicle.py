@@ -103,17 +103,35 @@ def get_vehicle_config(vehicle_type):
     # Try to load external vehicle module from vehicles/ subdirectory
     try:
         import os
-        lib_dir = os.path.dirname(__file__)
-        vehicle_file = os.path.join(lib_dir, 'vehicles', vehicle_type, f'{vehicle_type}.py')
         
-        if os.path.exists(vehicle_file):
+        # MicroPython doesn't have os.path, so use direct string manipulation
+        vehicle_file = f'/lib/vehicles/{vehicle_type}/{vehicle_type}.py'
+        
+        # Check if file exists by trying to open it
+        try:
             # Read and execute the vehicle file directly
             with open(vehicle_file, 'r') as f:
                 vehicle_code = f.read()
             # Create a namespace for the vehicle module
-            # Import vehicle module so 'from vehicle import ...' works
-            import vehicle as vehicle_module
-            vehicle_globals = {'vehicle': vehicle_module}
+            # Pass the constants directly instead of importing vehicle module
+            # to avoid circular import issues
+            vehicle_globals = {
+                'PROTOCOL_OBD2': PROTOCOL_OBD2,
+                'PROTOCOL_CANOPEN_SDO': PROTOCOL_CANOPEN_SDO,
+                'PROTOCOL_CAN_RAW': PROTOCOL_CAN_RAW,
+                'OBD2_MODE_CURRENT_DATA': OBD2_MODE_CURRENT_DATA,
+                'OBD2_MODE_READ_PARAM': OBD2_MODE_READ_PARAM,
+                'OBD2_MODE_RESPONSE_PARAM': OBD2_MODE_RESPONSE_PARAM,
+            }
+            # Also add a mock vehicle module for 'from vehicle import ...' syntax
+            class VehicleModule:
+                PROTOCOL_OBD2 = PROTOCOL_OBD2
+                PROTOCOL_CANOPEN_SDO = PROTOCOL_CANOPEN_SDO
+                PROTOCOL_CAN_RAW = PROTOCOL_CAN_RAW
+                OBD2_MODE_CURRENT_DATA = OBD2_MODE_CURRENT_DATA
+                OBD2_MODE_READ_PARAM = OBD2_MODE_READ_PARAM
+                OBD2_MODE_RESPONSE_PARAM = OBD2_MODE_RESPONSE_PARAM
+            vehicle_globals['vehicle'] = VehicleModule()
             exec(vehicle_code, vehicle_globals)
             config = vehicle_globals.get('VEHICLE_CONFIG', None)
             if config:
@@ -121,6 +139,9 @@ def get_vehicle_config(vehicle_type):
                 external_parse_funcs = vehicle_globals.get('PARSE_FUNCTIONS', {})
                 PARSE_FUNCTIONS.update(external_parse_funcs)
                 return config
+        except OSError:
+            # File doesn't exist, return None
+            pass
     except Exception as e:
         print(f"[vehicle] get_vehicle_config: Exception loading {vehicle_type}: {e}")
         import sys
@@ -138,49 +159,90 @@ def list_vehicles():
         import os
         import sys
         
-        lib_dir = os.path.dirname(__file__)
-        vehicles_dir = os.path.join(lib_dir, 'vehicles')
-        print(f"[vehicle] list_vehicles: lib_dir={lib_dir}, vehicles_dir={vehicles_dir}")
+        # MicroPython doesn't have os.path, so use direct string manipulation
+        vehicles_dir = '/lib/vehicles'
+        print(f"[vehicle] list_vehicles: vehicles_dir={vehicles_dir}")
         
-        # Ensure lib_dir is in sys.path for imports
-        if lib_dir not in sys.path:
-            sys.path.insert(0, lib_dir)
-            print(f"[vehicle] list_vehicles: added {lib_dir} to sys.path")
-        
-        if os.path.exists(vehicles_dir) and os.path.isdir(vehicles_dir):
+        # Check if vehicles directory exists by trying to list it
+        try:
+            items = os.listdir(vehicles_dir)
             print(f"[vehicle] list_vehicles: vehicles_dir exists, listing...")
             # Look for subdirectories (e.g., zombie_vcu/, obdii/)
-            for item in os.listdir(vehicles_dir):
-                item_path = os.path.join(vehicles_dir, item)
+            for item in items:
+                # Build path manually (no os.path.join)
+                item_path = f'{vehicles_dir}/{item}'
                 print(f"[vehicle] list_vehicles: checking {item}, path={item_path}")
-                # Check if it's a directory and contains a matching .py file
-                if os.path.isdir(item_path) and not item.startswith('_'):
-                    vehicle_file = os.path.join(item_path, f'{item}.py')
-                    print(f"[vehicle] list_vehicles: checking file {vehicle_file}, exists={os.path.exists(vehicle_file)}")
-                    if os.path.exists(vehicle_file):
-                        vehicle_id = item
-                        if vehicle_id not in vehicle_list:
-                            try:
-                                print(f"[vehicle] list_vehicles: loading {vehicle_file}")
-                                # Read and execute the vehicle file directly
-                                with open(vehicle_file, 'r') as f:
-                                    vehicle_code = f.read()
-                                # Create a namespace for the vehicle module
-                                # Import vehicle module so 'from vehicle import ...' works
-                                import vehicle as vehicle_module
-                                vehicle_globals = {'vehicle': vehicle_module}
-                                exec(vehicle_code, vehicle_globals)
-                                config = vehicle_globals.get('VEHICLE_CONFIG', None)
-                                print(f"[vehicle] list_vehicles: got config for {vehicle_id}, config={config}")
-                                if config:
-                                    vehicle_name = config.get('name', vehicle_id.replace('_', ' ').title())
-                                    vehicle_list[vehicle_id] = vehicle_name
-                                    print(f"[vehicle] list_vehicles: added {vehicle_id} = {vehicle_name}")
-                            except Exception as e:
-                                print(f"[vehicle] list_vehicles: Exception loading {vehicle_id}: {e}")
-                                sys.print_exception(e)
-        else:
-            print(f"[vehicle] list_vehicles: vehicles_dir does not exist or is not a directory")
+                
+                # Check if it's a directory by trying to list it
+                try:
+                    sub_items = os.listdir(item_path)
+                    # If we can list it, it's a directory
+                    if not item.startswith('_'):
+                        # Build vehicle file path manually
+                        vehicle_file = f'{item_path}/{item}.py'
+                        print(f"[vehicle] list_vehicles: checking file {vehicle_file}")
+                        
+                        # Check if file exists by trying to open it
+                        try:
+                            with open(vehicle_file, 'r') as f:
+                                # File exists, process it
+                                vehicle_id = item
+                                if vehicle_id not in vehicle_list:
+                                    try:
+                                        print(f"[vehicle] list_vehicles: loading {vehicle_file}")
+                                        # Read and execute the vehicle file directly
+                                        f.seek(0)  # Reset file pointer
+                                        vehicle_code = f.read()
+                                        # Create a namespace for the vehicle module
+                                        # Pass the constants directly instead of importing vehicle module
+                                        # to avoid circular import issues
+                                        vehicle_globals = {
+                                            'PROTOCOL_OBD2': PROTOCOL_OBD2,
+                                            'PROTOCOL_CANOPEN_SDO': PROTOCOL_CANOPEN_SDO,
+                                            'PROTOCOL_CAN_RAW': PROTOCOL_CAN_RAW,
+                                            'OBD2_MODE_CURRENT_DATA': OBD2_MODE_CURRENT_DATA,
+                                            'OBD2_MODE_READ_PARAM': OBD2_MODE_READ_PARAM,
+                                            'OBD2_MODE_RESPONSE_PARAM': OBD2_MODE_RESPONSE_PARAM,
+                                        }
+                                        # Also add a mock vehicle module for 'from vehicle import ...' syntax
+                                        class VehicleModule:
+                                            PROTOCOL_OBD2 = PROTOCOL_OBD2
+                                            PROTOCOL_CANOPEN_SDO = PROTOCOL_CANOPEN_SDO
+                                            PROTOCOL_CAN_RAW = PROTOCOL_CAN_RAW
+                                            OBD2_MODE_CURRENT_DATA = OBD2_MODE_CURRENT_DATA
+                                            OBD2_MODE_READ_PARAM = OBD2_MODE_READ_PARAM
+                                            OBD2_MODE_RESPONSE_PARAM = OBD2_MODE_RESPONSE_PARAM
+                                        vehicle_globals['vehicle'] = VehicleModule()
+                                        exec(vehicle_code, vehicle_globals)
+                                        config = vehicle_globals.get('VEHICLE_CONFIG', None)
+                                        print(f"[vehicle] list_vehicles: got config for {vehicle_id}")
+                                        if config:
+                                            # MicroPython doesn't have .title(), so use config name or format manually
+                                            vehicle_name = config.get('name')
+                                            if not vehicle_name:
+                                                # Simple title case: capitalize first letter of each word
+                                                parts = vehicle_id.replace('_', ' ').split(' ')
+                                                title_parts = []
+                                                for p in parts:
+                                                    if len(p) > 0:
+                                                        title_parts.append(p[0].upper() + p[1:])
+                                                    else:
+                                                        title_parts.append(p)
+                                                vehicle_name = ' '.join(title_parts)
+                                            vehicle_list[vehicle_id] = vehicle_name
+                                            print(f"[vehicle] list_vehicles: added {vehicle_id} = {vehicle_name}")
+                                    except Exception as e:
+                                        print(f"[vehicle] list_vehicles: Exception loading {vehicle_id}: {e}")
+                                        sys.print_exception(e)
+                        except OSError:
+                            # File doesn't exist, skip
+                            print(f"[vehicle] list_vehicles: file {vehicle_file} does not exist")
+                            pass
+                except OSError:
+                    # Not a directory or doesn't exist, skip
+                    pass
+        except OSError as e:
+            print(f"[vehicle] list_vehicles: vehicles_dir does not exist: {e}")
     except Exception as e:
         # Log error instead of silently failing
         print(f"[vehicle] list_vehicles: Exception during discovery: {e}")

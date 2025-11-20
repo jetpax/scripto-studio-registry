@@ -102,17 +102,29 @@ def get_vehicle_config(vehicle_type):
     
     # Try to load external vehicle module from vehicles/ subdirectory
     try:
-        # Use proper package import: vehicles.vehicle_type.vehicle_type
-        module_name = f'vehicles.{vehicle_type}.{vehicle_type}'
-        vehicle_module = __import__(module_name, fromlist=['VEHICLE_CONFIG'])
-        config = getattr(vehicle_module, 'VEHICLE_CONFIG', None)
-        if config:
-            # Merge parse functions from external module
-            external_parse_funcs = getattr(vehicle_module, 'PARSE_FUNCTIONS', {})
-            PARSE_FUNCTIONS.update(external_parse_funcs)
-            return config
-    except ImportError:
-        pass
+        import os
+        lib_dir = os.path.dirname(__file__)
+        vehicle_file = os.path.join(lib_dir, 'vehicles', vehicle_type, f'{vehicle_type}.py')
+        
+        if os.path.exists(vehicle_file):
+            # Read and execute the vehicle file directly
+            with open(vehicle_file, 'r') as f:
+                vehicle_code = f.read()
+            # Create a namespace for the vehicle module
+            # Import vehicle module so 'from vehicle import ...' works
+            import vehicle as vehicle_module
+            vehicle_globals = {'vehicle': vehicle_module}
+            exec(vehicle_code, vehicle_globals)
+            config = vehicle_globals.get('VEHICLE_CONFIG', None)
+            if config:
+                # Merge parse functions from external module
+                external_parse_funcs = vehicle_globals.get('PARSE_FUNCTIONS', {})
+                PARSE_FUNCTIONS.update(external_parse_funcs)
+                return config
+    except Exception as e:
+        print(f"[vehicle] get_vehicle_config: Exception loading {vehicle_type}: {e}")
+        import sys
+        sys.print_exception(e)
     
     return None
 
@@ -124,29 +136,56 @@ def list_vehicles():
     # Try to discover external vehicle modules in vehicles/ subdirectory
     try:
         import os
+        import sys
+        
         lib_dir = os.path.dirname(__file__)
         vehicles_dir = os.path.join(lib_dir, 'vehicles')
+        print(f"[vehicle] list_vehicles: lib_dir={lib_dir}, vehicles_dir={vehicles_dir}")
+        
+        # Ensure lib_dir is in sys.path for imports
+        if lib_dir not in sys.path:
+            sys.path.insert(0, lib_dir)
+            print(f"[vehicle] list_vehicles: added {lib_dir} to sys.path")
+        
         if os.path.exists(vehicles_dir) and os.path.isdir(vehicles_dir):
+            print(f"[vehicle] list_vehicles: vehicles_dir exists, listing...")
             # Look for subdirectories (e.g., zombie_vcu/, obdii/)
             for item in os.listdir(vehicles_dir):
                 item_path = os.path.join(vehicles_dir, item)
+                print(f"[vehicle] list_vehicles: checking {item}, path={item_path}")
                 # Check if it's a directory and contains a matching .py file
                 if os.path.isdir(item_path) and not item.startswith('_'):
                     vehicle_file = os.path.join(item_path, f'{item}.py')
+                    print(f"[vehicle] list_vehicles: checking file {vehicle_file}, exists={os.path.exists(vehicle_file)}")
                     if os.path.exists(vehicle_file):
                         vehicle_id = item
                         if vehicle_id not in vehicle_list:
                             try:
-                                # Use proper package import: vehicles.vehicle_id.vehicle_id
-                                module_name = f'vehicles.{vehicle_id}.{vehicle_id}'
-                                vehicle_module = __import__(module_name, fromlist=['VEHICLE_CONFIG'])
-                                config = getattr(vehicle_module, 'VEHICLE_CONFIG', None)
+                                print(f"[vehicle] list_vehicles: loading {vehicle_file}")
+                                # Read and execute the vehicle file directly
+                                with open(vehicle_file, 'r') as f:
+                                    vehicle_code = f.read()
+                                # Create a namespace for the vehicle module
+                                # Import vehicle module so 'from vehicle import ...' works
+                                import vehicle as vehicle_module
+                                vehicle_globals = {'vehicle': vehicle_module}
+                                exec(vehicle_code, vehicle_globals)
+                                config = vehicle_globals.get('VEHICLE_CONFIG', None)
+                                print(f"[vehicle] list_vehicles: got config for {vehicle_id}, config={config}")
                                 if config:
-                                    vehicle_list[vehicle_id] = config.get('name', vehicle_id.replace('_', ' ').title())
-                            except ImportError:
-                                pass
-    except Exception:
-        # Silently fail - vehicle discovery is optional
-        pass
+                                    vehicle_name = config.get('name', vehicle_id.replace('_', ' ').title())
+                                    vehicle_list[vehicle_id] = vehicle_name
+                                    print(f"[vehicle] list_vehicles: added {vehicle_id} = {vehicle_name}")
+                            except Exception as e:
+                                print(f"[vehicle] list_vehicles: Exception loading {vehicle_id}: {e}")
+                                sys.print_exception(e)
+        else:
+            print(f"[vehicle] list_vehicles: vehicles_dir does not exist or is not a directory")
+    except Exception as e:
+        # Log error instead of silently failing
+        print(f"[vehicle] list_vehicles: Exception during discovery: {e}")
+        import sys
+        sys.print_exception(e)
     
+    print(f"[vehicle] list_vehicles: returning {vehicle_list}")
     return vehicle_list

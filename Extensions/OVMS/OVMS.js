@@ -4,7 +4,7 @@
 // {
 //   "name": "OVMS",
 //   "id": "ovms",
-//   "version": [0, 6, 0],
+//   "version": [0, 6, 2],
 //   "author": "JetPax",
 //   "description": "Send OpenInverter metrics to OVMS v2 server",
 //   "icon": "cloud",
@@ -69,21 +69,36 @@ class OVMSExtension {
 
     try {
       this.state.ovms.isLoading = true
+      console.log('[OVMS] Calling device.execute()...')
       const result = await this.device.execute('from lib.OVMS_helpers import getOVMSConfig; getOVMSConfig()')
+      console.log('[OVMS] Raw result from execute:', result, 'Type:', typeof result, 'Length:', result?.length)
+      if (!result || result.trim() === '') {
+        console.error('[OVMS] Empty result from execute()')
+        this.state.ovms.isLoading = false
+        this.state.ovms.configLoaded = true
+        return this.state.ovms.config || {}
+      }
       const parsed = this.device.parseJSON(result)
+      console.log('[OVMS] Parsed config:', parsed)
+      console.log('[OVMS] parsed.ARG:', parsed?.ARG)
+      console.log('[OVMS] parsed.ARG.available_vehicles:', parsed?.ARG?.available_vehicles)
       if (parsed && parsed.CMD === 'OVMS-CONFIG') {
         this.state.ovms.config = parsed.ARG || {}
+        console.log('[OVMS] Config loaded, available_vehicles:', this.state.ovms.config.available_vehicles)
+        console.log('[OVMS] available_vehicles type:', typeof this.state.ovms.config.available_vehicles)
+        console.log('[OVMS] available_vehicles keys:', this.state.ovms.config.available_vehicles ? Object.keys(this.state.ovms.config.available_vehicles) : 'null')
         this.state.ovms.configLoaded = true
         this.emit('render')
       } else {
         // Mark as loaded even if response is invalid to prevent infinite retries
         this.state.ovms.configLoaded = true
-        console.warn('[OVMS] Config response invalid or missing:', parsed)
+        console.warn('[OVMS] Config response invalid or missing:', parsed, 'Raw result:', result)
       }
       this.state.ovms.isLoading = false
       return parsed?.ARG || this.state.ovms.config || {}
     } catch (e) {
       console.error('[OVMS] Error getting config:', e)
+      console.error('[OVMS] Error stack:', e.stack)
       this.state.ovms.isLoading = false
       this.state.ovms.configLoaded = true // Mark as loaded even on error to prevent infinite retries
       return this.state.ovms.config || {}
@@ -174,9 +189,18 @@ class OVMSExtension {
   // === Panel Renderers ===
 
   renderConfig() {
+    console.log('[OVMS] renderConfig() called, configLoaded:', this.state.ovms.configLoaded, 'isConnected:', this.state.isConnected, 'isLoading:', this.state.ovms.isLoading);
     // Load config if not loaded
     if (!this.state.ovms.configLoaded && this.state.isConnected && !this.state.ovms.isLoading) {
-      setTimeout(() => this.getOVMSConfig(), 0)
+      console.log('[OVMS] renderConfig: Calling getOVMSConfig() via setTimeout');
+      setTimeout(() => {
+        console.log('[OVMS] setTimeout callback executing, calling getOVMSConfig()');
+        this.getOVMSConfig().catch(err => {
+          console.error('[OVMS] getOVMSConfig() error:', err);
+        });
+      }, 0)
+    } else {
+      console.log('[OVMS] renderConfig: Skipping getOVMSConfig(), configLoaded:', this.state.ovms.configLoaded, 'isConnected:', this.state.isConnected, 'isLoading:', this.state.ovms.isLoading);
     }
 
     const config = this.state.ovms.config

@@ -84,18 +84,18 @@ _last_poll_time = 0
 def _send_response(cmd, arg):
     """Internal helper to send JSON response to WebREPL client"""
     try:
-        # Ensure arg is JSON-serializable
-        if isinstance(arg, dict):
-            # Convert any non-serializable values
-            serializable_arg = {}
-            for k, v in arg.items():
-                if isinstance(v, (str, int, float, bool, type(None))):
-                    serializable_arg[k] = v
-                elif isinstance(v, (list, tuple)):
-                    serializable_arg[k] = list(v)
-                else:
-                    serializable_arg[k] = str(v)  # Convert to string as fallback
-            arg = serializable_arg
+        # Ensure arg is JSON-serializable (recursively handle nested dicts/lists)
+        def make_serializable(obj):
+            if isinstance(obj, dict):
+                return {k: make_serializable(v) for k, v in obj.items()}
+            elif isinstance(obj, (list, tuple)):
+                return [make_serializable(item) for item in obj]
+            elif isinstance(obj, (str, int, float, bool, type(None))):
+                return obj
+            else:
+                return str(obj)  # Convert to string as fallback
+        
+        arg = make_serializable(arg)
         
         response = json.dumps({'CMD': cmd, 'ARG': arg})
         
@@ -157,17 +157,41 @@ def _save_config():
         print(f"[OVMS] Error saving config: {e}")
 
 
+def listVehicles():
+    """List available vehicles (command handler for testing)"""
+    try:
+        from vehicle import list_vehicles
+        vehicles = list_vehicles()
+        _send_response('VEHICLES-LIST', vehicles)
+    except Exception as e:
+        _send_error(f'Failed to list vehicles: {e}')
+
 def getOVMSConfig():
     """Get current OVMS configuration"""
     _load_config()
     try:
         from vehicle import list_vehicles
+        print("[OVMS_helpers] Calling list_vehicles()...")
         available_vehicles = list_vehicles()
-    except ImportError:
+        print(f"[OVMS_helpers] list_vehicles() returned: {available_vehicles}")
+    except ImportError as e:
+        print(f"[OVMS_helpers] ImportError importing list_vehicles: {e}")
+        import sys
+        sys.print_exception(e)
+        available_vehicles = {'zombie_vcu': 'ZombieVerter VCU'}
+    except Exception as e:
+        print(f"[OVMS_helpers] Exception calling list_vehicles: {e}")
+        import sys
+        sys.print_exception(e)
         available_vehicles = {'zombie_vcu': 'ZombieVerter VCU'}
     
+    print(f"[OVMS_helpers] available_vehicles: {available_vehicles}")
+    print(f"[OVMS_helpers] available_vehicles type: {type(available_vehicles)}")
+    print(f"[OVMS_helpers] available_vehicles keys: {list(available_vehicles.keys()) if available_vehicles else 'None'}")
     config_with_vehicles = _config.copy()
     config_with_vehicles['available_vehicles'] = available_vehicles
+    print(f"[OVMS_helpers] config_with_vehicles['available_vehicles']: {config_with_vehicles.get('available_vehicles')}")
+    print(f"[OVMS_helpers] About to send OVMS-CONFIG, full config keys: {list(config_with_vehicles.keys())}")
     _send_response('OVMS-CONFIG', config_with_vehicles)
 
 

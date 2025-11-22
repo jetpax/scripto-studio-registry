@@ -131,64 +131,98 @@ class GVRETExtension {
     try {
       // Ensure CAN is initialized using generic helper functions
       const result = await this.device.execute(`
-from lib.can_helpers import ensure_can_initialized, check_can_available, get_can_device
-import gvret
-
-# Check if CAN is available
-available, reason = check_can_available()
-if not available:
-    raise RuntimeError(reason)
-
-# Ensure CAN is initialized (auto-enables if needed)
-can_dev = ensure_can_initialized()
-if can_dev is None:
-    raise RuntimeError('CAN device is None after initialization')
-
-# Get CAN config for GVRET start
-import json
-import os
-config_dir = '/config'
-if not os.path.exists(config_dir):
-    config_dir = '/store/config'
-config_file = config_dir + '/can.json'
+try:
+    from lib.can_helpers import ensure_can_initialized, check_can_available
+    import gvret
+    
+    # Check if CAN is enabled in config
+    available, reason = check_can_available()
+    if not available:
+        raise RuntimeError(reason)
+    
+    # Ensure CAN is initialized (auto-initializes if not already initialized)
+    can_dev = ensure_can_initialized()
+    if can_dev is None:
+        raise RuntimeError('Failed to initialize CAN device')
+    
+    # Verify CAN device is actually usable
+    try:
+        # Try to access a CAN attribute to verify it's initialized
+        _ = can_dev.mode
+    except:
+        raise RuntimeError('CAN device initialized but not usable')
+except Exception as e:
+    raise
 
 try:
-    with open(config_file, 'r') as f:
-        config = json.load(f)
-    tx_pin = config.get('txPin', 5)
-    rx_pin = config.get('rxPin', 4)
-    bitrate = config.get('bitrate', 500000)
-except:
-    # Fallback to main.py or defaults
+    # Get CAN config for GVRET start
+    import json
+    import os
+    config_dir = '/config'
+    # Check existence by trying to listdir (MicroPython doesn't have os.path)
     try:
-        import sys
-        sys.path.insert(0, '/device scripts')
-        from main import CAN_TX_PIN, CAN_RX_PIN, CAN_BITRATE
-        tx_pin = CAN_TX_PIN
-        rx_pin = CAN_RX_PIN
-        bitrate = CAN_BITRATE
+        os.listdir(config_dir)
+    except OSError:
+        config_dir = '/store/config'
+    config_file = config_dir + '/can.json'
+    
+    try:
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+        tx_pin = config.get('txPin', 5)
+        rx_pin = config.get('rxPin', 4)
+        bitrate = config.get('bitrate', 500000)
     except:
-        tx_pin = 5
-        rx_pin = 4
-        bitrate = 500000
-
-# Register callback for bitrate changes from SavvyCAN
-def on_bitrate_change(new_bitrate):
-    from lib.can_helpers import reconfigure_can_bitrate
-    reconfigure_can_bitrate(new_bitrate)
-
-gvret.set_bitrate_change_callback(on_bitrate_change)
-
-# Start GVRET
-if not gvret.start(tx_pin, rx_pin, bitrate):
-    raise RuntimeError('GVRET start failed')
+        # Fallback to main.py or defaults
+        try:
+            import sys
+            sys.path.insert(0, '/device scripts')
+            from main import CAN_TX_PIN, CAN_RX_PIN, CAN_BITRATE
+            tx_pin = CAN_TX_PIN
+            rx_pin = CAN_RX_PIN
+            bitrate = CAN_BITRATE
+        except:
+            tx_pin = 5
+            rx_pin = 4
+            bitrate = 500000
+    
+    # Register callback for bitrate changes from SavvyCAN
+    def on_bitrate_change(new_bitrate):
+        from lib.can_helpers import reconfigure_can_bitrate
+        reconfigure_can_bitrate(new_bitrate)
+    
+    gvret.set_bitrate_change_callback(on_bitrate_change)
+    
+    # Start GVRET
+    if not gvret.start(tx_pin, rx_pin, bitrate):
+        raise RuntimeError('GVRET start returned False')
+except Exception as e:
+    raise
       `)
       
       // Check for errors in result (RuntimeError will be in traceback)
-      if (result.includes('RuntimeError') || result.includes('Traceback')) {
-        const errorMatch = result.match(/RuntimeError: (.+)/) || result.match(/Error: (.+)/)
-        const errorMsg = errorMatch ? errorMatch[1] : 'Failed to start GVRET'
-        alert(`Failed to start GVRET: ${errorMsg}`)
+      if (result.includes('RuntimeError') || result.includes('Traceback') || result.includes('Error') || result.trim() === '') {
+        // Try to extract error message
+        let errorMsg = 'Failed to start GVRET'
+        
+        // Look for RuntimeError
+        const runtimeErrorMatch = result.match(/RuntimeError:\s*(.+)/i)
+        if (runtimeErrorMatch) {
+          errorMsg = runtimeErrorMatch[1].trim()
+        } else {
+          // Look for any error line
+          const errorLine = result.split('\n').find(line => 
+            line.includes('Error') || line.includes('Exception') || line.includes('Traceback')
+          )
+          if (errorLine) {
+            errorMsg = errorLine.trim()
+          } else if (result.trim() === '') {
+            errorMsg = 'GVRET start returned no output (check device logs for Python exception)'
+          }
+        }
+        
+        console.error('[GVRET] Start failed:', result)
+        alert(`Failed to start GVRET:\n${errorMsg}\n\nCheck browser console for full error details.`)
         return
       }
       

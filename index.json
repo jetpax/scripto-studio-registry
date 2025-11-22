@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1763603300,
+  "updated": 1763839729,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -647,7 +647,7 @@
       "filename": "GVRET.js",
       "version": [
         1,
-        1,
+        2,
         0
       ],
       "author": "JetPax",

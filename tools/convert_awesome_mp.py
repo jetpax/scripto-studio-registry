@@ -284,7 +284,7 @@ def categorize_library(repo_name, description, readme_content):
 
 def generate_tags(category, repo_name, description):
     """Generate relevant tags for the library"""
-    tags = ['untested', 'awesome-micropython', category.lower()]
+    tags = ['untested', category.lower()]
     
     # Add technology tags
     text = (repo_name + ' ' + description).lower()

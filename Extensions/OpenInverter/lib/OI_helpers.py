@@ -50,10 +50,12 @@ import time
 # Import webrepl to send responses directly to client
 from esp32 import webrepl
 
-# CAN module will be imported dynamically when needed
-# This avoids import errors at module load time
-CAN_AVAILABLE = None  # Will be checked dynamically
-CAN = None  # Will be imported when needed
+# CAN module - required for OpenInverter extension
+try:
+    from machine import CAN
+except ImportError:
+    # CAN module not available - functions will fail gracefully
+    CAN = None
 
 # SDO library is guaranteed to be present in extension (same package)
 from canopen_sdo import SDOClient, fixed_to_float, float_to_fixed, param_id_to_sdo
@@ -68,51 +70,6 @@ device_bitrate = 500000
 param_db_cache = None
 streaming_active = False
 
-
-def _check_can_available():
-    """Helper function to check if CAN module is available, importing it if needed."""
-    global CAN, CAN_AVAILABLE
-    
-    if CAN_AVAILABLE is not None:
-        return CAN_AVAILABLE
-    
-    # Try to import CAN module
-    if CAN is None:
-        try:
-            import CAN
-            CAN_AVAILABLE = True
-            return True
-        except ImportError:
-            CAN_AVAILABLE = False
-            return False
-        except Exception:
-            CAN_AVAILABLE = False
-            return False
-    
-    return CAN_AVAILABLE
-
-
-def _stop_gvret_if_running():
-    """
-    Stop GVRET if it's running to free TWAI for CAN module.
-    GVRET uses TWAI directly and conflicts with the CAN module.
-    Returns True if GVRET was stopped, False otherwise.
-    """
-    try:
-        import gvret
-        try:
-            # Note: GVRET and CAN module now use unified CAN manager - no need to stop GVRET
-            # The manager handles coordination between multiple CAN clients
-            pass
-            print("[OI] Stopped GVRET to free TWAI for CAN module")
-            time.sleep_ms(100)  # Give TWAI time to fully release
-            return True
-        except:
-            # GVRET might not be running, ignore errors
-            return False
-    except ImportError:
-        # GVRET module not available
-        return False
 
 # --- Global Parameters/Spot Values Store (Demo Data or from device) ---
 # This will be replaced with actual device data when connected
@@ -155,21 +112,21 @@ parameters = {
 
 
 def _send_response(cmd, arg):
-    """Internal helper to send JSON response to WebREPL client"""
+    """Internal helper to send JSON response to WebREPL client via WM binary protocol"""
     response = json.dumps({'CMD': cmd, 'ARG': arg})
-    webrepl.send(response)
+    webrepl.send_m2m(response)
 
 
 def _send_error(message, cmd):
-    """Internal helper to send error response"""
+    """Internal helper to send error response via WM binary protocol"""
     response = json.dumps({'CMD': cmd, 'ARG': {'error': message}})
-    webrepl.send(response)
+    webrepl.send_m2m(response)
 
 
 def _send_success(message, cmd):
-    """Internal helper to send success response"""
+    """Internal helper to send success response via WM binary protocol"""
     response = json.dumps({'CMD': cmd, 'ARG': {'success': True, 'message': message}})
-    webrepl.send(response)
+    webrepl.send_m2m(response)
 
 
 # ============================================================================
@@ -190,15 +147,12 @@ def initializeDevice(args=None):
     Returns:
         Connection status and device info
     """
-    global can_dev, sdo_client, device_connected, device_node_id, device_bitrate, CAN, CAN_AVAILABLE
+    global can_dev, sdo_client, device_connected, device_node_id, device_bitrate
     
-    # Check if CAN is available (will import if needed)
-    if not _check_can_available():
+    # Check if CAN module is available
+    if CAN is None:
         _send_error("CAN module not available on this platform", 'INIT-DEVICE-ERROR')
         return
-    
-    # Stop GVRET if running (GVRET uses TWAI directly and conflicts with CAN module)
-    _stop_gvret_if_running()
     
     # Parse arguments
     if args is None:
@@ -243,7 +197,6 @@ def initializeDevice(args=None):
                 if bitrate is None:
                     bitrate = CAN_BITRATE
         except Exception as e:
-            print(f"[OI] Warning: Could not load CAN config, using defaults: {e}")
             if tx_pin is None:
                 tx_pin = 5
             if rx_pin is None:
@@ -252,18 +205,6 @@ def initializeDevice(args=None):
                 bitrate = 500000
     
     try:
-        print(f"[OI] Initializing CAN: node_id={node_id}, bitrate={bitrate}, tx={tx_pin}, rx={rx_pin}")
-        
-        # Check if GVRET might be running (it uses TWAI directly and conflicts with CAN module)
-        # Note: GVRET and CAN module now use unified CAN manager - no conflict checking needed
-        # gvret_running = False  # No longer needed
-        try:
-            import gvret
-            # Note: GVRET and CAN module now use unified CAN manager - no conflict checking needed
-            # gvret_running = True  # No longer needed
-        except ImportError:
-            pass  # GVRET module not available
-        
         # Initialize CAN device
         can_dev = CAN(0, extframe=False, tx=tx_pin, rx=rx_pin, mode=mode, bitrate=bitrate, auto_restart=False)
         
@@ -274,7 +215,6 @@ def initializeDevice(args=None):
         device_node_id = node_id
         device_bitrate = bitrate
         
-        print(f"[OI] CAN initialized successfully")
         
         # Try to read a basic parameter to verify connection
         try:
@@ -287,7 +227,6 @@ def initializeDevice(args=None):
                 'connected': True
             })
         except Exception as e:
-            print(f"[OI] Warning: Device connection test failed: {e}")
             _send_response('DEVICE-INITIALIZED', {
                 'success': True,
                 'node_id': node_id,
@@ -297,10 +236,13 @@ def initializeDevice(args=None):
             })
             
     except Exception as e:
-        print(f"[OI] Error initializing CAN: {e}")
+        # Send error via M2M_LOG (opcode 0x03) instead of print()
+        try:
+            webrepl.send_m2m(f"[OI] Error initializing CAN: {e}", 0x03)
+        except:
+            pass
         device_connected = False
         error_msg = str(e)
-        # Note: GVRET and CAN module now use unified CAN manager - no conflict
         _send_error(f"Failed to initialize CAN: {error_msg}", 'INIT-DEVICE-ERROR')
 
 
@@ -329,7 +271,7 @@ def getDeviceStatus():
     """
     status = {
         'connected': device_connected,
-        'can_available': _check_can_available(),
+        'can_available': CAN is not None,
         'node_id': device_node_id,
         'bitrate': device_bitrate,
         'streaming_active': streaming_active
@@ -356,9 +298,7 @@ def fetchParameterDatabase():
         return
     
     try:
-        print("[OI] Fetching parameter database from device...")
-        
-        # Parameter database is at SDO 0x1021, subindex 0
+                # Parameter database is at SDO 0x1021, subindex 0
         # It's stored as a large JSON string, so we need to read it in chunks
         # For now, we'll use a simplified approach
         
@@ -376,13 +316,13 @@ def fetchParameterDatabase():
         # 3. Parsing to get parameter definitions
         
     except SDOTimeoutError as e:
-        print(f"[OI] Timeout fetching parameter database: {e}")
+        # Silent - errors sent via _send_error()
         _send_error(str(e), 'FETCH-PARAM-DB-ERROR')
     except SDOAbortError as e:
-        print(f"[OI] SDO abort fetching parameter database: {e}")
+        # Silent - errors sent via _send_error()
         _send_error(str(e), 'FETCH-PARAM-DB-ERROR')
     except Exception as e:
-        print(f"[OI] Error fetching parameter database: {e}")
+        # Silent - errors sent via _send_error()
         _send_error(str(e), 'FETCH-PARAM-DB-ERROR')
 
 
@@ -433,11 +373,10 @@ def loadParameterDatabase(json_db):
             parameters[param_name] = param
         
         param_db_cache = json_db
-        print(f"[OI] Loaded {len(parameters)} parameters from database")
         _send_success(f"Loaded {len(parameters)} parameters", 'PARAM-DB-LOADED')
         
     except Exception as e:
-        print(f"[OI] Error loading parameter database: {e}")
+        # Silent - errors sent via _send_error()
         _send_error(str(e), 'PARAM-DB-LOAD-ERROR')
 
 
@@ -452,7 +391,7 @@ def getOiParams():
     param_list = {}
     
     # If connected to device, read actual values
-    if device_connected and sdo_client and _check_can_available():
+    if device_connected and sdo_client and CAN is not None:
         try:
             for key, item in parameters.items():
                 if item.get('isparam') == True:
@@ -464,12 +403,12 @@ def getOiParams():
                             raw_value = sdo_client.read(index, subindex)
                             item['value'] = fixed_to_float(raw_value)
                         except (SDOTimeoutError, SDOAbortError) as e:
-                            print(f"[OI] Warning: Failed to read {key}: {e}")
                             # Keep existing value
+                            pass
                     
                     param_list[key] = item
         except Exception as e:
-            print(f"[OI] Error reading parameters: {e}")
+            # Silent - errors sent via _send_error()
             # Fall back to cached values
             for key, item in parameters.items():
                 if item.get('isparam') == True:
@@ -517,17 +456,15 @@ def setParameter(args):
             _send_error(f"Value {param_value} not in valid enums", 'SET-PARAMETER-ERROR')
             return
         
-        print(f"[OI] Setting parameter: {param_name} to {param_value}")
-        
+                
         # If connected to device, write via SDO
-        if device_connected and sdo_client and CAN_AVAILABLE:
+        if device_connected and sdo_client and CAN is not None:
             param_id = param_def.get('id')
             if param_id is not None:
                 try:
                     index, subindex = param_id_to_sdo(param_id)
                     fixed_value = float_to_fixed(param_value)
                     sdo_client.write(index, subindex, fixed_value)
-                    print(f"[OI] Successfully wrote {param_name} to device")
                 except SDOTimeoutError as e:
                     _send_error(f"Timeout writing parameter: {str(e)}", 'SET-PARAMETER-ERROR')
                     return
@@ -554,8 +491,7 @@ def saveParameters():
     TODO: Implement actual saving logic (e.g., to NVS, JSON file on flash)
     For now, just acknowledges the save request.
     """
-    print("[OI] STUB: Handling SAVE-PARAMETERS")
-    # TODO: Implement actual saving logic
+        # TODO: Implement actual saving logic
     # Example:
     # import json
     # with open('/flash/oi_params.json', 'w') as f:
@@ -634,7 +570,7 @@ def getSpotValues():
     spot_list = {}
     
     # If connected to device, read actual values
-    if device_connected and sdo_client and _check_can_available():
+    if device_connected and sdo_client and CAN is not None:
         try:
             for key, item in parameters.items():
                 if item.get('isparam') != True:
@@ -646,12 +582,12 @@ def getSpotValues():
                             raw_value = sdo_client.read(index, subindex)
                             item['value'] = fixed_to_float(raw_value)
                         except (SDOTimeoutError, SDOAbortError) as e:
-                            print(f"[OI] Warning: Failed to read {key}: {e}")
                             # Keep existing value
+                            pass
                     
                     spot_list[key] = item
         except Exception as e:
-            print(f"[OI] Error reading spot values: {e}")
+            # Silent - errors sent via _send_error()
             # Fall back to cached values
             for key, item in parameters.items():
                 if item.get('isparam') != True:
@@ -689,7 +625,7 @@ def getPlotData(args):
     
     if isinstance(args, list) and len(args) > 0:
         # If connected to device, read fresh values
-        if device_connected and sdo_client and CAN_AVAILABLE:
+        if device_connected and sdo_client and CAN is not None:
             for var_name in args:
                 if var_name in parameters:
                     item = parameters[var_name]
@@ -881,7 +817,7 @@ def getCanMap(args=None):
         _send_response('CAN-MAP-LIST', mappings)
         
     except Exception as e:
-        print(f"[OI] Error reading CAN mappings: {e}")
+        # Silent - errors sent via _send_error()
         _send_error(str(e), 'CAN-MAP-ERROR')
 
 
@@ -943,7 +879,6 @@ def addCanMapping(args):
         gain_offset_value = gain_fixed | ((offset & 0xFF) << 24)
         sdo_client.write(base_index, 2, gain_offset_value)
         
-        print(f"[OI] Added CAN mapping: {param_name} to CAN ID {can_id}")
         _send_success(f"Mapping added successfully", 'CAN-MAP-ADDED')
         
     except (SDOTimeoutError, SDOAbortError) as e:
@@ -1062,19 +997,16 @@ def importCanMapJson(args):
 # Legacy functions - kept for backwards compatibility but deprecated
 def mapCanSpotValue(args):
     """DEPRECATED: Use addCanMapping instead"""
-    print("[OI] Warning: mapCanSpotValue is deprecated, use addCanMapping")
     addCanMapping(args)
 
 
 def unmapCanSpotValue(args):
     """DEPRECATED: Use removeCanMapping instead"""
-    print("[OI] Warning: unmapCanSpotValue is deprecated, use removeCanMapping")
     removeCanMapping(args)
 
 
 def getCanMappingData():
     """DEPRECATED: Use getCanMap instead"""
-    print("[OI] Warning: getCanMappingData is deprecated, use getCanMap")
     getCanMap()
 
 
@@ -1095,7 +1027,6 @@ def deviceSave():
     try:
         # Send save command (subindex 1)
         sdo_client.write(0x3004, 1, 0)
-        print("[OI] Sent save command to device")
         _send_success("Parameters saved to flash", 'DEVICE-SAVED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-SAVE-ERROR')
@@ -1114,7 +1045,6 @@ def deviceLoad():
     try:
         # Send load command (subindex 2)
         sdo_client.write(0x3004, 2, 0)
-        print("[OI] Sent load command to device")
         _send_success("Parameters loaded from flash", 'DEVICE-LOADED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-LOAD-ERROR')
@@ -1133,7 +1063,6 @@ def deviceReset():
     try:
         # Send reset command (subindex 3)
         sdo_client.write(0x3004, 3, 0)
-        print("[OI] Sent reset command to device")
         _send_success("Device reset initiated", 'DEVICE-RESET')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-RESET-ERROR')
@@ -1152,7 +1081,6 @@ def deviceLoadDefaults():
     try:
         # Send load defaults command (subindex 4)
         sdo_client.write(0x3004, 4, 0)
-        print("[OI] Sent load defaults command to device")
         _send_success("Default parameters loaded", 'DEVICE-DEFAULTS-LOADED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-DEFAULTS-ERROR')
@@ -1178,7 +1106,6 @@ def deviceStart(args=None):
         sdo_client.write(0x3004, 5, mode)
         mode_names = {0: 'Normal', 1: 'Manual', 2: 'Boost', 3: 'Buck', 4: 'Sine', 5: 'ACHeat'}
         mode_name = mode_names.get(mode, f'Mode {mode}')
-        print(f"[OI] Sent start command to device (mode: {mode_name})")
         _send_success(f"Device started in {mode_name} mode", 'DEVICE-STARTED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-START-ERROR')
@@ -1197,7 +1124,6 @@ def deviceStop():
     try:
         # Send stop command (subindex 6)
         sdo_client.write(0x3004, 6, 0)
-        print("[OI] Sent stop command to device")
         _send_success("Device stopped", 'DEVICE-STOPPED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-STOP-ERROR')
@@ -1228,8 +1154,7 @@ def getSerialNumber():
             serial_parts.append(f"{part:08X}")
         
         serial_number = ":".join(serial_parts)
-        print(f"[OI] Device serial number: {serial_number}")
-        _send_response('SERIAL-NUMBER', {'serialNumber': serial_number})
+                _send_response('SERIAL-NUMBER', {'serialNumber': serial_number})
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'SERIAL-NUMBER-ERROR')
     except Exception as e:
@@ -1322,7 +1247,6 @@ def getErrorLog():
             except (SDOTimeoutError, SDOAbortError):
                 break
         
-        print(f"[OI] Retrieved {len(errors)} error entries")
         _send_response('ERROR-LOG', errors)
     except Exception as e:
         _send_error(str(e), 'ERROR-LOG-ERROR')
@@ -1343,7 +1267,7 @@ def startLiveStreaming(can_ids):
     """
     global streaming_active
     
-    if not _check_can_available() or can_dev is None:
+    if CAN is None or can_dev is None:
         _send_error("CAN not available", 'STREAMING-START-ERROR')
         return
     
@@ -1355,7 +1279,6 @@ def startLiveStreaming(can_ids):
         can_dev.stream_start()
         
         streaming_active = True
-        print(f"[OI] Started streaming for CAN IDs: {can_ids}")
         _send_success("Streaming started", 'STREAMING-STARTED')
     except Exception as e:
         _send_error(str(e), 'STREAMING-START-ERROR')
@@ -1367,7 +1290,7 @@ def stopLiveStreaming():
     """
     global streaming_active
     
-    if not _check_can_available() or can_dev is None:
+    if CAN is None or can_dev is None:
         _send_error("CAN not available", 'STREAMING-STOP-ERROR')
         return
     
@@ -1376,7 +1299,6 @@ def stopLiveStreaming():
         can_dev.stream_stop()
         
         streaming_active = False
-        print("[OI] Stopped streaming")
         _send_success("Streaming stopped", 'STREAMING-STOPPED')
     except Exception as e:
         _send_error(str(e), 'STREAMING-STOP-ERROR')
@@ -1388,26 +1310,22 @@ def stopLiveStreaming():
 
 def getSysInfo():
     """DEPRECATED: Use getDeviceInfo instead"""
-    print("[OI] Warning: getSysInfo is deprecated, use getDeviceInfo")
     getDeviceInfo()
 
 
 def actionButton(args):
     """DEPRECATED: Use device command functions instead"""
-    print(f"[OI] STUB: Handling ACTION-BUTTON: {args}")
     _send_error("Action button not implemented, use deviceStart/deviceStop instead", "ACTION_BUTTON_ERROR")
 
 
 def termCmd(args):
     """DEPRECATED: Direct terminal commands not supported"""
-    print(f"[OI] STUB: Handling TERM-CMD: {args}")
     _send_error("Terminal command not implemented", "TERM_CMD_ERROR")
 
 
 # Legacy saveParameters - now uses deviceSave
 def saveParameters():
     """DEPRECATED: Use deviceSave instead"""
-    print("[OI] Warning: saveParameters is deprecated, use deviceSave")
     deviceSave()
 
 
@@ -1502,7 +1420,6 @@ def uploadFirmwareChunk(args):
     # Write chunk data
     firmware_upgrade_state['firmware_data'][offset:offset+len(chunk)] = bytes(chunk)
     
-    print(f"[OI Firmware] Uploaded chunk at offset {offset}, size {len(chunk)}")
     _send_success("Chunk uploaded", 'FIRMWARE-CHUNK-UPLOADED')
 
 
@@ -1515,7 +1432,7 @@ def startFirmwareUpgrade(args):
         serial_number: str - 8 hex digit serial (optional, for recovery mode)
         node_id: int - Node ID to upgrade (for normal mode)
     """
-    if not _check_can_available() or can_dev is None:
+    if CAN is None or can_dev is None:
         _send_error("CAN not available", 'FIRMWARE-UPGRADE-ERROR')
         return
     
@@ -1579,14 +1496,16 @@ def startFirmwareUpgrade(args):
         try:
             # Send reset command
             sdo_client.write(0x1000, 0x01, 1)  # Reset command
-            print("[OI Firmware] Device reset sent")
         except Exception as e:
-            print(f"[OI Firmware] Failed to reset device: {e}")
+            # Send error via M2M_LOG (opcode 0x03) instead of print()
+            try:
+                webrepl.send_m2m(f"[OI Firmware] Failed to reset device: {e}", 0x03)
+            except:
+                pass
     
     # Set up CAN filter for upgrade messages (0x7DE)
     # TODO: Configure CAN filter for DEVICE_CAN_ID
     
-    print(f"[OI Firmware] Upgrade started: {len(pages)} pages, recovery={recovery_mode}")
     _send_success({
         'started': True,
         'pages': len(pages),
@@ -1618,11 +1537,9 @@ def processFirmwareCanMessage(can_id, data):
         # Check if this is our target device
         target = firmware_upgrade_state['target_serial']
         if target and device_serial != target:
-            print(f"[OI Firmware] Wrong device, ignoring")
-            return
+                        return
         
-        print(f"[OI Firmware] Device HELLO received, serial: {device_serial.hex()}")
-        
+                
         # Reply with device identifier (serial number)
         can_dev.send(list(data[4:8]), UPGRADER_CAN_ID)
         
@@ -1633,8 +1550,6 @@ def processFirmwareCanMessage(can_id, data):
     elif len(data) == 1 and data[0] == PACKET_START:
         if state != 'waiting_start':
             return
-        
-        print(f"[OI Firmware] Device START received")
         
         # Reply with number of pages
         num_pages = len(firmware_upgrade_state['pages'])
@@ -1654,7 +1569,11 @@ def processFirmwareCanMessage(can_id, data):
         pos = firmware_upgrade_state['page_position']
         
         if page_idx >= len(firmware_upgrade_state['pages']):
-            print(f"[OI Firmware] ERROR: Page request beyond available pages")
+            # Send error via M2M_LOG (opcode 0x03) instead of print()
+            try:
+                webrepl.send_m2m(f"[OI Firmware] ERROR: Page request beyond available pages", 0x03)
+            except:
+                pass
             return
         
         page = firmware_upgrade_state['pages'][page_idx]
@@ -1670,7 +1589,6 @@ def processFirmwareCanMessage(can_id, data):
         if pos >= PAGE_SIZE:
             firmware_upgrade_state['state'] = 'checking_crc'
             firmware_upgrade_state['page_position'] = 0
-            print(f"[OI Firmware] Page {page_idx} uploaded, waiting for CRC check")
     
     # Handle CRC request
     elif len(data) == 1 and data[0] == PACKET_CRC:
@@ -1690,8 +1608,6 @@ def processFirmwareCanMessage(can_id, data):
         ]
         can_dev.send(crc_bytes, UPGRADER_CAN_ID)
         
-        print(f"[OI Firmware] Sent CRC for page {page_idx}: 0x{crc:08X}")
-        
         # Move to next page
         firmware_upgrade_state['current_page'] += 1
         firmware_upgrade_state['progress'] = (firmware_upgrade_state['current_page'] * 100.0) / len(firmware_upgrade_state['pages'])
@@ -1700,7 +1616,6 @@ def processFirmwareCanMessage(can_id, data):
         if firmware_upgrade_state['current_page'] >= len(firmware_upgrade_state['pages']):
             firmware_upgrade_state['state'] = 'waiting_done'
             firmware_upgrade_state['message'] = 'Waiting for device to finalize...'
-            print(f"[OI Firmware] All pages uploaded, waiting for DONE")
         else:
             firmware_upgrade_state['state'] = 'uploading'
     
@@ -1709,15 +1624,18 @@ def processFirmwareCanMessage(can_id, data):
         if state != 'waiting_done':
             return
         
-        print(f"[OI Firmware] Upgrade COMPLETE!")
-        firmware_upgrade_state['active'] = False
+                firmware_upgrade_state['active'] = False
         firmware_upgrade_state['state'] = 'done'
         firmware_upgrade_state['progress'] = 100.0
         firmware_upgrade_state['message'] = 'Upgrade completed successfully!'
     
     # Handle ERROR packet
     elif len(data) == 1 and data[0] == PACKET_ERROR:
-        print(f"[OI Firmware] Device reported CRC ERROR")
+        # Send error via M2M_LOG (opcode 0x03) instead of print()
+        try:
+            webrepl.send_m2m("[OI Firmware] Device reported CRC ERROR", 0x03)
+        except:
+            pass
         firmware_upgrade_state['active'] = False
         firmware_upgrade_state['state'] = 'error'
         firmware_upgrade_state['error'] = 'CRC check failed on device'
@@ -1760,15 +1678,12 @@ def scanCanBus(args=None):
     
     Returns list of detected nodes with their device types and serial numbers.
     """
-    global can_dev, CAN, CAN_AVAILABLE
+    global can_dev, CAN
     
-    # Check if CAN is available (will import if needed)
-    if not _check_can_available():
+    # Check if CAN module is available
+    if CAN is None:
         _send_error("CAN module not available - check if CAN module is installed", 'CAN-SCAN-ERROR')
         return
-    
-    # Stop GVRET if running (GVRET uses TWAI directly and conflicts with CAN module)
-    _stop_gvret_if_running()
     
     # Parse args if it's a JSON string (from JavaScript calls)
     if args is None:
@@ -1821,7 +1736,6 @@ def scanCanBus(args=None):
                 if bitrate is None:
                     bitrate = CAN_BITRATE
         except Exception as e:
-            print(f"[OI] Warning: Could not load CAN config, using defaults: {e}")
             if tx_pin is None:
                 tx_pin = 5
             if rx_pin is None:
@@ -1868,23 +1782,20 @@ def scanCanBus(args=None):
         
         # Let the driver handle reinit automatically
         # The driver's make_new() checks if initialized and calls can_deinit() if needed
-        print(f"[OI] Initializing CAN for scanning: tx={tx_pin}, rx={rx_pin}, bitrate={bitrate}, mode={can_mode_str}")
         try:
             scan_can = CAN(0, extframe=False, tx=tx_pin, rx=rx_pin, mode=can_mode, bitrate=bitrate, auto_restart=False)
-            print(f"[OI] CAN initialized successfully for scanning")
             # Update can_dev reference if we created a new instance
             if not device_connected:
                 can_dev = scan_can
         except Exception as e:
             error_msg = str(e)
-            print(f"[OI] CAN init error: {error_msg}")
-            _send_error(f"Failed to initialize CAN: {error_msg}. If GVRET is running, stop it first (GVRET uses TWAI directly and conflicts with CAN module).", 'CAN-SCAN-ERROR')
+            # Silent - errors sent via _send_error()
+            _send_error(f"Failed to initialize CAN: {error_msg}", 'CAN-SCAN-ERROR')
             return
     
     # Wrap entire scan in try/except to ensure response is always sent
     try:
-        print(f"[OI] Starting CAN scan: nodes {start_node}-{end_node}, timeout={timeout_ms}ms per node")
-        # Clear any pending messages
+                # Clear any pending messages
         while scan_can.any():
             scan_can.recv()
         
@@ -1901,8 +1812,7 @@ def scanCanBus(args=None):
         SDO_SUBINDEX = 0x00
         
         # Scan each node
-        print(f"[OI] Scanning node IDs {start_node} to {end_node}...")
-        for node_id in range(start_node, end_node + 1):
+                for node_id in range(start_node, end_node + 1):
             try:
                 # Create SDO client for this node
                 sdo_client = SDOClient(scan_can, node_id=node_id, timeout=sdo_timeout)
@@ -2016,7 +1926,7 @@ def scanCanBus(args=None):
     except Exception as e:
         # Ensure error response is sent even if scan fails
         error_msg = str(e)
-        print(f"[OI] scanCanBus exception: {error_msg}")
+        # Silent - errors sent via _send_error()
         _send_error(f"Scan failed: {error_msg}", 'CAN-SCAN-ERROR')
     finally:
         # Clean up scan CAN instance if we created a separate one

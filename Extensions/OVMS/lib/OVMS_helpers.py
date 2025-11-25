@@ -15,7 +15,7 @@ Client-callable functions:
 """
 
 try:
-    print("[OVMS] Module import: Starting imports")
+    # Silent - module initialization should not produce output
     import json
     import time
     import socket
@@ -23,16 +23,16 @@ try:
     import hashlib
     import base64
     import sys
-    print("[OVMS] Module import: Standard library imports complete")
+    # Silent - module initialization should not produce output
     from esp32 import webrepl
-    print("[OVMS] Module import: webrepl import complete")
+    # Silent - module initialization should not produce output
 except Exception as e:
-    print(f"[OVMS] ERROR during imports: {type(e).__name__}: {e}")
+    # Silent - import errors should fail fast, not produce output
     import sys
     try:
         sys.print_exception(e)
     except:
-        print(f"[OVMS] Could not print import exception traceback")
+        pass
     raise  # Re-raise to fail fast
 
 # Import hmac module from local lib directory
@@ -99,34 +99,15 @@ def _send_response(cmd, arg):
         
         response = json.dumps({'CMD': cmd, 'ARG': arg})
         
-        # Try webrepl.send() first, but fall back to print() if it fails
-        # The frontend parses JSON from print() output anyway
-        try:
-            if hasattr(webrepl, 'send'):
-                result = webrepl.send(response)
-                if not result:
-                    # webrepl.send() returned False - no client connected
-                    # Fall through to print()
-                    print(response)
-            else:
-                # webrepl.send() doesn't exist - use print()
-                print(response)
-        except AttributeError:
-            # webrepl.send() doesn't exist - use print()
-            print(response)
-        except Exception as send_error:
-            # webrepl.send() failed - fall back to print()
-            print(f"[OVMS] webrepl.send() failed, using print(): {send_error}")
-            print(response)
+        # Send via WM binary protocol (M2M_RESP opcode 0x01)
+        webrepl.send_m2m(response)
     except Exception as e:
-        # If JSON serialization fails, print error but don't raise
-        print(f"[OVMS] Error sending response: {e}")
-        print(f"[OVMS] CMD: {cmd}, ARG: {arg}")
-        import sys
+        # Send error via M2M_LOG (opcode 0x03) instead of print()
         try:
-            sys.print_exception(e)
+            error_msg = f"[OVMS] Error sending response: {e}, CMD: {cmd}"
+            webrepl.send_m2m(error_msg, 0x03)  # M2M_LOG opcode
         except:
-            pass
+            pass  # Silent failure
 
 
 def _send_error(message, cmd='OVMS-ERROR'):
@@ -138,13 +119,10 @@ def _load_config():
     """Load configuration from file or use defaults"""
     global _config
     try:
-        print("[OVMS] _load_config: Attempting to open /ovms_config.json")
         with open('/ovms_config.json', 'r') as f:
             saved_config = json.loads(f.read())
             _config.update(saved_config)
-        print("[OVMS] _load_config: Config loaded successfully")
     except Exception as e:
-        print(f"[OVMS] _load_config: Using defaults (file not found or error: {e})")
         pass  # Use defaults
 
 
@@ -154,8 +132,7 @@ def _save_config():
         with open('/ovms_config.json', 'w') as f:
             f.write(json.dumps(_config))
     except Exception as e:
-        print(f"[OVMS] Error saving config: {e}")
-
+        pass  # Silent - errors handled by return
 
 def listVehicles():
     """List available vehicles (command handler for testing)"""
@@ -247,11 +224,10 @@ def _load_vehicle_config():
         vehicle_type = _config.get('vehicle_type', 'zombie_vcu')
         _vehicle_config = get_vehicle_config(vehicle_type)
         if _vehicle_config is None:
-            print(f"[OVMS] Warning: Vehicle type '{vehicle_type}' not found, using 'zombie_vcu'")
-            _vehicle_config = get_vehicle_config('zombie_vcu')
+                        _vehicle_config = get_vehicle_config('zombie_vcu')
         return _vehicle_config
     except ImportError as e:
-        print(f"[OVMS] Error loading vehicle config: {e}")
+        # Silent - errors handled by return None
         return None
 
 
@@ -266,7 +242,7 @@ def _init_can_for_ovms():
     # Load vehicle configuration
     _vehicle_config = _load_vehicle_config()
     if _vehicle_config is None:
-        print("[OVMS] No vehicle configuration available")
+        # Silent - errors handled by return False
         return False
     
     # Import CAN module
@@ -274,7 +250,7 @@ def _init_can_for_ovms():
         from machine import CAN
         CAN_AVAILABLE = True
     except ImportError:
-        print("[OVMS] CAN module not available")
+        # Silent - errors handled by return False
         CAN_AVAILABLE = False
         return False
     
@@ -282,7 +258,7 @@ def _init_can_for_ovms():
     try:
         from obd2_client import OBD2Client, OBD2TimeoutError, OBD2AbortError
     except ImportError:
-        print("[OVMS] obd2_client library not available")
+        # Silent - errors handled by return False
         return False
     
     # Note: GVRET and CAN module now use unified CAN manager - no need to stop GVRET
@@ -311,8 +287,7 @@ def _init_can_for_ovms():
             rx_pin = CAN_RX_PIN
             bitrate = CAN_BITRATE
     except Exception as e:
-        print(f"[OVMS] Warning: Could not load CAN config, using defaults: {e}")
-        tx_pin = 5
+                tx_pin = 5
         rx_pin = 4
         bitrate = 500000
     
@@ -326,10 +301,9 @@ def _init_can_for_ovms():
         _ovms_obd2_client = OBD2Client(_ovms_can_dev, tx_id=tx_id, rx_id=rx_id, timeout=1.0)
         
         _ovms_can_connected = True
-        print(f"[OVMS] CAN initialized: tx={tx_pin}, rx={rx_pin}, bitrate={bitrate}, vehicle={_vehicle_config.get('name', 'unknown')}")
-        return True
+                return True
     except Exception as e:
-        print(f"[OVMS] Failed to initialize CAN: {e}")
+        # Silent - errors handled by return False
         _ovms_can_connected = False
         return False
 
@@ -366,8 +340,7 @@ def _get_spot_values_direct():
             if pid is not None and parse_func_name is not None:
                 parse_func = PARSE_FUNCTIONS.get(parse_func_name)
                 if parse_func is None:
-                    print(f"[OVMS] Warning: Parse function '{parse_func_name}' not found for {name}")
-                    continue
+                                        continue
                 
                 try:
                     # Send OBD2 request
@@ -382,14 +355,12 @@ def _get_spot_values_direct():
                         'timestamp': time.time()
                     }
                 except (OBD2TimeoutError, OBD2AbortError) as e:
-                    print(f"[OVMS] Warning: Failed to read {name} (pid=0x{pid:04X}): {e}")
-                    # Skip this value
+                                        # Skip this value
                 except Exception as e:
-                    print(f"[OVMS] Error reading {name}: {e}")
-                    # Skip this value
+                                        # Skip this value
     
     except Exception as e:
-        print(f"[OVMS] Error reading spot values: {e}")
+        # Silent - errors handled by return empty dict
     
     return spot_list
 
@@ -412,8 +383,7 @@ def _update_metrics_from_spot_values():
                     'timestamp': current_time
                 }
     except Exception as e:
-        print(f"[OVMS] Error updating metrics: {e}")
-
+        
 
 def _poll_loop():
     """Periodic polling loop for metrics - called periodically"""
@@ -430,8 +400,7 @@ def _poll_loop():
         if _ovms_connected:
             _send_metrics_to_server()
     except Exception as e:
-        print(f"[OVMS] Poll error: {e}")
-    
+            
     # Note: In a real implementation, this would be called by a timer or async task
     # For now, the frontend can trigger polling by calling getOVMSMetrics()
 
@@ -493,7 +462,7 @@ def _send_login():
     except Exception as e:
         _ovms_state = 'error'
         _ovms_status = f'Login error: {e}'
-        print(f"[OVMS] Login error: {e}")
+        # Silent - errors handled by state/status
 
 
 def _handle_server_response(data):
@@ -536,7 +505,6 @@ def _handle_server_response(data):
                         _ovms_connected = True
                         _ovms_state = 'connected'
                         _ovms_status = 'Connected to OVMS server'
-                        print("[OVMS] Connected to server")
                     else:
                         _ovms_state = 'error'
                         _ovms_status = 'Authentication failed'
@@ -546,9 +514,8 @@ def _handle_server_response(data):
                     encrypted = base64.b64decode(line[5:])
                     decrypted = _rc4_crypt(_ovms_crypto_rx, encrypted)
                     # Process decrypted message
-                    print(f"[OVMS] Server message: {decrypted.decode('ascii', errors='ignore')}")
     except Exception as e:
-        print(f"[OVMS] Error handling server response: {e}")
+        # Silent - errors handled by state/status
 
 
 def _send_metrics_to_server():
@@ -589,7 +556,7 @@ def _send_metrics_to_server():
             
             _ovms_socket.send(final_msg.encode('ascii'))
     except Exception as e:
-        print(f"[OVMS] Error sending metrics: {e}")
+        # Silent - errors handled by state/status
 
 
 def checkServerMessages():
@@ -620,7 +587,7 @@ def checkServerMessages():
         # This is expected and not an error
         if e.errno != 11:  # EAGAIN/EWOULDBLOCK
             if _ovms_connected:
-                print(f"[OVMS] Socket read error: {e}")
+                # Silent - errors handled by state/status
                 _ovms_connected = False
                 _ovms_state = 'disconnected'
                 _ovms_status = f'Connection error: {e}'
@@ -632,7 +599,7 @@ def checkServerMessages():
                 _ovms_socket = None
     except Exception as e:
         if _ovms_connected:
-            print(f"[OVMS] Error checking messages: {e}")
+            # Silent - errors handled by state/status
             _ovms_connected = False
             _ovms_state = 'disconnected'
             _ovms_status = f'Connection error: {e}'
@@ -700,7 +667,7 @@ def startOVMS():
             # No immediate response, continue
             pass
         except Exception as e:
-            print(f"[OVMS] Error reading initial response: {e}")
+            # Silent - errors handled by state/status
         
         # Set non-blocking for subsequent reads
         _ovms_socket.setblocking(False)
@@ -760,58 +727,46 @@ def stopOVMS():
 def getOVMSStatus():
     """Get OVMS connection status"""
     try:
-        print("[OVMS] getOVMSStatus: Starting")
-        # Check for server messages if connected
+                # Check for server messages if connected
         if _ovms_connected:
-            print("[OVMS] getOVMSStatus: Checking server messages")
-            checkServerMessages()
+                        checkServerMessages()
         
         # Trigger poll if enabled and connected
         if _config['enabled'] and _ovms_connected:
             current_time = time.time()
             if _last_poll_time == 0 or (current_time - _last_poll_time) >= _config['pollinterval']:
-                print("[OVMS] getOVMSStatus: Triggering poll")
-                _poll_loop()
+                                _poll_loop()
         
-        print("[OVMS] getOVMSStatus: Building status dict")
-        status = {
+                status = {
             'state': _ovms_state,
             'status': _ovms_status,
             'connected': _ovms_connected,
             'metrics_count': len(_metrics),
             'last_poll': _last_poll_time
         }
-        print(f"[OVMS] getOVMSStatus: Sending response, status={status}")
-        _send_response('OVMS-STATUS', status)
-        print("[OVMS] getOVMSStatus: Complete")
-    except Exception as e:
+                _send_response('OVMS-STATUS', status)
+            except Exception as e:
         # Catch any unexpected exceptions and send error response
-        print(f"[OVMS] ERROR in getOVMSStatus: {type(e).__name__}: {e}")
+        # Send error via M2M_LOG (opcode 0x03) instead of print()
         try:
-            import sys
-            print("[OVMS] Printing full exception traceback:")
-            sys.print_exception(e)
-        except Exception as print_err:
-            # Fallback if print_exception not available or fails
-            print(f"[OVMS] Could not print exception: {print_err}")
-            print(f"[OVMS] Exception type: {type(e).__name__}")
-            print(f"[OVMS] Exception message: {e}")
-            print(f"[OVMS] Exception args: {e.args if hasattr(e, 'args') else 'N/A'}")
+            webrepl.send_m2m(f"[OVMS] ERROR in getOVMSStatus: {type(e).__name__}: {e}", 0x03)
+        except:
+            pass
         try:
             _send_error(f'Status error: {e}')
         except Exception as send_err:
-            print(f"[OVMS] Failed to send error response: {send_err}")
+            # Silent - error already occurred
 
 
 # Initialize config on module load
 try:
-    print("[OVMS] Module loading: Starting _load_config()")
+    # Silent - module initialization should not produce output
     _load_config()
-    print("[OVMS] Module loading: _load_config() completed")
+    # Silent - module initialization should not produce output
 except Exception as e:
-    print(f"[OVMS] ERROR during module load: {type(e).__name__}: {e}")
+    # Silent - module load errors fail silently
     import sys
     try:
         sys.print_exception(e)
     except:
-        print(f"[OVMS] Could not print exception traceback")
+        pass

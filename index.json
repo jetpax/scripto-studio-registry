@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1764110504,
+  "updated": 1764387986,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -620,6 +620,23 @@
       "license": "MIT",
       "docs": "https://github.com/jep-scriptomatic",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/UI%20Plugin%20-%20Hello%20World.py"
+    },
+    {
+      "name": "USB Modem Status",
+      "filename": "USB Modem Status.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "ScriptO Studio",
+      "description": " Check USB modem connection status, enumeration, and interface details.\n                          Shows device information, interface classes, and tests AT command communication.\n                          Useful for debugging USB modem connectivity issues.\n                      ",
+      "category": "Network",
+      "tags": [
+        "network"
+      ],
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/USB%20Modem%20Status.py"
     },
     {
       "name": "Wi-Fi Scan",

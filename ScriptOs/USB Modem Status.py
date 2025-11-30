@@ -12,7 +12,7 @@ dict(
     info    = dict(
         # ----------------------------------------------------------------------
         name        = 'USB Modem Status',                # Name is mandatory
-        version     = [1, 0, 0],                                # Version is mandatory (list of 3 int)
+        version     = [1, 0, 1],                                # Version is mandatory (list of 3 int)
         category    = 'Network',                              # Optional: category for organization
         description =                                           # Description is mandatory
                       ''' Check USB modem connection status, enumeration, and interface details.
@@ -76,55 +76,10 @@ try:
     enumerated = usbmodem.is_enumerated(vendor_id=vid, product_id=pid)
     print(f"✓ Enumerated: {enumerated}")
     
-    # List all USB devices
-    print("\n" + "-"*60)
-    print("All USB Devices:")
-    print("-"*60)
-    devices = usbmodem.list_devices()
-    if devices:
-        for addr, dev_vid, dev_pid, dev_class in devices:
-            vid_hex = f"0x{dev_vid:04X}"
-            pid_hex = f"0x{dev_pid:04X}"
-            match = " ← TARGET" if (dev_vid == vid and dev_pid == pid) else ""
-            print(f"  Address {addr}: VID={vid_hex}, PID={pid_hex}, Class={dev_class}{match}")
-    else:
-        print("  No USB devices found")
-    
-    # List interfaces for target device
-    print("\n" + "-"*60)
-    print(f"Interfaces for VID=0x{vid:04X}, PID=0x{pid:04X}:")
-    print("-"*60)
-    interfaces = usbmodem.list_interfaces(vendor_id=vid, product_id=pid)
-    if interfaces:
-        # Interface class names mapping
-        class_names = {
-            0x01: "Audio",
-            0x02: "CDC Control",
-            0x03: "HID",
-            0x08: "Mass Storage",
-            0x0A: "CDC Data",
-            0x0E: "Video",
-            0xFF: "Vendor Specific"
-        }
-        
-        for if_num, if_class, if_subclass, if_protocol, alt_setting in interfaces:
-            class_name = class_names.get(if_class, f"Unknown (0x{if_class:02X})")
-            print(f"  Interface {if_num}:")
-            print(f"    Class: 0x{if_class:02X} ({class_name})")
-            print(f"    SubClass: 0x{if_subclass:02X}")
-            print(f"    Protocol: 0x{if_protocol:02X}")
-            print(f"    Alt Setting: {alt_setting}")
-            
-            # Highlight the AT command interface (typically interface 2 for SIM7600)
-            if if_class == 0x0A and if_num == 2:
-                print(f"    → This is the AT command interface")
-            print()
-    else:
-        print("  No interfaces found (device not enumerated or not found)")
     
     # Test AT command if connected
     if connected and args.test_at_cmd:
-        print("-"*60)
+        print("\n"+"-"*60)
         print("Testing AT Command:")
         print("-"*60)
         try:

@@ -47,8 +47,8 @@ Global Parameters Store:
 import json
 import time
 
-# Import webrepl to send responses directly to client
-from esp32 import webrepl
+# Note: With WCB protocol, print() output automatically goes to M2M channel
+# No need to import webrepl.send_m2m() - just use print(json.dumps(...))
 
 # CAN module - required for OpenInverter extension
 try:
@@ -112,21 +112,24 @@ parameters = {
 
 
 def _send_response(cmd, arg):
-    """Internal helper to send JSON response to WebREPL client via WM binary protocol"""
+    """Internal helper to send JSON response to WebREPL client via WCB protocol"""
     response = json.dumps({'CMD': cmd, 'ARG': arg})
-    webrepl.send_m2m(response)
+    # With WCB protocol, print() output automatically goes to M2M channel
+    print(response)
 
 
 def _send_error(message, cmd):
-    """Internal helper to send error response via WM binary protocol"""
+    """Internal helper to send error response via WCB protocol"""
     response = json.dumps({'CMD': cmd, 'ARG': {'error': message}})
-    webrepl.send_m2m(response)
+    # With WCB protocol, print() output automatically goes to M2M channel
+    print(response)
 
 
 def _send_success(message, cmd):
-    """Internal helper to send success response via WM binary protocol"""
+    """Internal helper to send success response via WCB protocol"""
     response = json.dumps({'CMD': cmd, 'ARG': {'success': True, 'message': message}})
-    webrepl.send_m2m(response)
+    # With WCB protocol, print() output automatically goes to M2M channel
+    print(response)
 
 
 # ============================================================================
@@ -236,11 +239,8 @@ def initializeDevice(args=None):
             })
             
     except Exception as e:
-        # Send error via M2M_LOG (opcode 0x03) instead of print()
-        try:
-            webrepl.send_m2m(f"[OI] Error initializing CAN: {e}", 0x03)
-        except:
-            pass
+        # Log error (print() output goes to M2M channel automatically)
+        print(f"[OI] Error initializing CAN: {e}")
         device_connected = False
         error_msg = str(e)
         _send_error(f"Failed to initialize CAN: {error_msg}", 'INIT-DEVICE-ERROR')
@@ -1505,11 +1505,8 @@ def startFirmwareUpgrade(args):
             # Send reset command
             sdo_client.write(0x1000, 0x01, 1)  # Reset command
         except Exception as e:
-            # Send error via M2M_LOG (opcode 0x03) instead of print()
-            try:
-                webrepl.send_m2m(f"[OI Firmware] Failed to reset device: {e}", 0x03)
-            except:
-                pass
+            # Log error (print() output goes to M2M channel automatically)
+            print(f"[OI Firmware] Failed to reset device: {e}")
     
     # Set up CAN filter for upgrade messages (0x7DE)
     # TODO: Configure CAN filter for DEVICE_CAN_ID
@@ -1577,11 +1574,8 @@ def processFirmwareCanMessage(can_id, data):
         pos = firmware_upgrade_state['page_position']
         
         if page_idx >= len(firmware_upgrade_state['pages']):
-            # Send error via M2M_LOG (opcode 0x03) instead of print()
-            try:
-                webrepl.send_m2m(f"[OI Firmware] ERROR: Page request beyond available pages", 0x03)
-            except:
-                pass
+            # Log error (print() output goes to M2M channel automatically)
+            print(f"[OI Firmware] ERROR: Page request beyond available pages")
             return
         
         page = firmware_upgrade_state['pages'][page_idx]
@@ -1639,11 +1633,8 @@ def processFirmwareCanMessage(can_id, data):
     
     # Handle ERROR packet
     elif len(data) == 1 and data[0] == PACKET_ERROR:
-        # Send error via M2M_LOG (opcode 0x03) instead of print()
-        try:
-            webrepl.send_m2m("[OI Firmware] Device reported CRC ERROR", 0x03)
-        except:
-            pass
+        # Log error (print() output goes to M2M channel automatically)
+        print("[OI Firmware] Device reported CRC ERROR")
         firmware_upgrade_state['active'] = False
         firmware_upgrade_state['state'] = 'error'
         firmware_upgrade_state['error'] = 'CRC check failed on device'

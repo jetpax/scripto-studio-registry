@@ -109,21 +109,24 @@ parameters = {
 
 
 def _send_response(cmd, arg):
-    """Internal helper to send JSON response to WebREPL client via WCB protocol"""
-    response = json.dumps({'CMD': cmd, 'ARG': arg})
-    print(response)
+    """Internal helper to send JSON response to WebREPL client via WCB protocol
+    
+    With WCB protocol, responses are tracked by request ID, so we can just
+    send the data directly. For backward compatibility, we still accept cmd
+    parameter but only print the arg data.
+    """
+    # WCB protocol: Just send the data directly (client tracks by request ID)
+    print(json.dumps(arg))
 
 
 def _send_error(message, cmd):
     """Internal helper to send error response via WCB protocol"""
-    response = json.dumps({'CMD': cmd, 'ARG': {'error': message}})
-    print(response)
+    # WCB protocol: Send error as simple object
+    print(json.dumps({'error': message}))
 
 
-def _send_success(message, cmd):
-    """Internal helper to send success response via WCB protocol"""
-    response = json.dumps({'CMD': cmd, 'ARG': {'success': True, 'message': message}})
-    print(response)
+# _send_success() removed - PRO messages automatically signal success/error
+# Operations should return data if needed, or nothing (PRO signals completion)
 
 
 # ============================================================================
@@ -255,8 +258,6 @@ def disconnectDevice():
     
     # CAN device cleanup would go here if needed
     # For now, just mark as disconnected
-    
-    _send_success("Device disconnected", 'DEVICE-DISCONNECTED')
 
 
 def getDeviceStatus():
@@ -367,7 +368,6 @@ def loadParameterDatabase(json_db):
             parameters[param_name] = param
         
         param_db_cache = json_db
-        _send_success(f"Loaded {len(parameters)} parameters", 'PARAM-DB-LOADED')
         
     except Exception as e:
         # Silent - errors sent via _send_error()
@@ -498,8 +498,6 @@ def saveParameters():
     # import json
     # with open('/flash/oi_params.json', 'w') as f:
     #     json.dump({k: v for k, v in parameters.items() if v.get('isparam')}, f)
-    
-    _send_success("Parameters saved (stub).", 'PARAMETERS-SAVED')
 
 
 def getParametersForDownload():
@@ -881,7 +879,6 @@ def addCanMapping(args):
         gain_offset_value = gain_fixed | ((offset & 0xFF) << 24)
         sdo_client.write(base_index, 2, gain_offset_value)
         
-        _send_success(f"Mapping added successfully", 'CAN-MAP-ADDED')
         
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'CAN-MAP-ADD-ERROR')
@@ -918,7 +915,6 @@ def removeCanMapping(args):
         target_subindex = 1 + (param_index * 2)
         sdo_client.write(target_index, target_subindex, 0)
         
-        _send_success("Mapping removed successfully", 'CAN-MAP-REMOVED')
         
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'CAN-MAP-REMOVE-ERROR')
@@ -958,7 +954,6 @@ def clearCanMap(args):
                 except SDOAbortError:
                     break
         
-        _send_success(f"{direction} mappings cleared", 'CAN-MAP-CLEARED')
         
     except Exception as e:
         _send_error(str(e), 'CAN-MAP-CLEAR-ERROR')
@@ -1029,7 +1024,6 @@ def deviceSave():
     try:
         # Send save command (subindex 1)
         sdo_client.write(0x3004, 1, 0)
-        _send_success("Parameters saved to flash", 'DEVICE-SAVED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-SAVE-ERROR')
     except Exception as e:
@@ -1047,7 +1041,6 @@ def deviceLoad():
     try:
         # Send load command (subindex 2)
         sdo_client.write(0x3004, 2, 0)
-        _send_success("Parameters loaded from flash", 'DEVICE-LOADED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-LOAD-ERROR')
     except Exception as e:
@@ -1065,7 +1058,6 @@ def deviceReset():
     try:
         # Send reset command (subindex 3)
         sdo_client.write(0x3004, 3, 0)
-        _send_success("Device reset initiated", 'DEVICE-RESET')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-RESET-ERROR')
     except Exception as e:
@@ -1083,7 +1075,6 @@ def deviceLoadDefaults():
     try:
         # Send load defaults command (subindex 4)
         sdo_client.write(0x3004, 4, 0)
-        _send_success("Default parameters loaded", 'DEVICE-DEFAULTS-LOADED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-DEFAULTS-ERROR')
     except Exception as e:
@@ -1108,7 +1099,6 @@ def deviceStart(args=None):
         sdo_client.write(0x3004, 5, mode)
         mode_names = {0: 'Normal', 1: 'Manual', 2: 'Boost', 3: 'Buck', 4: 'Sine', 5: 'ACHeat'}
         mode_name = mode_names.get(mode, f'Mode {mode}')
-        _send_success(f"Device started in {mode_name} mode", 'DEVICE-STARTED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-START-ERROR')
     except Exception as e:
@@ -1126,7 +1116,6 @@ def deviceStop():
     try:
         # Send stop command (subindex 6)
         sdo_client.write(0x3004, 6, 0)
-        _send_success("Device stopped", 'DEVICE-STOPPED')
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'DEVICE-STOP-ERROR')
     except Exception as e:
@@ -1281,7 +1270,6 @@ def startLiveStreaming(can_ids):
         can_dev.stream_start()
         
         streaming_active = True
-        _send_success("Streaming started", 'STREAMING-STARTED')
     except Exception as e:
         _send_error(str(e), 'STREAMING-START-ERROR')
 
@@ -1301,7 +1289,6 @@ def stopLiveStreaming():
         can_dev.stream_stop()
         
         streaming_active = False
-        _send_success("Streaming stopped", 'STREAMING-STOPPED')
     except Exception as e:
         _send_error(str(e), 'STREAMING-STOP-ERROR')
 
@@ -1421,8 +1408,6 @@ def uploadFirmwareChunk(args):
     
     # Write chunk data
     firmware_upgrade_state['firmware_data'][offset:offset+len(chunk)] = bytes(chunk)
-    
-    _send_success("Chunk uploaded", 'FIRMWARE-CHUNK-UPLOADED')
 
 
 def startFirmwareUpgrade(args):
@@ -1505,11 +1490,12 @@ def startFirmwareUpgrade(args):
     # Set up CAN filter for upgrade messages (0x7DE)
     # TODO: Configure CAN filter for DEVICE_CAN_ID
     
-    _send_success({
+    # Return data via _send_response (this one actually has data to return)
+    _send_response('FIRMWARE-UPGRADE-STARTED', {
         'started': True,
         'pages': len(pages),
         'size': len(firmware_data)
-    }, 'FIRMWARE-UPGRADE-STARTED')
+    })
 
 
 def processFirmwareCanMessage(can_id, data):

@@ -40,14 +40,15 @@ class OpenInverterExtension {
   async getOiParams() {
     const result = await this.device.execute('from lib.OI_helpers import getOiParams; getOiParams()')
     const parsed = this.device.parseJSON(result)
-    return parsed.ARG || parsed
+    // WCB protocol: Response is direct data, no CMD/ARG wrapper
+    return parsed
   }
 
   async setParameter(args) {
     const argsStr = JSON.stringify(args)
     const result = await this.device.execute(`from lib.OI_helpers import setParameter; setParameter(${argsStr})`)
     const parsed = this.device.parseJSON(result)
-    return parsed.ARG || parsed
+    return parsed
   }
 
   async getSpotValues() {
@@ -56,7 +57,7 @@ class OpenInverterExtension {
     console.log('[OI App] Raw spot values result:', result)
     const parsed = this.device.parseJSON(result)
     console.log('[OI App] Parsed spot values:', parsed)
-    return parsed.ARG || parsed
+    return parsed
   }
 
   /**
@@ -727,9 +728,15 @@ class OpenInverterExtension {
 
     // Destroy existing chart if any
     if (this.state.plotState.chart) {
-      this.state.plotState.chart.destroy()
+      try {
+        this.state.plotState.chart.destroy()
+      } catch (e) {
+        console.warn('[OI Plot] Error destroying old chart:', e)
+      }
     }
 
+    // Don't set explicit canvas dimensions - let Chart.js handle it with responsive mode
+    // Setting explicit dimensions conflicts with Chart.js responsive sizing
     const ctx = canvas.getContext('2d')
     const colors = [
       'rgb(255, 99, 132)',
@@ -760,12 +767,19 @@ class OpenInverterExtension {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
         scales: {
           x: {
             display: true,
             title: {
               display: true,
               text: 'Time (s)'
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
             }
           },
           y: {
@@ -773,6 +787,9 @@ class OpenInverterExtension {
             title: {
               display: true,
               text: 'Value'
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
             }
           }
         },
@@ -781,7 +798,8 @@ class OpenInverterExtension {
             display: true,
             position: 'top'
           }
-        }
+        },
+        onResize: null  // Disable automatic resize handler - Chart.js responsive mode handles it automatically
       }
     })
 
@@ -807,14 +825,36 @@ class OpenInverterExtension {
       const argsStr = JSON.stringify(varNames)
       const result = await this.device.execute(`from lib.OI_helpers import getPlotData; getPlotData(${argsStr})`)
       const parsed = this.device.parseJSON(result)
-      const data = parsed.ARG || parsed
+      const data = parsed
 
       if (data && data.values) {
-        // Check if chart still exists (canvas might have been destroyed during re-render)
-        if (!this.state.plotState.chart || !this.state.plotState.chart.canvas || !document.body.contains(this.state.plotState.chart.canvas)) {
-          console.warn('[OI Plot] Chart canvas destroyed, re-initializing...')
-          this.initializeChart()
-          return // Let next cycle update the data
+        // Check if chart still exists
+        if (!this.state.plotState.chart) {
+          // Chart missing - re-initialize if plotting
+          const canvas = document.getElementById('oi-plot-canvas')
+          if (this.state.plotState.isPlotting && canvas) {
+            console.warn('[OI Plot] Chart missing, re-initializing...')
+            this.initializeChart()
+          }
+          return
+        }
+        
+        // Try to update the chart - if it fails, then re-initialize
+        // Don't check canvas references because they change on re-render
+        // Chart.js will handle its own canvas management
+        try {
+          // Test if chart is still functional by checking if we can access its data
+          if (!this.state.plotState.chart.data || !this.state.plotState.chart.data.datasets) {
+            throw new Error('Chart data structure invalid')
+          }
+        } catch (e) {
+          // Chart is broken - re-initialize
+          const canvas = document.getElementById('oi-plot-canvas')
+          if (this.state.plotState.isPlotting && canvas) {
+            console.warn('[OI Plot] Chart broken, re-initializing...', e)
+            this.initializeChart()
+          }
+          return
         }
 
         // Add new data point
@@ -1247,11 +1287,11 @@ class OpenInverterExtension {
       const parsed = this.device.parseJSON(result)
 
       // Check if we got an error response
-      if (parsed.ARG && parsed.ARG.error) {
-        this.state.scanMessage = `Error: ${parsed.ARG.error}`
+      if (parsed.error) {
+        this.state.scanMessage = `Error: ${parsed.error}`
         this.state.canScanResults = []
-      } else if (parsed.ARG && parsed.ARG.devices) {
-        this.state.canScanResults = parsed.ARG.devices
+      } else if (parsed.devices) {
+        this.state.canScanResults = parsed.devices
 
         if (this.state.canScanResults.length === 0) {
           // Show helpful message when no devices found
@@ -1281,7 +1321,7 @@ class OpenInverterExtension {
       const result = await this.device.execute(`from lib.OI_helpers import initializeDevice; initializeDevice(${args})`)
       const parsed = this.device.parseJSON(result)
 
-      if (parsed.success || (parsed.ARG && parsed.ARG.success)) {
+      if (parsed.success) {
         this.state.oiDeviceConnected = true
       } else {
         console.error('[OI Connection] Connection failed:', parsed)
@@ -1372,8 +1412,8 @@ class OpenInverterExtension {
       const result = await this.device.execute(`from lib.OI_helpers import startFirmwareUpgrade; startFirmwareUpgrade(${argsStr})`)
       const parsed = this.device.parseJSON(result)
 
-      if (parsed.error || (parsed.ARG && parsed.ARG.error)) {
-        throw new Error(parsed.error || parsed.ARG.error)
+      if (parsed.error) {
+        throw new Error(parsed.error)
       }
 
       // Poll for progress
@@ -1430,7 +1470,7 @@ class OpenInverterExtension {
       try {
         const result = await this.device.execute('from lib.OI_helpers import getFirmwareUpgradeStatus; getFirmwareUpgradeStatus()')
         const parsed = this.device.parseJSON(result)
-        const status = parsed.ARG || parsed
+        const status = parsed
 
         if (status.error) {
           throw new Error(status.error)
@@ -1466,11 +1506,11 @@ class OpenInverterExtension {
     try {
       const infoResult = await this.device.execute('from lib.OI_helpers import getDeviceInfo; getDeviceInfo()')
       const info = this.device.parseJSON(infoResult)
-      this.state.oiDeviceInfo = info.ARG || info
+      this.state.oiDeviceInfo = info
 
       const errorResult = await this.device.execute('from lib.OI_helpers import getErrorLog; getErrorLog()')
       const errors = this.device.parseJSON(errorResult)
-      const errorList = errors.ARG || errors
+      const errorList = errors
       // Ensure errorLog is always an array
       this.state.oiErrorLog = Array.isArray(errorList) ? errorList : []
     } catch (error) {

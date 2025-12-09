@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1765154043,
+  "updated": 1765308267,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -412,6 +412,23 @@
       ],
       "license": "MIT",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Test%20-%20Handler%20Direct.py"
+    },
+    {
+      "name": "Test - Logging",
+      "filename": "Test - Logging.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "ScriptO Team",
+      "description": "Test WebREPL logging functionality. This script demonstrates how to set up a logger with WebREPL handler to send log messages to ScriptO Studio's log sidebar. The logger automatically clears existing handlers to prevent duplicate messages.",
+      "category": "Testing",
+      "tags": [
+        "testing"
+      ],
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Test%20-%20Logging.py"
     },
     {
       "name": "Test - Manual File Handler",

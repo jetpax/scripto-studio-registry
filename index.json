@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1765308267,
+  "updated": 1765309545,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -380,23 +380,6 @@
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/ScriptOs%20-%20Template.py"
     },
     {
-      "name": "Stop Button Test",
-      "filename": "Stop Button Test.py",
-      "version": [
-        1,
-        0,
-        0
-      ],
-      "author": "ScriptO Studio",
-      "description": "Simple infinite counter to test the Stop button. Counts up forever until stopped.",
-      "category": "Testing",
-      "tags": [
-        "testing"
-      ],
-      "license": "MIT",
-      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Stop%20Button%20Test.py"
-    },
-    {
       "name": "Test - Handler Direct",
       "filename": "Test - Handler Direct.py",
       "version": [
@@ -463,6 +446,23 @@
       ],
       "license": "MIT",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Test%20-%20Queue%20Cleanup.py"
+    },
+    {
+      "name": "Stop Button Test",
+      "filename": "Test - Stop Button.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "ScriptO Studio",
+      "description": "Simple infinite counter to test the Stop button. Counts up forever until stopped. Also demonstrates logging if enabled",
+      "category": "Testing",
+      "tags": [
+        "testing"
+      ],
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Test%20-%20Stop%20Button.py"
     },
     {
       "name": "Test - VFS Diagnostics",

@@ -109,19 +109,19 @@ parameters = {
 
 
 def _send_response(cmd, arg):
-    """Internal helper to send JSON response to WebREPL client via WCB protocol
+    """Internal helper to send JSON response to WebREPL client via WebREPL Binary Protocol
     
-    With WCB protocol, responses are tracked by request ID, so we can just
+    With WebREPL Binary Protocol, responses are tracked by request ID, so we can just
     send the data directly. For backward compatibility, we still accept cmd
     parameter but only print the arg data.
     """
-    # WCB protocol: Just send the data directly (client tracks by request ID)
+    # WebREPL Binary Protocol: Just send the data directly (client tracks by request ID)
     print(json.dumps(arg))
 
 
 def _send_error(message, cmd):
-    """Internal helper to send error response via WCB protocol"""
-    # WCB protocol: Send error as simple object
+    """Internal helper to send error response via WebREPL Binary Protocol"""
+    # WebREPL Binary Protocol: Send error as simple object
     print(json.dumps({'error': message}))
 
 

@@ -40,7 +40,7 @@ class OpenInverterExtension {
   async getOiParams() {
     const result = await this.device.execute('from lib.OI_helpers import getOiParams; getOiParams()')
     const parsed = this.device.parseJSON(result)
-    // WCB protocol: Response is direct data, no CMD/ARG wrapper
+    // WebREPL Binary Protocol: Response is direct data, no CMD/ARG wrapper
     return parsed
   }
 

@@ -2,21 +2,22 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [1, 0, 0],
+//   "version": [1, 0, 1],
 //   "author": "JetPax",
 //   "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
 //   "icon": "sliders",
+//   "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon icon-tabler icon-tabler-bolt\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11\" /></svg>",
 //   "mipPackage": "github:jetpax/scripto-studio-registry/Extensions/OpenInverter/lib",
 //   "menu": [
-//     { "id": "parameters", "label": "Parameters", "icon": "sliders" },
-//     { "id": "spotvalues", "label": "Spot Values", "icon": "activity" },
-//     { "id": "canmapping", "label": "CAN Mapping", "icon": "radio" },
-//     { "id": "commands", "label": "Device Control", "icon": "zap" },
-//     { "id": "errors", "label": "Error Log", "icon": "alert-triangle" },
-//     { "id": "plot", "label": "Live Plot", "icon": "trending-up" },
-//     { "id": "firmware", "label": "Firmware Upgrade", "icon": "download" }
+//     { "id": "parameters", "label": "Parameters" },
+//     { "id": "spotvalues", "label": "Spot Values" },
+//     { "id": "canmapping", "label": "CAN Mapping" },
+//     { "id": "commands", "label": "Device Control" },
+//     { "id": "errors", "label": "Error Log" },
+//     { "id": "plot", "label": "Live Plot" },
+//     { "id": "firmware", "label": "Firmware Upgrade" }
 //   ],
-//   "styles": ".oi-compact-header { padding: 16px 20px !important; min-height: auto !important; display: flex; justify-content: space-between; align-items: center; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap; align-items: center; } .oi-button-row .secondary-button, .oi-button-row .primary-button { padding: 6px 12px !important; font-size: 12px !important; font-weight: 600; text-transform: none; letter-spacing: normal; display: flex; align-items: center; gap: 6px; } .oi-button-row .secondary-button svg, .oi-button-row .primary-button svg { width: 14px; height: 14px; flex-shrink: 0; } .oi-plot-controls { display: flex; gap: 20px; align-items: center; } .oi-plot-controls .button { display: flex; flex-direction: column; align-items: center; } .oi-plot-controls .codicon { font-size: 20px; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 400; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 6px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-value-input, .oi-enum-select { width: 100%; padding: 6px 0px; border: 1px solid #34495e; border-radius: 4px; background: #121212; color: #0fdb0f; font-size: 14px; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; } .oi-value-input:focus, .oi-enum-select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(#121212); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 20px; font-weight: 600; font-family: 'Press Start 2P', monospace; background-color: #c8e4b7; color: #3b5e2b; padding: 10px 15px; border: 2px solid #5a7d4a; border-radius: 5px; box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3); text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3); line-height: 1.2; image-rendering: pixelated; background-image: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0px, rgba(0, 0, 0, 0.05) 1px, transparent 1px, transparent 3px); } .oi-plot-container { display: flex; height: 500px; max-height: calc(100vh - 260px); gap: 20px; padding: 20px; overflow: hidden; } .oi-plot-sidebar { width: 140px; flex-shrink: 0; border-right: 1px solid var(--border-color); padding-right: 20px; overflow-y: auto; } .oi-plot-section-title { font-size: 14px; font-weight: 600; color: var(--scheme-primary); margin: 16px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; } .oi-plot-signal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; } .oi-plot-signal { padding: 8px; border-radius: 4px; transition: background 0.2s; } .oi-plot-signal:hover { background: var(--bg-tertiary); } .oi-plot-signal label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; } .oi-plot-signal input[type=\"checkbox\"] { width: 16px; height: 16px; cursor: pointer; } .oi-plot-signal-name { font-weight: 600; color: var(--text-primary); } .oi-plot-signal-unit { color: var(--text-secondary); font-size: 12px; margin-left: auto; } .oi-plot-settings { display: flex; flex-direction: column; gap: 12px; } .oi-plot-settings label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); } .oi-plot-settings input[type=\"number\"] { padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; } .oi-plot-settings input[type=\"number\"]:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-plot-chart-area { flex: 1; position: relative; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; min-height: 0; min-width: 0; display: flex; flex-direction: column; } .oi-plot-chart-area canvas { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; } .oi-button-row .primary-button { width: auto; background: var(--scheme-primary); color: white; font-family: inherit; font-size: 14px; } .oi-button-row .primary-button:hover { background: var(--scheme-primary-light); } .oi-button-row .secondary-button { width: auto; background: var(--bg-tertiary); color: var(--text-primary); font-family: inherit; font-size: 14px; } .oi-button-row .secondary-button:hover { background: var(--button-hover); }"
+//   "styles": ".oi-compact-header { padding: 16px 20px !important; min-height: auto !important; display: flex; justify-content: space-between; align-items: center; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap; align-items: center; } .oi-button-row .secondary-button, .oi-button-row .primary-button { padding: 6px 12px !important; font-size: 12px !important; font-weight: 600; text-transform: none; letter-spacing: normal; display: flex; align-items: center; gap: 6px; } .oi-button-row .secondary-button svg, .oi-button-row .primary-button svg { width: 14px; height: 14px; flex-shrink: 0; } .oi-button-row img.icon, .oi-button-row .icon img { filter: none !important; } .oi-plot-controls { display: flex; gap: 20px; align-items: center; } .oi-plot-controls .button { display: flex; flex-direction: column; align-items: center; } .oi-plot-controls .icon { display: inline-flex; align-items: center; justify-content: center; filter: none !important; } .oi-plot-controls .icon svg { width: 20px; height: 20px; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 400; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 6px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-value-input, .oi-enum-select { width: 100%; padding: 6px 0px; border: 1px solid #34495e; border-radius: 4px; background: #121212; color: #0fdb0f; font-size: 14px; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; } .oi-value-input:focus, .oi-enum-select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(#121212); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 20px; font-weight: 600; font-family: 'Press Start 2P', monospace; background-color: #c8e4b7; color: #3b5e2b; padding: 10px 15px; border: 2px solid #5a7d4a; border-radius: 5px; box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3); text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3); line-height: 1.2; image-rendering: pixelated; background-image: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0px, rgba(0, 0, 0, 0.05) 1px, transparent 1px, transparent 3px); } .oi-plot-container { display: flex; height: 500px; max-height: calc(100vh - 260px); gap: 20px; padding: 20px; overflow: hidden; } .oi-plot-sidebar { width: 140px; flex-shrink: 0; border-right: 1px solid var(--border-color); padding-right: 20px; overflow-y: auto; } .oi-plot-section-title { font-size: 14px; font-weight: 600; color: var(--scheme-primary); margin: 16px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; } .oi-plot-signal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; } .oi-plot-signal { padding: 8px; border-radius: 4px; transition: background 0.2s; } .oi-plot-signal:hover { background: var(--bg-tertiary); } .oi-plot-signal label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; } .oi-plot-signal input[type=\"checkbox\"] { width: 16px; height: 16px; cursor: pointer; } .oi-plot-signal-name { font-weight: 600; color: var(--text-primary); } .oi-plot-signal-unit { color: var(--text-secondary); font-size: 12px; margin-left: auto; } .oi-plot-settings { display: flex; flex-direction: column; gap: 12px; } .oi-plot-settings label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); } .oi-plot-settings input[type=\"number\"] { padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; } .oi-plot-settings input[type=\"number\"]:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-plot-chart-area { flex: 1; position: relative; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; min-height: 0; min-width: 0; display: flex; flex-direction: column; } .oi-plot-chart-area canvas { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; } .oi-button-row .primary-button { width: auto; background: var(--scheme-primary); color: white; font-family: inherit; font-size: 14px; } .oi-button-row .primary-button:hover { background: var(--scheme-primary-light); } .oi-button-row .secondary-button { width: auto; background: var(--bg-tertiary); color: var(--text-primary); font-family: inherit; font-size: 14px; } .oi-button-row .secondary-button:hover { background: var(--button-hover); }"
 // }
 // === END_EXTENSION_CONFIG ===
 
@@ -28,11 +29,37 @@
  */
 
 class OpenInverterExtension {
+  // Embedded Tabler Icons for self-contained extension (no dependency on SS sprite)
+  static ICONS = {
+    playerPlay: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 4v16l13 -8z" /></svg>',
+    playerPause: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" /><path d="M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" /></svg>',
+    playerStop: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 5m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" /></svg>',
+    refresh: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>'
+  }
+
   constructor(deviceAPI, emit, state, html) {
     this.device = deviceAPI
     this.emit = emit
     this.state = state
     this.html = html
+  }
+
+  /**
+   * Render an embedded Tabler icon as a data URI for use in img tags
+   * @param {string} name - Icon name from ICONS
+   * @param {number} size - Icon size in pixels (default 24)
+   * @param {string} color - Stroke color (default '#333')
+   * @returns {string} Data URI for use in img src
+   */
+  icon(name, size = 24, color = '#333') {
+    const svg = OpenInverterExtension.ICONS[name]
+    if (!svg) return ''
+    const modifiedSvg = svg
+      .replace(/width="24"/g, `width="${size}"`)
+      .replace(/height="24"/g, `height="${size}"`)
+      .replace(/stroke="currentColor"/g, `stroke="${color}"`)
+    // encodeURIComponent properly handles # -> %23
+    return `data:image/svg+xml,${encodeURIComponent(modifiedSvg)}`
   }
 
   // === Helper Methods for OI_helpers.py ===
@@ -277,11 +304,6 @@ class OpenInverterExtension {
               onclick=${() => this.refreshSpotValues()}
               disabled=${!this.state.isConnected}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="23 4 23 10 17 10"/>
-                <polyline points="1 20 1 14 7 14"/>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-              </svg>
               Refresh
             </button>
           </div>
@@ -577,9 +599,9 @@ class OpenInverterExtension {
                   onclick=${() => this.pauseResumePlot()}
                   title="${this.state.plotState.isPaused ? 'Resume' : 'Pause'} plotting">
                   ${this.state.plotState.isPaused ? this.html`
-                    <img class="icon" src="media/run.svg" />
+                    <img class="icon" src=${this.icon('playerPlay', 20)} />
                   ` : this.html`
-                    <i class="codicon codicon-debug-pause"></i>
+                    <img class="icon" src=${this.icon('playerPause', 20)} />
                   `}
                 </button>
                 <div class="label active">${this.state.plotState.isPaused ? 'Run' : 'Pause'}</div>
@@ -588,7 +610,7 @@ class OpenInverterExtension {
                 <button 
                   onclick=${() => this.stopPlot()}
                   title="Stop plotting">
-                  <img class="icon" src="media/stop.svg" />
+                  <img class="icon" src=${this.icon('playerStop', 20)} />
                 </button>
                 <div class="label active">Stop</div>
               </div>
@@ -598,7 +620,7 @@ class OpenInverterExtension {
                   disabled=${!this.state.isConnected || this.state.plotState.selectedVars.length === 0}
                   onclick=${() => this.startPlot()}
                   title="Start plotting selected variables">
-                  <img class="icon" src="media/run.svg" />
+                  <img class="icon" src=${this.icon('playerPlay', 20)} />
                 </button>
                 <div class="label ${(!this.state.isConnected || this.state.plotState.selectedVars.length === 0) ? 'inactive' : 'active'}">Start Plot</div>
               </div>

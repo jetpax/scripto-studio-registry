@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1765823374,
+  "updated": 1765824414,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -413,23 +413,6 @@
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Test%20-%20Manual%20File%20Handler.py"
     },
     {
-      "name": "Queue Cleanup Test",
-      "filename": "Test - Queue Cleanup.py",
-      "version": [
-        1,
-        0,
-        0
-      ],
-      "author": "Jonathan E. Peace",
-      "description": "Tests the queue cleanup refactor:\n                         - Static file serving with direct GIL\n                         - WebREPL file transfers with direct GIL\n                         - Concurrent operations\n                         - Memory usage verification\n                         \n                         This verifies that file I/O uses direct GIL acquisition\n                         instead of queuing, improving performance and simplicity.",
-      "category": "Testing",
-      "tags": [
-        "testing"
-      ],
-      "license": "MIT",
-      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Test%20-%20Queue%20Cleanup.py"
-    },
-    {
       "name": "Stop Button Test",
       "filename": "Test - Stop Button.py",
       "version": [
@@ -503,16 +486,16 @@
       "version": [
         1,
         0,
-        0
+        1
       ],
       "author": "ScriptO Team",
       "description": "Tests automatic gzip compression support in webfiles module.\n                         Creates both regular and .gz versions of test files.\n                         When client sends \"Accept-Encoding: gzip\", the .gz version is served automatically.\n                         This tests the new direct GIL file serving with mp_vfs_stat() gzip resolution.\n                      ",
-      "category": "Tests/WebFiles",
+      "category": "Testing",
       "tags": [
-        "tests/webfiles"
+        "testing"
       ],
       "license": "MIT",
-      "docs": "https://github.com/scriptomatic",
+      "docs": "https://github.com/jetpax",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Test%20-%20WebFiles%20Gzip.py"
     },
     {

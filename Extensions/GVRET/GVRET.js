@@ -2,7 +2,7 @@
 // {
 //   "name": "GVRET",
 //   "id": "gvret-manager",
-//   "version": [1, 2, 0],
+//   "version": [1, 3, 0],
 //   "author": "JetPax",
 //   "description": "High-performance GVRET implementation for MicroPython. Enables SavvyCAN connection over TCP/IP (mpDirect) for vehicle network analysis.",
 //   "icon": "radio",
@@ -157,41 +157,15 @@ except Exception as e:
     raise
 
 try:
-    # Get CAN config for GVRET start
-    import json
-    import os
-    config_dir = '/config'
-    # Check existence by trying to listdir (MicroPython doesn't have os.path)
-    try:
-        os.listdir(config_dir)
-    except OSError:
-        config_dir = '/store/config'
-    config_file = config_dir + '/can.json'
-    
-    try:
-        with open(config_file, 'r') as f:
-            config = json.load(f)
-        tx_pin = config.get('txPin', 4)  # Default TX=GPIO4 for this hardware
-        rx_pin = config.get('rxPin', 5)  # Default RX=GPIO5 for this hardware
-        bitrate = config.get('bitrate', 500000)
-    except:
-        # Fallback to main.py or defaults
-        try:
-            import sys
-            sys.path.insert(0, '/device scripts')
-            from main import CAN_TX_PIN, CAN_RX_PIN, CAN_BITRATE
-            tx_pin = CAN_TX_PIN
-            rx_pin = CAN_RX_PIN
-            bitrate = CAN_BITRATE
-        except:
-            # Final fallback defaults (TX=GPIO4, RX=GPIO5 for this hardware)
-            tx_pin = 4
-            rx_pin = 5
-            bitrate = 500000
+    # Get CAN config from board definition (via hw_config)
+    from lib.can_helpers import get_can_config, reconfigure_can_bitrate
+    config = get_can_config()
+    tx_pin = config['txPin']
+    rx_pin = config['rxPin']
+    bitrate = config['bitrate']
     
     # Register callback for bitrate changes from SavvyCAN
     def on_bitrate_change(new_bitrate):
-        from lib.can_helpers import reconfigure_can_bitrate
         reconfigure_can_bitrate(new_bitrate)
     
     gvret.set_bitrate_change_callback(on_bitrate_change)

@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1765591653,
+  "updated": 1765758335,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -654,6 +654,23 @@
       "license": "MIT",
       "docs": "https://github.com/jczic",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Wi-Fi%20Scan.py"
+    },
+    {
+      "name": "iperf3 Server",
+      "filename": "iperf3 Server.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "Damien P. George / Mod by Antigravity",
+      "description": " Run iperf3 network performance tests.\n                          Supports Server and Client modes, TCP/UDP, and Reverse mode.\n                      ",
+      "category": "Network",
+      "tags": [
+        "network"
+      ],
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/iperf3%20Server.py"
     }
   ],
   "extensions": [
@@ -667,7 +684,7 @@
         0
       ],
       "author": "JetPax",
-      "description": "Manage GVRET on MicroPython with mpDirect (CAN over TCP)",
+      "description": "High-performance GVRET implementation for MicroPython. Enables SavvyCAN connection over TCP/IP (mpDirect) for vehicle network analysis.",
       "icon": "radio",
       "menu": [
         {
@@ -691,7 +708,7 @@
         1
       ],
       "author": "JetPax",
-      "description": "Send OpenInverter metrics to OVMS v2 server",
+      "description": "Pushes vehicle metrics to an OVMS v2 server for remote monitoring.",
       "icon": "cloud",
       "menu": [
         {
@@ -720,7 +737,7 @@
         1
       ],
       "author": "JetPax",
-      "description": "OpenInverter debug and configuration tool for motor control parameters, spot values, CAN mapping, and live plotting",
+      "description": "Complete OpenInverter suite. Configure parameters, map CAN messages, view spot values, and plot real-time signals from OpenInverter motor controllers.",
       "icon": "sliders",
       "menu": [
         {

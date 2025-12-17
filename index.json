@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1765918695,
+  "updated": 1765991292,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -127,6 +127,23 @@
       "license": "MIT",
       "docs": "https://github.com/jczic",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/DAC%20Output.py"
+    },
+    {
+      "name": "ES8311 Play Sound",
+      "filename": "ES8311 Play Sound.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "jetpax",
+      "description": "Plays a test tone through the ES8311 mono audio codec.\n                        Generates a sine wave at the specified frequency and plays it for the specified duration.\n                        Requires ES8311 hardware connected via I2C (control) and I2S (audio data).",
+      "category": "Audio",
+      "tags": [
+        "audio"
+      ],
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/ES8311%20Play%20Sound.py"
     },
     {
       "name": "GPIO Input",
@@ -417,7 +434,7 @@
       "filename": "Test - Logging.py",
       "version": [
         1,
-        0,
+        1,
         0
       ],
       "author": "ScriptO Team",
@@ -451,7 +468,7 @@
       "filename": "Test - Stop Button.py",
       "version": [
         1,
-        0,
+        1,
         0
       ],
       "author": "ScriptO Studio",

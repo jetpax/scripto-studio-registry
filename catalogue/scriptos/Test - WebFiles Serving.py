@@ -44,7 +44,7 @@ dict(
 
 # === END_CONFIG_PARAMETERS ===
 
-from esp32 import webrepl
+import webrepl_binary as webrepl
 import network
 import os
 
@@ -243,4 +243,3 @@ print("then webfiles.serve() is working as expected.")
 print("")
 print(f"Manual test: http://{ip}/test/test.html")
 print("="*60 + "\n")
-

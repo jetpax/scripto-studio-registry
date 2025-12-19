@@ -23,6 +23,7 @@ Based on OVMS v3 vehicle framework (vehicle.h, vehicle.cpp, etc.)
 PROTOCOL_OBD2 = 'obd2'
 PROTOCOL_CANOPEN_SDO = 'canopen_sdo'
 PROTOCOL_CAN_RAW = 'can_raw'
+PROTOCOL_FAKE = 'fake'  # For simulated vehicles (no CAN hardware required)
 
 # OBD2 Mode definitions
 OBD2_MODE_CURRENT_DATA = 0x01
@@ -119,6 +120,7 @@ def get_vehicle_config(vehicle_type):
                 'PROTOCOL_OBD2': PROTOCOL_OBD2,
                 'PROTOCOL_CANOPEN_SDO': PROTOCOL_CANOPEN_SDO,
                 'PROTOCOL_CAN_RAW': PROTOCOL_CAN_RAW,
+                'PROTOCOL_FAKE': PROTOCOL_FAKE,
                 'OBD2_MODE_CURRENT_DATA': OBD2_MODE_CURRENT_DATA,
                 'OBD2_MODE_READ_PARAM': OBD2_MODE_READ_PARAM,
                 'OBD2_MODE_RESPONSE_PARAM': OBD2_MODE_RESPONSE_PARAM,
@@ -128,6 +130,7 @@ def get_vehicle_config(vehicle_type):
                 PROTOCOL_OBD2 = PROTOCOL_OBD2
                 PROTOCOL_CANOPEN_SDO = PROTOCOL_CANOPEN_SDO
                 PROTOCOL_CAN_RAW = PROTOCOL_CAN_RAW
+                PROTOCOL_FAKE = PROTOCOL_FAKE
                 OBD2_MODE_CURRENT_DATA = OBD2_MODE_CURRENT_DATA
                 OBD2_MODE_READ_PARAM = OBD2_MODE_READ_PARAM
                 OBD2_MODE_RESPONSE_PARAM = OBD2_MODE_RESPONSE_PARAM
@@ -197,6 +200,7 @@ def list_vehicles():
                                             'PROTOCOL_OBD2': PROTOCOL_OBD2,
                                             'PROTOCOL_CANOPEN_SDO': PROTOCOL_CANOPEN_SDO,
                                             'PROTOCOL_CAN_RAW': PROTOCOL_CAN_RAW,
+                                            'PROTOCOL_FAKE': PROTOCOL_FAKE,
                                             'OBD2_MODE_CURRENT_DATA': OBD2_MODE_CURRENT_DATA,
                                             'OBD2_MODE_READ_PARAM': OBD2_MODE_READ_PARAM,
                                             'OBD2_MODE_RESPONSE_PARAM': OBD2_MODE_RESPONSE_PARAM,
@@ -206,6 +210,7 @@ def list_vehicles():
                                             PROTOCOL_OBD2 = PROTOCOL_OBD2
                                             PROTOCOL_CANOPEN_SDO = PROTOCOL_CANOPEN_SDO
                                             PROTOCOL_CAN_RAW = PROTOCOL_CAN_RAW
+                                            PROTOCOL_FAKE = PROTOCOL_FAKE
                                             OBD2_MODE_CURRENT_DATA = OBD2_MODE_CURRENT_DATA
                                             OBD2_MODE_READ_PARAM = OBD2_MODE_READ_PARAM
                                             OBD2_MODE_RESPONSE_PARAM = OBD2_MODE_RESPONSE_PARAM

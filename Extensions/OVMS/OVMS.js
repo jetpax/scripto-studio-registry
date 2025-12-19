@@ -216,8 +216,10 @@ class OVMSExtension {
   // === Panel Renderers ===
 
   renderConfig() {
-    // Load config if not loaded
-    if (!this.state.ovms.configLoaded && this.state.isConnected && !this.state.ovms.isLoading) {
+    // Load config if needed (config is empty or hasn't been loaded yet)
+    const needsLoad = !this.state.ovms.config.server && !this.state.ovms.isLoading && this.state.isConnected
+    
+    if (needsLoad) {
       setTimeout(() => {
         this.getOVMSConfig().catch(err => {
           console.error('[OVMS] getOVMSConfig() error:', err);

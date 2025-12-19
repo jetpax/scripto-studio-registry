@@ -12,6 +12,11 @@ Client-callable functions:
 - getOVMSStatus()          - Get connection status
 - testOVMSConnectivity()   - Test connection to OVMS server without starting service
 - listVehicles()           - List available vehicle types
+
+Update behavior (matches OVMS v3):
+- When apps connected (peers > 0): Updates every 60 seconds (configurable)
+- When idle (peers == 0): Updates every 600 seconds (configurable)
+- Immediate update sent when app first connects (bandwidth optimization)
 """
 
 try:
@@ -54,7 +59,8 @@ _config = {
     'vehicleid': '',
     'password': '',
     'tls': False,
-    'pollinterval': 5,
+    'updatetime_connected': 60,  # Seconds between updates when apps connected (default: 60)
+    'updatetime_idle': 600,      # Seconds between updates when no apps (default: 600)
     'vehicle_type': 'zombie_vcu'  # Default vehicle type
 }
 
@@ -69,8 +75,11 @@ _ovms_status = ''
 _ovms_token = ''
 _ovms_crypto_rx = None
 _ovms_crypto_tx = None
+_ovms_peers = 0  # Number of connected apps/peers
 _poll_task = None
+_reader_task = None  # Background task for reading server messages
 _last_poll_time = 0
+_stop_reader = False  # Flag to stop reader task
 
 # Vehicle configuration will be loaded from vehicle.py module
 # This allows support for multiple vehicle types (ZombieVerter, Tesla, etc.)
@@ -261,19 +270,36 @@ def _init_can_for_ovms():
 
 
 def _get_spot_values_direct():
-    """Get spot values directly from vehicle via OBD2 (independent of OpenInverter extension)"""
+    """Get spot values directly from vehicle via OBD2 or fake simulator
+    
+    Behavior is determined by the vehicle configuration:
+    - protocol='fake': Use fake_zombieverter simulator (no CAN hardware)
+    - protocol='obd2': Use real CAN/OBD2 communication
+    """
     global _ovms_can_connected, _ovms_obd2_client, _vehicle_config
     global OBD2TimeoutError, OBD2AbortError
     
-    # Initialize CAN if not already done
-    if not _init_can_for_ovms():
-        return {}
-    
-    # Load vehicle config if not loaded
+    # Load vehicle config
     if _vehicle_config is None:
         _vehicle_config = _load_vehicle_config()
         if _vehicle_config is None:
             return {}
+    
+    # Check protocol and dispatch accordingly
+    protocol = _vehicle_config.get('protocol', 'obd2')
+    
+    if protocol == 'fake':
+        # HeadlessZombie or other simulated vehicle - use fake simulator
+        try:
+            from fake_zombieverter import get_zombie_spot_values
+            return get_zombie_spot_values()
+        except Exception as e:
+            print(f"[OVMS] Fake ZombieVerter error: {e}")
+            return {}
+    
+    # Real vehicle with OBD2 protocol - initialize CAN
+    if not _init_can_for_ovms():
+        return {}
     
     spot_list = {}
     protocol = _vehicle_config.get('protocol', 'obd2')
@@ -437,8 +463,14 @@ def _handle_server_response(data):
     try:
         lines = data.decode('ascii').strip().split('\n')
         for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            print(f"[OVMS] Processing line: {line[:100]}")  # Debug: show what we received
+                
             if line.startswith('MP-S 0 '):
-                # Server authentication response
+                # Server authentication response (plain text)
                 parts = line[7:].split(' ', 1)
                 if len(parts) == 2:
                     server_token = parts[0]
@@ -453,7 +485,8 @@ def _handle_server_response(data):
                     
                     if expected_digest == server_digest:
                         # Setup encryption
-                        shared_key = _ovms_token + server_token
+                        # CRITICAL: Server token THEN client token (matches Perl demo line 179-180)
+                        shared_key = server_token + _ovms_token
                         h = hmac.new(_config['password'].encode('ascii'),
                                    shared_key.encode('ascii'),
                                    hashlib.md5)
@@ -476,35 +509,129 @@ def _handle_server_response(data):
                     else:
                         _ovms_state = 'error'
                         _ovms_status = 'Authentication failed'
-            elif line.startswith('MP-0 '):
-                # Encrypted server message
+                        
+            else:
+                # All other messages are encrypted (just base64, no MP-0 prefix on wire)
                 if _ovms_crypto_rx:
-                    encrypted = base64.b64decode(line[5:])
-                    decrypted = _rc4_crypt(_ovms_crypto_rx, encrypted)
-                    # Process decrypted message
+                    try:
+                        encrypted = base64.b64decode(line)
+                        decrypted = _rc4_crypt(_ovms_crypto_rx, encrypted)
+                        
+                        # Try to decode as ASCII
+                        try:
+                            msg = decrypted.decode('ascii')
+                            print(f"[OVMS] Decrypted server message: {msg}")
+                        except UnicodeError:
+                            # Not valid ASCII - show hex dump
+                            hex_dump = ' '.join(f'{b:02x}' for b in decrypted)
+                            print(f"[OVMS] Decrypted bytes (hex): {hex_dump}")
+                            print(f"[OVMS] Decrypted bytes (repr): {decrypted}")
+                            # Don't process further if not valid ASCII
+                            continue
+                        
+                        # Parse message: MP-0 <code><data>
+                        if len(msg) >= 6 and msg.startswith('MP-0 '):
+                            code = msg[5]
+                            data = msg[6:] if len(msg) > 6 else ''
+                            
+                            # Handle ping message
+                            if code == 'A':
+                                # Server ping - respond with ping ack
+                                print("[OVMS] Got ping from server, sending pong")
+                                _transmit_encrypted('MP-0 a')
+                            elif code == 'Z':
+                                # App connection count notification
+                                _handle_peer_count(data)
+                            else:
+                                print(f"[OVMS] Unhandled server message code: {code}, data: {data}")
+                    except Exception as e:
+                        print(f"[OVMS] Error decrypting server message: {e}")
+                        import sys
+                        sys.print_exception(e)
     except Exception as e:
-        # Silent - errors handled by state/status
-        pass
+        print(f"[OVMS] Error handling server response: {e}")
+
+
+def _handle_peer_count(count_str):
+    """Handle peer connection count update from server
+    
+    When an app connects (peers goes from 0 to 1+), immediately send fresh status.
+    This is bandwidth-efficient: only send frequent updates when someone is watching.
+    """
+    global _ovms_peers, _ovms_status, _last_poll_time
+    
+    try:
+        new_count = int(count_str) if count_str else 0
+        old_count = _ovms_peers
+        _ovms_peers = new_count
+        
+        print(f"[OVMS] Peer count: {old_count} -> {new_count}")
+        
+        # Update status to reflect app connection state
+        if new_count > 0:
+            _ovms_status = f'Connected to OVMS server ({new_count} app{"s" if new_count != 1 else ""} connected)'
+            if old_count == 0:
+                # App just connected - force immediate transmission of fresh status
+                print("[OVMS] App connected - sending fresh status")
+                _last_poll_time = 0  # Reset poll time to force immediate poll
+                _send_initial_messages()
+        else:
+            _ovms_status = 'Connected to OVMS server (no apps connected)'
+            if old_count > 0:
+                print("[OVMS] All apps disconnected")
+    except Exception as e:
+        print(f"[OVMS] Error handling peer count: {e}")
 
 
 def _send_initial_messages():
     """Send initial status messages after authentication to show device as connected"""
-    global _ovms_socket, _ovms_crypto_tx
+    global _ovms_socket, _ovms_crypto_tx, _metrics
     
     if not _ovms_connected or not _ovms_socket:
         return
     
     try:
-        # Send Firmware message (F) - minimal required info
+        # CRITICAL: Poll fake_zombieverter FIRST to ensure we have fresh metrics
+        _update_metrics_from_spot_values()
+        
+        # Get live metrics from fake_zombieverter (using uppercase key names)
+        # Note: fake_zombieverter uses 'SOC', 'Veh_Speed', etc. (see fake_zombieverter.py line 110)
+        # NO FALLBACKS - if metrics aren't present, we want it to fail loudly!
+        soc = int(_metrics['SOC']['value'])
+        speed_kph = int(_metrics['Veh_Speed']['value'])
+        temp_motor = int(_metrics['tmpm']['value'])
+        temp_inverter = int(_metrics['tmphs']['value'])
+        temp_battery = int(_metrics['tmpaux']['value'])
+        voltage = int(_metrics['udc']['value'])
+        current = int(_metrics['idc']['value'])
+        power_kw = _metrics['power']['value']
+        
+        # Determine charge state from current/power
+        if power_kw < -0.5:  # Charging (negative power)
+            chargestate = 'charging'
+        elif speed_kph > 5:
+            chargestate = 'driving'
+        else:
+            chargestate = 'stopped'
+        
+        # Send Firmware message (F) - format: MP-0 F<version>,<vin>,<signal>,<canwrite>,<vtype>,<provider>,<service_range>,<service_time>,<hardware>,<mdm_mode>
+        # Note: No space after F, and mp_encode for string fields
         msg = "MP-0 F,,,0,,,,,-1,-1,,"
         _transmit_encrypted(msg)
         
-        # Send Environment message (D) - doors/status
-        msg = "MP-0 D0,0,5,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0"
+        # Send Environment message (D) - format: MP-0 D<doors1>,<doors2>,<lockunlock>,<temp_pem>,<temp_motor>,<temp_battery>,<trip>,<odometer>,<speed>,<park_time>,<ambient_temp>,<doors3>,<stale_temps>,<stale_ambient>,<vehicle12v>,<doors4>,<alarm_sounding>,<alarm_duration>,<tpms_health>,<tpms_alert>
+        # Use real temps and speed from metrics
+        msg = f"MP-0 D0,0,5,{temp_inverter},{temp_motor},{temp_battery},0,0,{speed_kph},0,25,0,0,0,0,0,0,0,0,0"
         _transmit_encrypted(msg)
         
-        # Send Stats message (S) - battery stats  
-        msg = "MP-0 S0,K,0,0,stopped,standard,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+        # Send Stats message (S) - format: MP-0 S<soc>,<units>,<linevoltage>,<chargecurrent>,<chargestate>,<chargemode>,<idealrange>,<estimrange>,<soh>,<cac>,...
+        # Use live SoC and other metrics from fake_zombieverter
+        # Units: K=kilometers, M=miles
+        # Calculate range based on live SoC (assuming 350km max range like demo car)
+        ideal_range = int((soc / 100.0) * 350)
+        est_range = int(ideal_range * 0.9)  # Estimated range is typically 90% of ideal
+        
+        msg = f"MP-0 S{soc},K,{voltage},{abs(current)},{chargestate},standard,{ideal_range},{est_range},100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
         _transmit_encrypted(msg)
         
     except Exception as e:
@@ -583,7 +710,11 @@ def _send_metrics_to_server():
 
 
 def checkServerMessages():
-    """Check for incoming server messages (non-blocking)"""
+    """Check for incoming server messages (non-blocking)
+    
+    NOTE: This is now deprecated in favor of the background reader task.
+    Kept for backwards compatibility but the reader task is preferred.
+    """
     global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status
     
     if not _ovms_connected or not _ovms_socket:
@@ -593,6 +724,7 @@ def checkServerMessages():
         data = _ovms_socket.recv(4096)
         if not data:
             # Connection closed
+            print("[OVMS] Server closed connection (recv returned empty)")
             _ovms_connected = False
             _ovms_state = 'disconnected'
             _ovms_status = 'Connection closed'
@@ -604,11 +736,13 @@ def checkServerMessages():
             _ovms_socket = None
             return
         
+        print(f"[OVMS] Received {len(data)} bytes from server")
         _handle_server_response(data)
     except OSError as e:
         # Non-blocking socket would raise EAGAIN/EWOULDBLOCK when no data available
         # This is expected and not an error
         if e.errno != 11:  # EAGAIN/EWOULDBLOCK
+            print(f"[OVMS] Socket error: {e}")
             if _ovms_connected:
                 # Silent - errors handled by state/status
                 _ovms_connected = False
@@ -621,6 +755,7 @@ def checkServerMessages():
                     pass
                 _ovms_socket = None
     except Exception as e:
+        print(f"[OVMS] Exception in checkServerMessages: {e}")
         if _ovms_connected:
             # Silent - errors handled by state/status
             _ovms_connected = False
@@ -632,6 +767,93 @@ def checkServerMessages():
             except:
                 pass
             _ovms_socket = None
+
+
+def _reader_loop():
+    """Background task that continuously reads from OVMS server socket
+    
+    This runs in a loop checking for incoming messages.
+    Handles line-based protocol (messages end with \r\n).
+    """
+    global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status, _stop_reader
+    
+    print("[OVMS] Reader task started")
+    
+    # Buffer for incomplete lines
+    line_buffer = b''
+    loop_count = 0
+    
+    while not _stop_reader:
+        try:
+            # Heartbeat every 10 loops (1 second)
+            loop_count += 1
+            if loop_count % 10 == 0:
+                print(f"[OVMS] Reader: Heartbeat (socket={_ovms_socket is not None}, state={_ovms_state})")
+            
+            # Check if socket exists (even if not fully connected yet - we need to process auth!)
+            if not _ovms_socket:
+                time.sleep(0.1)
+                continue
+            
+            # Non-blocking receive
+            try:
+                data = _ovms_socket.recv(4096)
+                if data:
+                    print(f"[OVMS] Reader: Got {len(data)} bytes")
+                    # Add to buffer
+                    line_buffer += data
+                    
+                    # Process complete lines (ending with \r\n)
+                    while b'\r\n' in line_buffer or b'\n' in line_buffer:
+                        # Find line ending
+                        if b'\r\n' in line_buffer:
+                            line_end = line_buffer.index(b'\r\n')
+                            line = line_buffer[:line_end]
+                            line_buffer = line_buffer[line_end+2:]
+                        else:
+                            line_end = line_buffer.index(b'\n')
+                            line = line_buffer[:line_end]
+                            line_buffer = line_buffer[line_end+1:]
+                        
+                        if line:  # Skip empty lines
+                            print(f"[OVMS] Reader: Received line ({len(line)} bytes)")
+                            _handle_server_response(line + b'\n')  # Pass single line
+                else:
+                    # Empty data = connection closed
+                    print("[OVMS] Reader: Server closed connection")
+                    _ovms_connected = False
+                    _ovms_state = 'disconnected'
+                    _ovms_status = 'Connection closed by server'
+                    if _ovms_socket:
+                        try:
+                            _ovms_socket.close()
+                        except:
+                            pass
+                    _ovms_socket = None
+                    break
+            except OSError as e:
+                # EAGAIN/EWOULDBLOCK (errno 11) = no data available, this is normal
+                if e.errno != 11:
+                    print(f"[OVMS] Reader: Socket error errno={e.errno}: {e}")
+                    _ovms_connected = False
+                    _ovms_state = 'disconnected'
+                    _ovms_status = f'Connection error: {e}'
+                    if _ovms_socket:
+                        try:
+                            _ovms_socket.close()
+                        except:
+                            pass
+                    _ovms_socket = None
+                    break
+        except Exception as e:
+            print(f"[OVMS] Reader: Unexpected error: {e}")
+            import sys
+            sys.print_exception(e)
+        
+        # Check every 100ms for messages
+        time.sleep(0.1)
+    
+    print("[OVMS] Reader task stopped")
 
 
 def pollMetrics():
@@ -654,7 +876,12 @@ def testOVMSConnectivity():
     
     Returns JSON with success status and message
     """
-    global _ovms_socket, _ovms_connected, _ovms_state
+    global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status
+    
+    # Save current state to restore after test
+    saved_state = _ovms_state
+    saved_status = _ovms_status
+    saved_connected = _ovms_connected
     
     # If there's an existing connection from a previous test, clean it up
     if _ovms_socket:
@@ -664,22 +891,35 @@ def testOVMSConnectivity():
             pass
         _ovms_socket = None
     
-    # Reset connection state
+    # Reset connection state for test
     _ovms_connected = False
     _ovms_state = 'disconnected'
+    _ovms_status = ''
     
     _load_config()
     
     if not _config['server']:
         print(json.dumps({'success': False, 'error': 'Server address not configured'}))
+        # Restore state
+        _ovms_state = saved_state
+        _ovms_status = saved_status
+        _ovms_connected = saved_connected
         return
     
     if not _config['vehicleid']:
         print(json.dumps({'success': False, 'error': 'Vehicle ID not configured'}))
+        # Restore state
+        _ovms_state = saved_state
+        _ovms_status = saved_status
+        _ovms_connected = saved_connected
         return
     
     if not _config['password']:
         print(json.dumps({'success': False, 'error': 'Password not configured'}))
+        # Restore state
+        _ovms_state = saved_state
+        _ovms_status = saved_status
+        _ovms_connected = saved_connected
         return
     
     test_socket = None
@@ -689,6 +929,10 @@ def testOVMSConnectivity():
             addr = socket.getaddrinfo(_config['server'], _config['port'])[0][-1]
         except Exception as e:
             print(json.dumps({'success': False, 'error': f'Failed to resolve server address: {e}'}))
+            # Restore state
+            _ovms_state = saved_state
+            _ovms_status = saved_status
+            _ovms_connected = saved_connected
             return
         
         # Create socket and connect
@@ -811,17 +1055,22 @@ def testOVMSConnectivity():
             'error': f'Test failed: {e}'
         }))
     finally:
-        # CRITICAL: Always close test socket and ensure no state pollution
+        # CRITICAL: Always close test socket and restore global state
         if test_socket:
             try:
                 test_socket.close()
             except:
                 pass
+        
+        # Restore original state (test should not affect main connection state)
+        _ovms_state = saved_state
+        _ovms_status = saved_status
+        _ovms_connected = saved_connected
 
 
 def startOVMS():
     """Start OVMS client connection"""
-    global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status, _poll_task
+    global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status, _poll_task, _reader_task, _stop_reader
     
     if _ovms_connected:
         print(json.dumps({'status': 'already_connected'}))
@@ -840,39 +1089,41 @@ def startOVMS():
     try:
         _ovms_state = 'connecting'
         _ovms_status = f"Connecting to {_config['server']}:{_config['port']}..."
+        _ovms_connected = False  # CRITICAL: Don't set connected until authenticated!
         
         # Create socket connection
         addr = socket.getaddrinfo(_config['server'], _config['port'])[0][-1]
         _ovms_socket = socket.socket()
         _ovms_socket.connect(addr)
-        _ovms_socket.setblocking(True)  # Use blocking for now
         
-        # Send login
+        # Send login immediately (don't wait for server hello)
         _send_login()
         
-        # Try to read initial response (with timeout)
-        try:
-            _ovms_socket.settimeout(5.0)
-            data = _ovms_socket.recv(4096)
-            if data:
-                _handle_server_response(data)
-        except socket.timeout:
-            # No immediate response, continue
-            pass
-        except Exception as e:
-            # Silent - errors handled by state/status
-            pass
-        
-        # Set non-blocking for subsequent reads
+        # Set non-blocking immediately - let reader thread handle ALL responses
         _ovms_socket.setblocking(False)
         
-        # Do initial poll
-        _poll_loop()
+        # Start background reader task immediately for event-driven message handling
+        # The reader will handle authentication response and all subsequent messages
+        print("[OVMS] Starting background reader task")
+        _stop_reader = False
+        try:
+            import _thread
+            _reader_task = _thread.start_new_thread(_reader_loop, ())
+            
+            # Give reader a moment to start and process auth
+            time.sleep(0.5)
+            
+        except Exception as e:
+            print(f"[OVMS] Warning: Could not start reader task: {e}")
+            _ovms_state = 'error'
+            _ovms_status = 'Failed to start reader thread'
         
-        print(json.dumps({'status': _ovms_state}))
+        # Report current state (reader thread will update _ovms_connected when auth succeeds)
+        print(json.dumps({'status': _ovms_state, 'connected': _ovms_connected}))
     except Exception as e:
         _ovms_state = 'error'
         _ovms_status = f'Connection error: {e}'
+        _ovms_connected = False
         if _ovms_socket:
             try:
                 _ovms_socket.close()
@@ -884,8 +1135,15 @@ def startOVMS():
 
 def stopOVMS():
     """Stop OVMS client connection"""
-    global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status, _poll_task
-    global _ovms_can_dev, _ovms_sdo_client, _ovms_can_connected
+    global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status, _poll_task, _reader_task, _stop_reader
+    global _ovms_can_dev, _ovms_sdo_client, _ovms_can_connected, _ovms_peers
+    
+    # Stop background reader task
+    if _reader_task:
+        print("[OVMS] Stopping background reader task")
+        _stop_reader = True
+        time.sleep(0.3)  # Give reader task time to exit
+        _reader_task = None
     
     if _poll_task:
         # Stop polling task if running
@@ -914,6 +1172,8 @@ def stopOVMS():
     _ovms_token = ''
     _ovms_crypto_rx = None
     _ovms_crypto_tx = None
+    _ovms_peers = 0
+    _stop_reader = False
     
     print(json.dumps({'status': 'stopped'}))
 
@@ -925,16 +1185,23 @@ def getOVMSStatus():
         if _ovms_connected:
             checkServerMessages()
         
-        # Trigger poll if enabled and connected
+        # Trigger poll/transmission if enabled and connected
+        # Use peer-based update intervals like OVMS v3:
+        # - 60s when apps connected (peers > 0)
+        # - 600s when idle (peers == 0)
         if _config['enabled'] and _ovms_connected:
             current_time = time.time()
-            if _last_poll_time == 0 or (current_time - _last_poll_time) >= _config['pollinterval']:
+            # Choose interval based on peer count
+            update_interval = _config['updatetime_connected'] if _ovms_peers > 0 else _config['updatetime_idle']
+            
+            if _last_poll_time == 0 or (current_time - _last_poll_time) >= update_interval:
                 _poll_loop()
         
         status = {
             'state': _ovms_state,
             'status': _ovms_status,
             'connected': _ovms_connected,
+            'peers': _ovms_peers,
             'metrics_count': len(_metrics),
             'last_poll': _last_poll_time
         }

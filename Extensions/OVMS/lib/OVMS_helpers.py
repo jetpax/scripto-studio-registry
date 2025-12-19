@@ -38,6 +38,12 @@ except Exception as e:
 # Import hmac module from local lib directory
 import lib.hmac as hmac
 
+# Create a logger for OVMS
+logger = logging.getLogger("OVMS")
+handler = webrepl.logHandler(logging.INFO)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+
 # CAN and OBD2 imports - will be imported when needed
 CAN_AVAILABLE = None
 CAN = None
@@ -50,6 +56,7 @@ _ovms_can_dev = None
 _ovms_obd2_client = None
 _ovms_can_connected = False
 _vehicle_config = None  # Loaded from vehicle.py
+
 
 # Configuration storage
 _config = {
@@ -270,12 +277,7 @@ def _init_can_for_ovms():
 
 
 def _get_spot_values_direct():
-    """Get spot values directly from vehicle via OBD2 or fake simulator
-    
-    Behavior is determined by the vehicle configuration:
-    - protocol='fake': Use fake_zombieverter simulator (no CAN hardware)
-    - protocol='obd2': Use real CAN/OBD2 communication
-    """
+
     global _ovms_can_connected, _ovms_obd2_client, _vehicle_config
     global OBD2TimeoutError, OBD2AbortError
     
@@ -287,15 +289,6 @@ def _get_spot_values_direct():
     
     # Check protocol and dispatch accordingly
     protocol = _vehicle_config.get('protocol', 'obd2')
-    
-    if protocol == 'fake':
-        # HeadlessZombie or other simulated vehicle - use fake simulator
-        try:
-            from fake_zombieverter import get_zombie_spot_values
-            return get_zombie_spot_values()
-        except Exception as e:
-            print(f"[OVMS] Fake ZombieVerter error: {e}")
-            return {}
     
     # Real vehicle with OBD2 protocol - initialize CAN
     if not _init_can_for_ovms():
@@ -465,10 +458,7 @@ def _handle_server_response(data):
         for line in lines:
             line = line.strip()
             if not line:
-                continue
-            
-            print(f"[OVMS] Processing line: {line[:100]}")  # Debug: show what we received
-                
+                continue            
             if line.startswith('MP-S 0 '):
                 # Server authentication response (plain text)
                 parts = line[7:].split(' ', 1)
@@ -520,12 +510,12 @@ def _handle_server_response(data):
                         # Try to decode as ASCII
                         try:
                             msg = decrypted.decode('ascii')
-                            print(f"[OVMS] Decrypted server message: {msg}")
+                            logger.debug(f"[OVMS] RX: {msg}")
                         except UnicodeError:
                             # Not valid ASCII - show hex dump
                             hex_dump = ' '.join(f'{b:02x}' for b in decrypted)
-                            print(f"[OVMS] Decrypted bytes (hex): {hex_dump}")
-                            print(f"[OVMS] Decrypted bytes (repr): {decrypted}")
+                            logger.debug(f"[OVMS] Decrypted bytes (hex): {hex_dump}")
+                            logger.debug(f"[OVMS] Decrypted bytes (repr): {decrypted}")
                             # Don't process further if not valid ASCII
                             continue
                         
@@ -537,19 +527,18 @@ def _handle_server_response(data):
                             # Handle ping message
                             if code == 'A':
                                 # Server ping - respond with ping ack
-                                print("[OVMS] Got ping from server, sending pong")
+                                logger.debug("Got ping from server, sending pong")
                                 _transmit_encrypted('MP-0 a')
                             elif code == 'Z':
                                 # App connection count notification
                                 _handle_peer_count(data)
                             else:
-                                print(f"[OVMS] Unhandled server message code: {code}, data: {data}")
+                                logger.debug(f"[OVMS] Unhandled server message code: {code}, data: {data}")
                     except Exception as e:
-                        print(f"[OVMS] Error decrypting server message: {e}")
-                        import sys
-                        sys.print_exception(e)
+                        logger.debug(f"[OVMS] Error decrypting server message: {e}")
+  
     except Exception as e:
-        print(f"[OVMS] Error handling server response: {e}")
+        logger.debug(f"[OVMS] Error handling server response: {e}")
 
 
 def _handle_peer_count(count_str):
@@ -563,24 +552,21 @@ def _handle_peer_count(count_str):
     try:
         new_count = int(count_str) if count_str else 0
         old_count = _ovms_peers
-        _ovms_peers = new_count
-        
-        print(f"[OVMS] Peer count: {old_count} -> {new_count}")
-        
+        _ovms_peers = new_count        
         # Update status to reflect app connection state
         if new_count > 0:
             _ovms_status = f'Connected to OVMS server ({new_count} app{"s" if new_count != 1 else ""} connected)'
             if old_count == 0:
                 # App just connected - force immediate transmission of fresh status
-                print("[OVMS] App connected - sending fresh status")
+                logger.debug("App connected - sending fresh status")
                 _last_poll_time = 0  # Reset poll time to force immediate poll
                 _send_initial_messages()
         else:
             _ovms_status = 'Connected to OVMS server (no apps connected)'
             if old_count > 0:
-                print("[OVMS] All apps disconnected")
+                logger.debug("All apps disconnected")
     except Exception as e:
-        print(f"[OVMS] Error handling peer count: {e}")
+        logger.debug(f"[OVMS] Error handling peer count: {e}")
 
 
 def _send_initial_messages():
@@ -648,23 +634,20 @@ def _transmit_encrypted(msg):
         return False
     
     try:
-        print(f"[OVMS] Sending: {msg}")
+        logger.debug(f"[OVMS] Sending: {msg}")
         
         # Encrypt message with RC4
         msg_bytes = msg.encode('ascii')
         encrypted = _rc4_crypt(_ovms_crypto_tx, msg_bytes)
         
         # Base64 encode
-        encoded = base64.b64encode(encrypted).decode('ascii')
-        
-        print(f"[OVMS] Encrypted: {encoded[:50]}...")
-        
+        encoded = base64.b64encode(encrypted).decode('ascii')        
         # Send with CRLF
         final_msg = encoded + '\r\n'
         _ovms_socket.send(final_msg.encode('ascii'))
         return True
     except Exception as e:
-        print(f"[OVMS] Transmit error: {e}")
+        logger.debug(f"[OVMS] Transmit error: {e}")
         return False
 
 
@@ -725,7 +708,7 @@ def checkServerMessages():
         data = _ovms_socket.recv(4096)
         if not data:
             # Connection closed
-            print("[OVMS] Server closed connection (recv returned empty)")
+            logger.debug("Server closed connection (recv returned empty)")
             _ovms_connected = False
             _ovms_state = 'disconnected'
             _ovms_status = 'Connection closed'
@@ -737,13 +720,13 @@ def checkServerMessages():
             _ovms_socket = None
             return
         
-        print(f"[OVMS] Received {len(data)} bytes from server")
+        logger.debug(f"[OVMS] Received {len(data)} bytes from server")
         _handle_server_response(data)
     except OSError as e:
         # Non-blocking socket would raise EAGAIN/EWOULDBLOCK when no data available
         # This is expected and not an error
         if e.errno != 11:  # EAGAIN/EWOULDBLOCK
-            print(f"[OVMS] Socket error: {e}")
+            logger.debug(f"[OVMS] Socket error: {e}")
             if _ovms_connected:
                 # Silent - errors handled by state/status
                 _ovms_connected = False
@@ -756,7 +739,7 @@ def checkServerMessages():
                     pass
                 _ovms_socket = None
     except Exception as e:
-        print(f"[OVMS] Exception in checkServerMessages: {e}")
+        logger.debug(f"[OVMS] Exception in checkServerMessages: {e}")
         if _ovms_connected:
             # Silent - errors handled by state/status
             _ovms_connected = False
@@ -778,19 +761,13 @@ def _reader_loop():
     """
     global _ovms_socket, _ovms_connected, _ovms_state, _ovms_status, _stop_reader
     
-    print("[OVMS] Reader task started")
+    logger.debug("Reader task started")
     
     # Buffer for incomplete lines
     line_buffer = b''
-    loop_count = 0
     
     while not _stop_reader:
-        try:
-            # Heartbeat every 10 loops (1 second)
-            loop_count += 1
-            if loop_count % 10 == 0:
-                print(f"[OVMS] Reader: Heartbeat (socket={_ovms_socket is not None}, state={_ovms_state})")
-            
+        try:        
             # Check if socket exists (even if not fully connected yet - we need to process auth!)
             if not _ovms_socket:
                 time.sleep(0.1)
@@ -800,7 +777,7 @@ def _reader_loop():
             try:
                 data = _ovms_socket.recv(4096)
                 if data:
-                    print(f"[OVMS] Reader: Got {len(data)} bytes")
+                    logger.debug(f"[OVMS] Reader: Got {len(data)} bytes")
                     # Add to buffer
                     line_buffer += data
                     
@@ -817,11 +794,10 @@ def _reader_loop():
                             line_buffer = line_buffer[line_end+1:]
                         
                         if line:  # Skip empty lines
-                            print(f"[OVMS] Reader: Received line ({len(line)} bytes)")
                             _handle_server_response(line + b'\n')  # Pass single line
                 else:
                     # Empty data = connection closed
-                    print("[OVMS] Reader: Server closed connection")
+                    logger.debug("Reader: Server closed connection")
                     _ovms_connected = False
                     _ovms_state = 'disconnected'
                     _ovms_status = 'Connection closed by server'
@@ -835,7 +811,7 @@ def _reader_loop():
             except OSError as e:
                 # EAGAIN/EWOULDBLOCK (errno 11) = no data available, this is normal
                 if e.errno != 11:
-                    print(f"[OVMS] Reader: Socket error errno={e.errno}: {e}")
+                    logger.debug(f"[OVMS] Reader: Socket error errno={e.errno}: {e}")
                     _ovms_connected = False
                     _ovms_state = 'disconnected'
                     _ovms_status = f'Connection error: {e}'
@@ -847,14 +823,12 @@ def _reader_loop():
                     _ovms_socket = None
                     break
         except Exception as e:
-            print(f"[OVMS] Reader: Unexpected error: {e}")
-            import sys
-            sys.print_exception(e)
+            logger.debug(f"[OVMS] Reader: Unexpected error: {e}")
         
         # Check every 100ms for messages
         time.sleep(0.1)
     
-    print("[OVMS] Reader task stopped")
+    logger.debug("Reader task stopped")
 
 
 def pollMetrics():
@@ -1105,7 +1079,7 @@ def startOVMS():
         
         # Start background reader task immediately for event-driven message handling
         # The reader will handle authentication response and all subsequent messages
-        print("[OVMS] Starting background reader task")
+        logger.debug("Starting background reader task")
         _stop_reader = False
         try:
             import _thread
@@ -1115,7 +1089,7 @@ def startOVMS():
             time.sleep(0.5)
             
         except Exception as e:
-            print(f"[OVMS] Warning: Could not start reader task: {e}")
+            logger.debug(f"[OVMS] Warning: Could not start reader task: {e}")
             _ovms_state = 'error'
             _ovms_status = 'Failed to start reader thread'
         
@@ -1141,7 +1115,7 @@ def stopOVMS():
     
     # Stop background reader task
     if _reader_task:
-        print("[OVMS] Stopping background reader task")
+        logger.debug("Stopping background reader task")
         _stop_reader = True
         time.sleep(0.3)  # Give reader task time to exit
         _reader_task = None

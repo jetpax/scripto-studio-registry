@@ -1,36 +1,44 @@
 {
-  "board_id": "generic_esp32s3",
-  "board_name": "Generic ESP32-S3",
-  "chip": "ESP32-S3",
-  "version": "1.0",
-  "description": "Generic ESP32-S3 board with no fixed hardware",
-  
-  "hardware": {
-    "boot_control": {
-        "pins": {
-          "boot": 0
-        },
-        "description": "Boot mode selection pin (GPIO35) - controlled by auto-reset circuit via RTS signal for bootloader entry"
-      },
-      "uart0": {
-        "pins": {
-          "tx": 43,
-          "rx": 44
-        },
-        "description": "Primary UART"
-      },      
+  "identity": {
+    "id": "generic_esp32s3",
+    "name": "Generic ESP32-S3",
+    "vendor": "generic",
+    "chip": "ESP32-S3",
+    "revision": "1.0",
+    "description": "Generic ESP32-S3 board with no fixed hardware"
+  },
+
+  "capabilities": {
+    "can": true,
+    "neopixel": true
+  },
+
+  "resources": {
+    "pins": {
+      "status_led": 48,
+      "boot": 0
+    },
+
+    "uart": {
+      "primary": {
+        "tx": 43,
+        "rx": 44
+      }
+    },
+
+    "can": {
+      "twai": {
+        "tx": 20,
+        "rx": 21
+      }
+    }
+  },
+
+  "devices": {
     "status_led": {
       "type": "neopixel",
-      "pin": 48,
       "pixel_order": "GRB",
       "description": "Onboard RGB status LED - GRB order"
     }
-  },
-  "can": {
-    "pins": {
-      "tx": 20,
-      "rx": 21
-    },
-    "description": "CAN bus (TWAI)"
-  },
+  }
 }

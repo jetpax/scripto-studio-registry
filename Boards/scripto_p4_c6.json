@@ -1,13 +1,73 @@
 {
-  "board_id": "scripto_p4_c6",
-  "board_name": "Scripto P4+C6",
-  "chip": "ESP32-P4",
-  "version": "1.4",
-  "description": "ESP32-P4 development board with Ethernet, CAN, and NeoPixel status LED",
-  
-  "hardware": {
+  "identity": {
+    "id": "scripto_p4_c6",
+    "name": "Scripto P4+C6",
+    "vendor": "scripto",
+    "chip": "ESP32-P4",
+    "revision": "2.0.0",
+    "description": "ESP32-P4 development board with Ethernet, CAN, and NeoPixel status LED"
+  },
+
+  "capabilities": {
+    "ethernet": true,
+    "can": true,
+    "sdcard": true,
+    "audio": true,
+    "neopixel": true,
+    "coprocessor": true
+  },
+
+  "resources": {
+    "pins": {
+      "status_led": 1,
+      "boot": 35
+    },
+
+    "uart": {
+      "primary": {
+        "tx": 37,
+        "rx": 38
+      }
+    },
+
+    "i2c": {
+      "i2c0": {
+        "sda": 7,
+        "scl": 8
+      }
+    },
+
+    "can": {
+      "twai": {
+        "tx": 20,
+        "rx": 21
+      }
+    },
+
+    "sdmmc": {
+      "sdcard": {
+        "cmd": 44,
+        "clk": 43,
+        "d0": 39,
+        "d1": 40,
+        "d2": 41,
+        "d3": 42
+      },
+      "slot1": {
+        "cmd": 26,
+        "clk": 25,
+        "d0": 27,
+        "d1": 28,
+        "d2": 29,
+        "d3": 30
+      }
+    }
+  },
+
+  "devices": {
     "ethernet": {
-      "type": "IP101",
+      "phy": "IP101",
+      "interface": "rmii",
       "phy_addr": 1,
       "pins": {
         "mdc": 31,
@@ -16,72 +76,34 @@
       },
       "description": "IP101 Ethernet PHY with RMII interface"
     },
-    "i2c0": {
-      "pins": {
-        "sda": 7,
-        "scl": 8
-      },
-      "description": "Primary I2C bus"
-    },
+
     "status_led": {
       "type": "neopixel",
-      "pin": 1,
       "pixel_order": "RGB",
       "description": "Onboard Neopixel - RGB order"
     },
-    "boot_control": {
-      "pins": {
-        "boot": 35
-      },
-      "description": "Boot mode selection pin (GPIO35) - controlled by auto-reset circuit via RTS signal for bootloader entry"
-    },
-    "uart0": {
-        "pins": {
-          "tx": 37,
-          "rx": 38
-        },
-        "description": "Primary UART"
-      },    
-    "can": {
-      "pins": {
-        "tx": 20,
-        "rx": 21
-      },
-      "description": "CAN bus (TWAI)"
-    },
+
     "sdcard": {
       "mode": "SDMMC",
-      "pins": {
-        "cmd": 44,
-        "clk": 43,
-        "d0": 39,
-        "d1": 40,
-        "d2": 41,
-        "d3": 42
-      },
       "power_control": {
         "pin": 45,
         "active_low": true
-      }
-    },
-    "c6_coprocessor": {
-      "interface": "sdio",
-      "slot": 1,
-      "pins": {
-        "cmd": 26,
-        "clk": 25,
-        "d0": 27,
-        "d1": 28,
-        "d2": 29,
-        "d3": 30
       },
+      "description": "SD card slot"
+    },
+
+    "c6_coprocessor": {
+      "type": "ESP32-C6",
+      "interface": "sdio",
+      "slot": "slot1",
       "description": "ESP32-C6 coprocessor connected via SDIO on SD2/SLOT1"
     },
-    "es8311": {
+
+    "audio_codec": {
       "type": "ES8311",
-      "i2c": "i2c0",
+      "i2c_bus": "i2c0",
       "i2c_address": "0x18",
-      "pins": {
+      "i2s": {
         "dsdin": 9,
         "lrck": 10,
         "asdout": 11,

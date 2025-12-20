@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1766242736,
+  "updated": 1766246097,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -843,22 +843,28 @@
   ],
   "boards": [
     {
+      "board_id": "generic_esp32s3",
+      "board_name": "generic_esp32s3",
+      "chip": "ESP32",
+      "version": "1.0",
+      "filename": "generic_esp32s3.json",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Boards/generic_esp32s3.json"
+    },
+    {
       "board_id": "retrovms_mini",
-      "board_name": "RetroVMS Mini",
-      "chip": "ESP32-S3",
+      "board_name": "retrovms_mini",
+      "chip": "ESP32",
       "version": "1.0",
       "filename": "retrovms_mini.json",
-      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Boards/retrovms_mini.json",
-      "description": "Vehicle control module with 24 inputs, 12 outputs, and CAN bus"
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Boards/retrovms_mini.json"
     },
     {
       "board_id": "scripto_p4_c6",
-      "board_name": "Scripto P4+C6",
-      "chip": "ESP32-P4",
-      "version": "1.4",
+      "board_name": "scripto_p4_c6",
+      "chip": "ESP32",
+      "version": "1.0",
       "filename": "scripto_p4_c6.json",
-      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Boards/scripto_p4_c6.json",
-      "description": "ESP32-P4 development board with Ethernet, CAN, and NeoPixel status LED"
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Boards/scripto_p4_c6.json"
     }
   ]
 }

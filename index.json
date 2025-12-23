@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1766246215,
+  "updated": 1766529025,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -430,6 +430,24 @@
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/ScriptOs%20-%20Template.py"
     },
     {
+      "name": "Status LED Color Control",
+      "filename": "Status LED Color Control.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "ScriptO Team",
+      "description": "Control the status LED color with a visual color picker.\n                         \n                         This ScriptO provides:\n                         • Color picker UI to select LED color\n                         • Real-time RGB value display\n                         • Direct control of status LED\n                         • Preview of selected color\n                      ",
+      "category": "UI Plugins",
+      "tags": [
+        "ui plugins"
+      ],
+      "license": "MIT",
+      "docs": "https://github.com/jep-scriptomatic",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/Status%20LED%20Color%20Control.py"
+    },
+    {
       "name": "Async Tasks Test",
       "filename": "Test - Async Tasks.py",
       "version": [
@@ -658,10 +676,10 @@
       "version": [
         1,
         0,
-        0
+        1
       ],
       "author": "JC`zic",
-      "description": " Initializes an UART bus on two GPIO, sends or not a custom command and receives data from the bus.\n                          You can choose bus identifier, baud rate, bits per character, parity, stop bits and TX/RX GPIO.\n                      ",
+      "description": " Initializes UART on given GPIO, optionally sends a canned command and displays received data.\n                      ",
       "category": "Communication",
       "tags": [
         "communication"
@@ -687,6 +705,24 @@
       "license": "MIT",
       "docs": "https://github.com/jep-scriptomatic",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/UI%20Plugin%20-%20Hello%20World.py"
+    },
+    {
+      "name": "UI Plugin - LED Color Picker",
+      "filename": "UI Plugin - LED Color Picker.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "ScriptO Team",
+      "description": "Interactive LED Color Picker with RGB Sliders\n                         \n                         This ScriptO provides a beautiful UI to control the status LED:\n                         • Real-time RGB color sliders (0-255)\n                         • Live color preview\n                         • Displays current RGB values\n                         • Set LED to selected color instantly\n                         • Predefined color buttons for quick selection\n                         \n                         The UI is served directly from your ESP32 device and communicates\n                         with the device to change the LED color in real-time.\n                      ",
+      "category": "UI Plugins",
+      "tags": [
+        "ui plugins"
+      ],
+      "license": "MIT",
+      "docs": "https://github.com/jep-scriptomatic",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/UI%20Plugin%20-%20LED%20Color%20Picker.py"
     },
     {
       "name": "USB Modem Status",
@@ -849,22 +885,6 @@
       "version": "1.0",
       "filename": "generic_esp32s3.json",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Boards/generic_esp32s3.json"
-    },
-    {
-      "board_id": "retrovms_mini",
-      "board_name": "retrovms_mini",
-      "chip": "ESP32",
-      "version": "1.0",
-      "filename": "retrovms_mini.json",
-      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Boards/retrovms_mini.json"
-    },
-    {
-      "board_id": "scripto_p4_c6",
-      "board_name": "scripto_p4_c6",
-      "chip": "ESP32",
-      "version": "1.0",
-      "filename": "scripto_p4_c6.json",
-      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Boards/scripto_p4_c6.json"
     }
   ]
 }

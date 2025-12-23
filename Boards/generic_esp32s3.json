@@ -10,7 +10,8 @@
 
   "capabilities": {
     "can": true,
-    "neopixel": true
+    "neopixel": true,
+    "status_led": true
   },
 
   "resources": {

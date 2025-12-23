@@ -8,10 +8,9 @@ dict(
     info    = dict(
         # ----------------------------------------------------------------------
         name        = 'UART Test',
-        version     = [1, 0, 0],
+        version     = [1, 0, 1],
         category    = 'Communication',
-        description = ''' Initializes an UART bus on two GPIO, sends or not a custom command and receives data from the bus.
-                          You can choose bus identifier, baud rate, bits per character, parity, stop bits and TX/RX GPIO.
+        description = ''' Initializes UART on given GPIO, optionally sends a canned command and displays received data.
                       ''',
         author      = 'JC`zic',
         mail        = 'jczic.bos@gmail.com',
@@ -93,7 +92,7 @@ try :
                  tx       = args.txPin,
                  rx       = args.rxPin,
                  timeout  = 5 * 1000 )
-    print('UART bus initialized.')
+    print('UART initialized.')
     cmd = (args.cmd + '\n').encode()
     if not args.cmd or uart.write(cmd) == len(cmd) :
         if args.cmd :
@@ -110,6 +109,6 @@ try :
                     print('No data received after sending your command.')
                 break
     else :
-        print('Error: Unable to write in the UART bus.')
+        print('Error: Unable to write to UART.')
 except Exception as ex :
-    print('UART bus initialization error (%s).' % ex)
+    print('UART initialization error (%s).' % ex)

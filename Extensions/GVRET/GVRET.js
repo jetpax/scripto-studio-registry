@@ -134,67 +134,95 @@ class GVRETExtension {
       // Ensure CAN is initialized using generic helper functions
       const result = await this.device.execute(`
 try:
-    from lib.can_helpers import ensure_can_initialized, check_can_available
+    from lib.can_helpers import ensure_can_initialized, check_can_available, get_can_config, reconfigure_can_bitrate
     import gvret
+    import sys
     
-    # Check if CAN is enabled in config
-    available, reason = check_can_available()
-    if not available:
-        raise RuntimeError(reason)
-    
-    # Ensure CAN is initialized (auto-initializes if not already initialized)
-    can_dev = ensure_can_initialized()
-    if can_dev is None:
-        raise RuntimeError('Failed to initialize CAN device')
-    
-    # Verify CAN device is actually usable
+    # First, check if GVRET is already running
+    # Avoid calling start() when already enabled to prevent blocking delays
+    _already_running = False
     try:
-        # Try to access a CAN attribute to verify it's initialized
-        _ = can_dev.mode
+        bitrate = gvret.get_bitrate()
+        if bitrate > 0:
+            _already_running = True
     except:
-        raise RuntimeError('CAN device initialized but not usable')
+        # GVRET not running, proceed with start
+        pass
+    
+    if _already_running:
+        print("OK: GVRET already running")
+    else:
+        # Check if CAN is enabled in config
+        available, reason = check_can_available()
+        if not available:
+            print(f"ERROR: CAN not available: {reason}")
+            raise RuntimeError(reason)
+        
+        # Ensure CAN is initialized (auto-initializes if not already initialized)
+        can_dev = ensure_can_initialized()
+        if can_dev is None:
+            print("ERROR: ensure_can_initialized returned None")
+            raise RuntimeError('Failed to initialize CAN device')
+        
+        # Get CAN config from board definition (via hw_config)
+        config = get_can_config()
+        tx_pin = config['txPin']
+        rx_pin = config['rxPin']
+        bitrate = config['bitrate']
+        
+        # Register callback for bitrate changes from SavvyCAN
+        def on_bitrate_change(new_bitrate):
+            reconfigure_can_bitrate(new_bitrate)
+        
+        gvret.set_bitrate_change_callback(on_bitrate_change)
+        
+        # Start GVRET
+        result = gvret.start(tx_pin, rx_pin, bitrate)
+        if not result:
+            print("ERROR: gvret.start() returned False")
+            raise RuntimeError('GVRET start returned False')
+        
+        print("OK: GVRET started successfully")
+    
 except Exception as e:
-    raise
-
-try:
-    # Get CAN config from board definition (via hw_config)
-    from lib.can_helpers import get_can_config, reconfigure_can_bitrate
-    config = get_can_config()
-    tx_pin = config['txPin']
-    rx_pin = config['rxPin']
-    bitrate = config['bitrate']
-    
-    # Register callback for bitrate changes from SavvyCAN
-    def on_bitrate_change(new_bitrate):
-        reconfigure_can_bitrate(new_bitrate)
-    
-    gvret.set_bitrate_change_callback(on_bitrate_change)
-    
-    # Start GVRET
-    if not gvret.start(tx_pin, rx_pin, bitrate):
-        raise RuntimeError('GVRET start returned False')
-except Exception as e:
+    print(f"EXCEPTION: {type(e).__name__}: {str(e)}")
+    sys.print_exception(e)
     raise
       `)
       
-      // Check for errors in result (RuntimeError will be in traceback)
-      if (result.includes('RuntimeError') || result.includes('Traceback') || result.includes('Error') || result.trim() === '') {
+      // Check for success or errors in result
+      const isAlreadyRunning = result.includes('OK: GVRET already running')
+      const isStartedSuccessfully = result.includes('OK: GVRET started successfully')
+      
+      if (!isAlreadyRunning && !isStartedSuccessfully) {
         // Try to extract error message
         let errorMsg = 'Failed to start GVRET'
         
-        // Look for RuntimeError
-        const runtimeErrorMatch = result.match(/RuntimeError:\s*(.+)/i)
-        if (runtimeErrorMatch) {
-          errorMsg = runtimeErrorMatch[1].trim()
+        // Look for ERROR: prefix
+        const errorMatch = result.match(/ERROR:\s*(.+)/i)
+        if (errorMatch) {
+          errorMsg = errorMatch[1].trim()
         } else {
-          // Look for any error line
-          const errorLine = result.split('\n').find(line => 
-            line.includes('Error') || line.includes('Exception') || line.includes('Traceback')
-          )
-          if (errorLine) {
-            errorMsg = errorLine.trim()
-          } else if (result.trim() === '') {
-            errorMsg = 'GVRET start returned no output (check device logs for Python exception)'
+          // Look for EXCEPTION: prefix
+          const exceptionMatch = result.match(/EXCEPTION:\s*(.+)/i)
+          if (exceptionMatch) {
+            errorMsg = exceptionMatch[1].trim()
+          } else {
+            // Look for RuntimeError
+            const runtimeErrorMatch = result.match(/RuntimeError:\s*(.+)/i)
+            if (runtimeErrorMatch) {
+              errorMsg = runtimeErrorMatch[1].trim()
+            } else {
+              // Look for any error line
+              const errorLine = result.split('\n').find(line => 
+                line.includes('Error') || line.includes('Exception') || line.includes('Traceback')
+              )
+              if (errorLine) {
+                errorMsg = errorLine.trim()
+              } else if (result.trim() === '') {
+                errorMsg = 'GVRET start returned no output (check device logs for Python exception)'
+              }
+            }
           }
         }
         

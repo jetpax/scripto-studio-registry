@@ -245,12 +245,13 @@ def parse_board_file(file_path, repo_url=None, branch='main'):
         
         filename = file_path.name
         
-        # Extract metadata
-        board_id = board_config.get('board_id', filename.replace('.json', ''))
-        board_name = board_config.get('board_name', board_id)
-        chip = board_config.get('chip', 'ESP32')
-        version = board_config.get('version', '1.0')
-        description = board_config.get('description', '')
+        # Extract metadata from new structure (identity.id, identity.name, etc.)
+        identity = board_config.get('identity', {})
+        board_id = identity.get('id', filename.replace('.json', ''))
+        board_name = identity.get('name', board_id)
+        chip = identity.get('chip', 'ESP32')
+        version = identity.get('revision', '1.0')
+        description = identity.get('description', '')
         
         # Generate URL
         if repo_url:

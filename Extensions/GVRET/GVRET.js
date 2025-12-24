@@ -131,137 +131,80 @@ class GVRETExtension {
   async startGVRET() {
     const s = this.state.gvret
     try {
-      // Ensure CAN is initialized using generic helper functions
       const result = await this.device.execute(`
+from lib.can_helpers import ensure_can_initialized, check_can_available, get_can_config, reconfigure_can_bitrate
+import gvret
+import json
+
+# Check if already running
 try:
-    from lib.can_helpers import ensure_can_initialized, check_can_available, get_can_config, reconfigure_can_bitrate
-    import gvret
-    import sys
-    
-    # First, check if GVRET is already running
-    # Avoid calling start() when already enabled to prevent blocking delays
-    _already_running = False
-    try:
-        bitrate = gvret.get_bitrate()
-        if bitrate > 0:
-            _already_running = True
-    except:
-        # GVRET not running, proceed with start
-        pass
-    
-    if _already_running:
-        print("OK: GVRET already running")
+    bitrate = gvret.get_bitrate()
+    if bitrate > 0:
+        print(json.dumps({'success': True, 'status': 'already_running'}))
     else:
-        # Check if CAN is enabled in config
-        available, reason = check_can_available()
-        if not available:
-            print(f"ERROR: CAN not available: {reason}")
-            raise RuntimeError(reason)
-        
-        # Ensure CAN is initialized (auto-initializes if not already initialized)
+        raise ValueError('Not running')
+except:
+    # Not running, proceed with start
+    available, reason = check_can_available()
+    if not available:
+        print(json.dumps({'success': False, 'error': f'CAN not available: {reason}'}))
+    else:
         can_dev = ensure_can_initialized()
         if can_dev is None:
-            print("ERROR: ensure_can_initialized returned None")
-            raise RuntimeError('Failed to initialize CAN device')
-        
-        # Get CAN config from board definition (via hw_config)
-        config = get_can_config()
-        tx_pin = config['txPin']
-        rx_pin = config['rxPin']
-        bitrate = config['bitrate']
-        
-        # Register callback for bitrate changes from SavvyCAN
-        def on_bitrate_change(new_bitrate):
-            reconfigure_can_bitrate(new_bitrate)
-        
-        gvret.set_bitrate_change_callback(on_bitrate_change)
-        
-        # Start GVRET
-        result = gvret.start(tx_pin, rx_pin, bitrate)
-        if not result:
-            print("ERROR: gvret.start() returned False")
-            raise RuntimeError('GVRET start returned False')
-        
-        print("OK: GVRET started successfully")
-    
-except Exception as e:
-    print(f"EXCEPTION: {type(e).__name__}: {str(e)}")
-    sys.print_exception(e)
-    raise
+            print(json.dumps({'success': False, 'error': 'Failed to initialize CAN'}))
+        else:
+            config = get_can_config()
+            
+            def on_bitrate_change(new_bitrate):
+                reconfigure_can_bitrate(new_bitrate)
+            
+            gvret.set_bitrate_change_callback(on_bitrate_change)
+            
+            if gvret.start(config['txPin'], config['rxPin'], config['bitrate']):
+                print(json.dumps({'success': True, 'status': 'started'}))
+            else:
+                print(json.dumps({'success': False, 'error': 'gvret.start() returned False'}))
       `)
       
-      // Check for success or errors in result
-      const isAlreadyRunning = result.includes('OK: GVRET already running')
-      const isStartedSuccessfully = result.includes('OK: GVRET started successfully')
-      
-      if (!isAlreadyRunning && !isStartedSuccessfully) {
-        // Try to extract error message
-        let errorMsg = 'Failed to start GVRET'
-        
-        // Look for ERROR: prefix
-        const errorMatch = result.match(/ERROR:\s*(.+)/i)
-        if (errorMatch) {
-          errorMsg = errorMatch[1].trim()
-        } else {
-          // Look for EXCEPTION: prefix
-          const exceptionMatch = result.match(/EXCEPTION:\s*(.+)/i)
-          if (exceptionMatch) {
-            errorMsg = exceptionMatch[1].trim()
-          } else {
-            // Look for RuntimeError
-            const runtimeErrorMatch = result.match(/RuntimeError:\s*(.+)/i)
-            if (runtimeErrorMatch) {
-              errorMsg = runtimeErrorMatch[1].trim()
-            } else {
-              // Look for any error line
-              const errorLine = result.split('\n').find(line => 
-                line.includes('Error') || line.includes('Exception') || line.includes('Traceback')
-              )
-              if (errorLine) {
-                errorMsg = errorLine.trim()
-              } else if (result.trim() === '') {
-                errorMsg = 'GVRET start returned no output (check device logs for Python exception)'
-              }
-            }
-          }
-        }
-        
+      if (!result || !result.success) {
+        const errorMsg = result?.error || 'Unknown error'
         console.error('[GVRET] Start failed:', result)
-        alert(`Failed to start GVRET:\n${errorMsg}\n\nCheck browser console for full error details.`)
+        alert(`Failed to start GVRET: ${errorMsg}`)
         return
       }
       
       s.isRunning = true
-      // Reset stats when starting
       s.stats = { rx: 0, tx: 0, dropped: 0 }
       this.emit('render')
       
-      // Re-apply filters if any
       if (s.filters.length > 0) {
         await this.applyFilters()
       }
       
-      // Start auto-refreshing stats every 2 seconds
       this.startStatsRefresh()
     } catch (e) {
+      console.error('[GVRET] Exception:', e)
       alert('Failed to start GVRET: ' + e.message)
     }
   }
 
   async stopGVRET() {
     try {
-      await this.device.execute(`
+      const result = await this.device.execute(`
 import gvret
+import json
 gvret.stop()
+print(json.dumps({'success': True, 'status': 'stopped'}))
       `)
-      this.state.gvret.isRunning = false
-      // Stop auto-refresh
-      this.stopStatsRefresh()
-      // Reset stats
-      this.state.gvret.stats = { rx: 0, tx: 0, dropped: 0 }
-      this.emit('render')
+      
+      if (result && result.success) {
+        this.state.gvret.isRunning = false
+        this.stopStatsRefresh()
+        this.state.gvret.stats = { rx: 0, tx: 0, dropped: 0 }
+        this.emit('render')
+      }
     } catch (e) {
-      alert('Failed to stop GVRET: ' + e.message)
+      console.error('[GVRET] Stop exception:', e)
     }
   }
   
@@ -311,10 +254,15 @@ gvret.stop()
   async clearFilters() {
     this.state.gvret.filters = []
     try {
-      await this.device.execute('import gvret; gvret.clear_filters()')
+      await this.device.execute(`
+import gvret
+import json
+gvret.clear_filters()
+print(json.dumps({'success': True}))
+      `)
       this.emit('render')
     } catch (e) {
-      console.error('Failed to clear filters', e)
+      console.error('[GVRET] Clear filters exception:', e)
     }
   }
 
@@ -323,20 +271,21 @@ gvret.stop()
     if (!s.isRunning) return
 
     try {
-      let code = 'import gvret\ngvret.clear_filters()\n'
+      let code = 'import gvret\nimport json\ngvret.clear_filters()\n'
       for (const f of s.filters) {
         code += `gvret.add_filter(${f.id}, ${f.mask}, ${f.extended ? 'True' : 'False'})\n`
       }
+      code += 'print(json.dumps({"success": True}))\n'
+      
       await this.device.execute(code)
     } catch (e) {
-      console.error('Failed to apply filters', e)
+      console.error('[GVRET] Apply filters exception:', e)
     }
   }
 
   async refreshStats() {
     const s = this.state.gvret
     if (!s.isRunning) {
-      // Reset stats when not running
       s.stats = { rx: 0, tx: 0, dropped: 0 }
       this.emit('render')
       return
@@ -345,26 +294,18 @@ gvret.stop()
     try {
       const result = await this.device.execute(`
 import gvret
-try:
-    stats = gvret.get_stats()
-    print(f"STATS:{stats[0]},{stats[1]},{stats[2]}")
-except Exception as e:
-    print(f"ERROR:{e}")
+import json
+stats = gvret.get_stats()
+print(json.dumps({'success': True, 'rx': stats[0], 'tx': stats[1], 'dropped': stats[2]}))
       `)
       
-      // Parse stats from output: "STATS:rx,tx,dropped"
-      const statsMatch = result.match(/STATS:(\d+),(\d+),(\d+)/)
-      if (statsMatch) {
-        s.stats.rx = parseInt(statsMatch[1], 10)
-        s.stats.tx = parseInt(statsMatch[2], 10)
-        s.stats.dropped = parseInt(statsMatch[3], 10)
+      if (result && result.success) {
+        s.stats.rx = result.rx || 0
+        s.stats.tx = result.tx || 0
+        s.stats.dropped = result.dropped || 0
         this.emit('render')
-      } else {
-        console.error('[GVRET] Failed to parse stats:', result)
       }
     } catch (e) {
-      // If error indicates connection lost, silently stop the interval
-      // Don't spam console with connection errors
       const errorMsg = e.message ? e.message.toLowerCase() : String(e).toLowerCase()
       if (errorMsg.includes('not connected') || 
           errorMsg.includes('connection') && errorMsg.includes('closed') ||
@@ -372,8 +313,7 @@ except Exception as e:
         this.stopStatsRefresh()
         return
       }
-      // Only log other errors (not connection errors)
-      console.error('[GVRET] Failed to get stats:', e)
+      console.error('[GVRET] Stats exception:', e)
     }
   }
 }

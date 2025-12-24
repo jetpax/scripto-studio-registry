@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1766536338,
+  "updated": 1766541954,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -521,7 +521,7 @@
       "version": [
         1,
         2,
-        0
+        1
       ],
       "author": "ScriptO Studio",
       "description": "Simple infinite counter to test the Stop button. Counts up forever until stopped. Also demonstrates logging if enabled",

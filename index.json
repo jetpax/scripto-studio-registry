@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1767415741,
+  "updated": 1767417677,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -711,7 +711,7 @@
       "filename": "UI Plugin - Hello World.py",
       "version": [
         1,
-        1,
+        2,
         0
       ],
       "author": "ScriptO Team",

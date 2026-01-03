@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1767394728,
+  "updated": 1767412054,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -420,7 +420,7 @@
         0
       ],
       "author": "jetpax",
-      "description": "Test syslog functionality by sending messages at different severity levels.\n                         \n                         Configure your syslog server address and port, then send test messages.\n                         Messages will be sent via UDP to the syslog server (RFC 3164 format).\n                         \n                         If syslog is not configured, messages will be silently ignored (no-op).\n                      ",
+      "description": "Test syslog functionality by sending messages at different severity levels.\n                         \n                         Configure your syslog server address and port, then send test messages.\n                         Messages will be sent via UDP to the syslog server (RFC 3164 format).\n                         \n                         IMPORTANT: rsyslog must be configured to accept remote UDP messages:\n                         1. Edit /etc/rsyslog.conf\n                         2. Uncomment: module(load=\"imudp\") and input(type=\"imudp\" port=\"514\")\n                         3. Restart: sudo systemctl restart rsyslog\n                         \n                         If syslog is not configured, messages will be silently ignored (no-op).\n                      ",
       "category": "Testing",
       "tags": [
         "testing"

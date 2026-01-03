@@ -181,6 +181,11 @@
                          Configure your syslog server address and port, then send test messages.
                          Messages will be sent via UDP to the syslog server (RFC 3164 format).
                          
+                         IMPORTANT: rsyslog must be configured to accept remote UDP messages:
+                         1. Edit /etc/rsyslog.conf
+                         2. Uncomment: module(load="imudp") and input(type="imudp" port="514")
+                         3. Restart: sudo systemctl restart rsyslog
+                         
                          If syslog is not configured, messages will be silently ignored (no-op).
                       
             </div>

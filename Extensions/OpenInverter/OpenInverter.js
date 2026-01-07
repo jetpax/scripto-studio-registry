@@ -2,22 +2,17 @@
 // {
 //   "name": "OpenInverter",
 //   "id": "openinverter",
-//   "version": [1, 0, 1],
+//   "version": [1, 99, 0],
 //   "author": "JetPax",
 //   "description": "Complete OpenInverter suite. Configure parameters, map CAN messages, view spot values, and plot real-time signals from OpenInverter motor controllers.",
 //   "icon": "sliders",
 //   "iconSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon icon-tabler icon-tabler-bolt\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11\" /></svg>",
 //   "mipPackage": "github:jetpax/scripto-studio-registry/Extensions/OpenInverter/lib",
 //   "menu": [
-//     { "id": "parameters", "label": "Parameters" },
-//     { "id": "spotvalues", "label": "Spot Values" },
-//     { "id": "canmapping", "label": "CAN Mapping" },
-//     { "id": "commands", "label": "Device Control" },
-//     { "id": "errors", "label": "Error Log" },
-//     { "id": "plot", "label": "Live Plot" },
-//     { "id": "firmware", "label": "Firmware Upgrade" }
+//     { "id": "overview", "label": "Overview" },
+//     { "id": "deviceselector", "label": "Device Selector" }
 //   ],
-//   "styles": ".oi-compact-header { padding: 16px 20px !important; min-height: auto !important; display: flex; justify-content: space-between; align-items: center; } .oi-compact-header h2 { font-size: 18px !important; margin: 0 !important; } .oi-button-row { display: flex; flex-direction: row; gap: 8px; flex-wrap: wrap; align-items: center; } .oi-button-row .secondary-button, .oi-button-row .primary-button { padding: 6px 12px !important; font-size: 12px !important; font-weight: 600; text-transform: none; letter-spacing: normal; display: flex; align-items: center; gap: 6px; } .oi-button-row .secondary-button svg, .oi-button-row .primary-button svg { width: 14px; height: 14px; flex-shrink: 0; } .oi-button-row img.icon, .oi-button-row .icon img { filter: none !important; } .oi-plot-controls { display: flex; gap: 20px; align-items: center; } .oi-plot-controls .button { display: flex; flex-direction: column; align-items: center; } .oi-plot-controls .icon { display: inline-flex; align-items: center; justify-content: center; filter: none !important; } .oi-plot-controls .icon svg { width: 20px; height: 20px; } .oi-parameters-container { padding: 20px; } .oi-category-section { margin-bottom: 32px; } .oi-category-title { font-size: 18px; font-weight: 400; color: var(--scheme-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--scheme-primary); } .oi-parameters-table { border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; } .oi-table-header, .oi-table-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 1.2fr 0.8fr; gap: 12px; padding: 6px 16px; align-items: center; } .oi-table-header { background: var(--scheme-primary); color: white; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; } .oi-table-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; padding: 3px 16px; } .oi-table-row:hover { background: var(--bg-tertiary); } .oi-table-row:last-child { border-bottom: none; } .oi-value-input, .oi-enum-select { width: 100%; padding: 6px 0px; border: 1px solid #34495e; border-radius: 4px; background: #121212; color: #0fdb0f; font-size: 14px; font-family: 'Menlo', 'Monaco', 'Courier New', monospace; } .oi-value-input:focus, .oi-enum-select:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; } .oi-spotvalue-card { background: var(#121212); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; transition: all 0.2s; } .oi-spotvalue-card:hover { border-color: var(--scheme-primary); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); } .oi-spotvalue-name { font-weight: 600; color: var(--scheme-primary); font-size: 13px; margin-bottom: 8px; } .oi-spotvalue-value { font-size: 20px; font-weight: 600; font-family: 'Press Start 2P', monospace; background-color: #c8e4b7; color: #3b5e2b; padding: 10px 15px; border: 2px solid #5a7d4a; border-radius: 5px; box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3); text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3); line-height: 1.2; image-rendering: pixelated; background-image: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0px, rgba(0, 0, 0, 0.05) 1px, transparent 1px, transparent 3px); } .oi-plot-container { display: flex; height: 500px; max-height: calc(100vh - 260px); gap: 20px; padding: 20px; overflow: hidden; } .oi-plot-sidebar { width: 140px; flex-shrink: 0; border-right: 1px solid var(--border-color); padding-right: 20px; overflow-y: auto; } .oi-plot-section-title { font-size: 14px; font-weight: 600; color: var(--scheme-primary); margin: 16px 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; } .oi-plot-signal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; } .oi-plot-signal { padding: 8px; border-radius: 4px; transition: background 0.2s; } .oi-plot-signal:hover { background: var(--bg-tertiary); } .oi-plot-signal label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; } .oi-plot-signal input[type=\"checkbox\"] { width: 16px; height: 16px; cursor: pointer; } .oi-plot-signal-name { font-weight: 600; color: var(--text-primary); } .oi-plot-signal-unit { color: var(--text-secondary); font-size: 12px; margin-left: auto; } .oi-plot-settings { display: flex; flex-direction: column; gap: 12px; } .oi-plot-settings label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); } .oi-plot-settings input[type=\"number\"] { padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; } .oi-plot-settings input[type=\"number\"]:focus { outline: none; border-color: var(--scheme-primary); box-shadow: 0 0 0 2px rgba(0, 129, 132, 0.2); } .oi-plot-chart-area { flex: 1; position: relative; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; min-height: 0; min-width: 0; display: flex; flex-direction: column; } .oi-plot-chart-area canvas { width: 100% !important; height: 100% !important; max-width: 100%; max-height: 100%; } .oi-button-row .primary-button { width: auto; background: var(--scheme-primary); color: white; font-family: inherit; font-size: 14px; } .oi-button-row .primary-button:hover { background: var(--scheme-primary-light); } .oi-button-row .secondary-button { width: auto; background: var(--bg-tertiary); color: var(--text-primary); font-family: inherit; font-size: 14px; } .oi-button-row .secondary-button:hover { background: var(--button-hover); }"
+//   "styles": ":root { --oi-blue: #1e88e5; --oi-blue-dark: #1565c0; --oi-blue-light: #e3f2fd; --oi-orange: #ff8c00; --oi-orange-light: #ffa726; --oi-beige: #fef8f0; --oi-yellow: #ffd54f; --oi-status-success: #4caf50; --oi-status-warning: #ff9800; --oi-status-error: #f44336; --oi-status-info: #1e88e5; } .tabs-container { display: flex; flex-direction: column; height: 100%; } .tabs-header { border-bottom: 2px solid var(--border-color); background: var(--bg-secondary); } .tabs-nav { display: flex; gap: 0; overflow-x: auto; } .tab-button { background: transparent; border: none; padding: 16px 24px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; } .tab-button:hover:not(:disabled) { color: var(--oi-blue); background: var(--oi-blue-light); } .tab-button:disabled { opacity: 0.5; cursor: not-allowed; } .tabs-content { flex: 1; overflow-y: auto; } .system-panel { background: var(--bg-secondary); border-radius: 8px; overflow: hidden; margin-bottom: 24px; } .panel-header { background: var(--oi-blue); color: white; padding: 20px; border-bottom: 1px solid var(--border-color); } .panel-message { padding: 40px 20px; text-align: center; color: var(--text-secondary); } .primary-button { background: var(--oi-blue); color: white; border: 2px solid var(--oi-blue); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .primary-button:hover:not(:disabled) { background: var(--oi-blue-dark); border-color: var(--oi-blue-dark); } .primary-button:disabled { opacity: 0.5; cursor: not-allowed; } .secondary-button { background: var(--oi-orange); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .secondary-button:hover:not(:disabled) { background: #f0e4d0; border-color: var(--oi-blue); color: var(--oi-blue); } .secondary-button:disabled { opacity: 0.5; cursor: not-allowed; } .refresh-button { background: var(--oi-beige); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .refresh-button:hover:not(:disabled) { background: #f0e4d0; border-color: var(--oi-blue); color: var(--oi-blue); } .spot-values-categories { display: flex; flex-direction: column; gap: 2rem; } .spot-values-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; } .oi-category-section { margin-bottom: 2rem; } .oi-category-title { font-size: 1.1rem; font-weight: 600; color: var(--oi-blue); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--oi-blue); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalue-card { background: var(--bg-secondary); border: 2px solid transparent; border-radius: 6px; padding: 0.75rem; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 0.75rem; } .oi-spotvalue-card:hover { border-color: var(--oi-blue); background: var(--oi-blue-light); } .oi-spotvalue-name { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.25rem; } .oi-spotvalue-value { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; } .parameter-item { display: flex; flex-direction: column; gap: 0.5rem; } .parameter-header { display: flex; justify-content: space-between; align-items: baseline; } .parameter-label { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0; } .parameter-value { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; } .parameter-category { border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; background: var(--bg-secondary); transition: padding 0.2s; } .category-title { font-size: 1.1rem; font-weight: 600; color: var(--oi-blue); margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--oi-beige); display: flex; align-items: center; gap: 0.75rem; user-select: none; transition: all 0.2s; } .category-title:hover { color: var(--oi-blue-dark); } .param-count { margin-left: auto; font-size: 0.85rem; font-weight: normal; color: var(--text-secondary); } .parameters-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }"
 // }
 // === END_EXTENSION_CONFIG ===
 
@@ -42,6 +37,227 @@ class OpenInverterExtension {
     this.emit = emit
     this.state = state
     this.html = html
+    
+    // Initialize state for device list
+    if (!this.state.discoveredDevices) {
+      this.state.discoveredDevices = []
+    }
+    if (!this.state.selectedDeviceSerial) {
+      this.state.selectedDeviceSerial = null
+    }
+    if (!this.state.activeDeviceTab) {
+      this.state.activeDeviceTab = 'overview'
+    }
+    
+    // Initialize chart-related state
+    if (!this.state.spotValueHistory) {
+      this.state.spotValueHistory = {}
+    }
+    if (!this.state.selectedChartParams) {
+      this.state.selectedChartParams = new Set()
+    }
+  }
+
+  /**
+   * Render custom sidebar items (called by Scripto Studio for DEVICES section)
+   * Shows list of discovered OpenInverter devices
+   */
+  renderSidebarDevices() {
+    if (!this.state.discoveredDevices || this.state.discoveredDevices.length === 0) {
+      return this.html`
+        <div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 12px;">
+          <p style="margin: 0;">No devices found</p>
+          <p style="margin: 8px 0 0; font-size: 11px;">Use Device Selector to scan</p>
+        </div>
+      `
+    }
+
+    return this.html`
+      <div style="padding: 4px 0;">
+        ${this.state.discoveredDevices.map(device => this.html`
+          <div 
+            onclick=${() => this.selectDeviceFromSidebar(device)}
+            style="
+              padding: 12px 16px;
+              cursor: pointer;
+              transition: background 0.2s;
+              border-left: 3px solid ${this.state.selectedDeviceSerial === device.serial ? 'var(--oi-blue)' : 'transparent'};
+              background: ${this.state.selectedDeviceSerial === device.serial ? 'var(--oi-blue-light)' : 'transparent'};
+            "
+            onmouseover=${(e) => { if (this.state.selectedDeviceSerial !== device.serial) e.currentTarget.style.background = 'var(--bg-tertiary)' }}
+            onmouseout=${(e) => { if (this.state.selectedDeviceSerial !== device.serial) e.currentTarget.style.background = 'transparent' }}>
+            
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: ${device.online ? '#4caf50' : '#999'};"></div>
+              <div style="font-weight: 600; font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${device.name || `Device ${device.nodeId}`}
+              </div>
+            </div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-left: 16px;">
+              ${device.serial ? device.serial.substring(0, 12) + '...' : `Node ${device.nodeId}`}
+            </div>
+          </div>
+        `)}
+      </div>
+    `
+  }
+
+  /**
+   * Select a device from sidebar - switches to device view with tabs
+   */
+  selectDeviceFromSidebar(device) {
+    this.state.selectedDeviceSerial = device.serial
+    this.state.selectedNodeId = device.nodeId
+    this.state.activeDeviceTab = 'overview'
+    
+    // Connect to device if not already connected
+    if (!this.state.oiDeviceConnected || this.state.currentDeviceSerial !== device.serial) {
+      this.connectToDevice(device.nodeId, device.serial)
+    }
+    
+    this.emit('render')
+  }
+
+  /**
+   * Render device panel with tabs when a device is selected
+   * This replaces the individual panel renders when viewing a specific device
+   */
+  renderDevicePanel() {
+    const device = this.state.discoveredDevices.find(d => d.serial === this.state.selectedDeviceSerial)
+    
+    if (!device) {
+      return this.html`
+        <div class="panel-message">
+          <p>Device not found</p>
+        </div>
+      `
+    }
+
+    return this.html`
+      <div style="display: flex; flex-direction: column; height: 100%;">
+        <!-- Device Header -->
+        <div style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: ${device.online ? '#4caf50' : '#999'};"></div>
+            <h1 style="margin: 0; font-size: 24px; color: var(--text-primary);">
+              ${device.name || `Device ${device.nodeId}`}
+            </h1>
+            <span style="background: var(--oi-beige); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; color: var(--text-secondary);">
+              ${device.online ? 'Connected' : 'Offline'}
+            </span>
+          </div>
+          <div style="display: flex; gap: 16px; color: var(--text-secondary); font-size: 13px;">
+            <span>Serial: ${device.serial || 'Unknown'}</span>
+            <span>Node ID: ${device.nodeId}</span>
+            <span>Firmware: ${device.firmware || 'Unknown'}</span>
+          </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs-header">
+          <div class="tabs-nav">
+            <button 
+              class="tab-button ${this.state.activeDeviceTab === 'overview' ? 'active' : ''}"
+              onclick=${() => this.switchDeviceTab('overview')}>
+              Overview
+            </button>
+            <button 
+              class="tab-button ${this.state.activeDeviceTab === 'parameters' ? 'active' : ''}"
+              onclick=${() => this.switchDeviceTab('parameters')}>
+              Parameters
+            </button>
+            <button 
+              class="tab-button ${this.state.activeDeviceTab === 'canmapping' ? 'active' : ''}"
+              onclick=${() => this.switchDeviceTab('canmapping')}>
+              CAN Mappings
+            </button>
+            <button 
+              class="tab-button ${this.state.activeDeviceTab === 'canmessages' ? 'active' : ''}"
+              onclick=${() => this.switchDeviceTab('canmessages')}>
+              CAN Messages
+            </button>
+            <button 
+              class="tab-button ${this.state.activeDeviceTab === 'ota' ? 'active' : ''}"
+              onclick=${() => this.switchDeviceTab('ota')}>
+              OTA Update
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tabs-content">
+          ${this.renderDeviceTabContent()}
+        </div>
+      </div>
+    `
+  }
+
+  /**
+   * Switch between device tabs
+   */
+  switchDeviceTab(tabId) {
+    // Stop auto-refresh if switching away from overview
+    if (this.state.activeDeviceTab === 'overview' && tabId !== 'overview' && this.autoRefreshTimer) {
+      console.log('[OI Overview] Stopping auto-refresh (switching away from overview)')
+      clearInterval(this.autoRefreshTimer)
+      this.autoRefreshTimer = null
+    }
+    
+    this.state.activeDeviceTab = tabId
+    this.emit('render')
+  }
+
+  /**
+   * Render the active tab content for the selected device
+   */
+  renderDeviceTabContent() {
+    switch (this.state.activeDeviceTab) {
+      case 'overview':
+        return this.renderOverviewContent()
+      case 'parameters':
+        return this.renderParametersContent()
+      case 'canmapping':
+        return this.renderCanmappingContent()
+      case 'canmessages':
+        return this.renderCanmessagesContent()
+      case 'ota':
+        return this.renderFirmwareContent()
+      default:
+        return this.html`<div class="panel-message">Unknown tab</div>`
+    }
+  }
+
+  /**
+   * Add mock/test devices for development/testing
+   */
+  addMockDevices() {
+    this.state.discoveredDevices = [
+      {
+        nodeId: 1,
+        serial: 'ABC123456789ABCD',
+        name: 'Test Inverter 1',
+        firmware: 'v4.2.0',
+        online: true
+      },
+      {
+        nodeId: 2,
+        serial: 'DEF456789ABC1234',
+        name: 'Test Inverter 2',
+        firmware: 'v4.1.5',
+        online: true
+      }
+    ]
+    
+    // Also populate canScanResults for backward compatibility
+    this.state.canScanResults = this.state.discoveredDevices.map(d => ({
+      nodeId: d.nodeId,
+      serial: d.serial,
+      deviceType: 0,
+      deviceTypeHex: '0x00000000'
+    }))
+    
+    this.state.scanMessage = 'Mock devices added for testing'
+    this.emit('render')
   }
 
   /**
@@ -62,6 +278,158 @@ class OpenInverterExtension {
     return `data:image/svg+xml,${encodeURIComponent(modifiedSvg)}`
   }
 
+  // === Utility Functions ===
+
+  /**
+   * Formats a parameter value for display based on its type
+   * Ported from openinverter-web-interface/web/src/utils/parameterDisplay.ts
+   * 
+   * @param {Object} param - The parameter object containing enums, unit, etc.
+   * @param {number|string|null|undefined} value - The raw value to format
+   * @returns {string} Formatted string for display, or empty string if value is null/undefined
+   */
+  formatParameterValue(param, value) {
+    // Handle null/undefined - show nothing
+    if (value === null || value === undefined) {
+      return ''
+    }
+
+    // Handle enum values - show the mapped label
+    if (param.enums && Object.keys(param.enums).length > 0) {
+      const enumValue = String(Math.round(Number(value)))
+      const label = param.enums[enumValue]
+      return label || String(value)
+    }
+
+    // Handle numeric values with units
+    if (typeof value === 'number') {
+      const formattedValue = value.toFixed(2)
+      return param.unit ? `${formattedValue} ${param.unit}` : formattedValue
+    }
+
+    // Fallback to string value
+    return String(value)
+  }
+
+  /**
+   * Gets the enum label for a numeric value
+   * 
+   * @param {Object} param - The parameter object containing enums
+   * @param {number|string} value - The numeric value to convert
+   * @returns {string} The enum label or the original value as string
+   */
+  getEnumLabel(param, value) {
+    if (!param.enums || Object.keys(param.enums).length === 0) {
+      return String(value)
+    }
+
+    const enumValue = String(Math.round(Number(value)))
+    return param.enums[enumValue] || String(value)
+  }
+
+  /**
+   * Converts a parameter value to a string suitable for dropdown selection
+   * Rounds numeric values and converts to string to match enum keys
+   * 
+   * @param {number|string|null|undefined} value - The value to convert
+   * @returns {string} String representation suitable for dropdown value
+   */
+  normalizeEnumValue(value) {
+    if (value === null || value === undefined) {
+      return '0'
+    }
+    return String(Math.round(Number(value)))
+  }
+
+  /**
+   * Parse a unit string that may contain a numeric prefix
+   * Examples: "10ms" -> { multiplier: 10, baseUnit: "ms" }
+   *           "ms" -> { multiplier: 1, baseUnit: "ms" }
+   *           "100us" -> { multiplier: 100, baseUnit: "us" }
+   * 
+   * @param {string} unit - The unit string to parse
+   * @returns {Object|null} Object with multiplier and baseUnit, or null if invalid
+   */
+  parseUnit(unit) {
+    if (!unit) return null
+
+    // Try to match a number at the start of the unit string
+    const match = unit.match(/^(\d+(?:\.\d+)?)(.+)$/)
+
+    if (match) {
+      // Has numeric prefix (e.g., "10ms")
+      return {
+        multiplier: parseFloat(match[1]),
+        baseUnit: match[2]
+      }
+    }
+
+    // No numeric prefix, treat as base unit with multiplier 1
+    return {
+      multiplier: 1,
+      baseUnit: unit
+    }
+  }
+
+  /**
+   * Apply conversion to a spot value based on its unit
+   * Ported from openinverter-web-interface/web/src/utils/spotValueConversions.ts
+   * 
+   * For units with numeric prefixes (e.g., "10ms", "100us"), converts the value
+   * by applying the multiplier and normalizes the unit to remove the prefix.
+   * Example: rawValue=12345 with unit="10ms" → value=123450 with unit="ms"
+   * 
+   * @param {number} rawValue - The raw numeric value from the device
+   * @param {string} unit - The unit string from the parameter definition
+   * @returns {Object} Object with converted value and display unit
+   */
+  convertSpotValue(rawValue, unit) {
+    if (!unit) {
+      return { value: rawValue, unit: '' }
+    }
+
+    const parsed = this.parseUnit(unit)
+    if (!parsed) {
+      return { value: rawValue, unit }
+    }
+
+    const { multiplier, baseUnit } = parsed
+
+    // Recognized time units
+    const TIME_UNITS = new Set(['s', 'ms', 'us', 'μs', 'ns', 'min', 'h', 'd'])
+
+    // Check if it's a recognized unit type and has a numeric prefix
+    if (multiplier !== 1 && TIME_UNITS.has(baseUnit)) {
+      // Apply the multiplier to normalize to the base unit
+      // Example: 12345 in "10ms" → 12345 × 10 = 123450 "ms"
+      return {
+        value: rawValue * multiplier,
+        unit: baseUnit
+      }
+    }
+
+    // No conversion needed, return as-is
+    return { value: rawValue, unit }
+  }
+
+  /**
+   * Check if a unit can be converted
+   * 
+   * @param {string} unit - The unit string to check
+   * @returns {boolean} True if the unit has a conversion
+   */
+  hasConversion(unit) {
+    if (!unit) return false
+
+    const parsed = this.parseUnit(unit)
+    if (!parsed) return false
+
+    const TIME_UNITS = new Set(['s', 'ms', 'us', 'μs', 'ns', 'min', 'h', 'd'])
+    
+    // Check if it's a recognized unit with a non-1 multiplier
+    return parsed.multiplier !== 1 && TIME_UNITS.has(parsed.baseUnit)
+  }
+
   // === Helper Methods for OI_helpers.py ===
 
   async getOiParams() {
@@ -79,12 +447,344 @@ class OpenInverterExtension {
   }
 
   async getSpotValues() {
-    console.log('[OI App] Fetching spot values...')
     const result = await this.device.execute('from lib.OI_helpers import getSpotValues; getSpotValues()')
-    console.log('[OI App] Raw spot values result:', result)
     const parsed = this.device.parseJSON(result)
-    console.log('[OI App] Parsed spot values:', parsed)
     return parsed
+  }
+
+  // === Render Methods ===
+
+  /**
+   * Render Overview - System-level overview or device panel if device selected
+   */
+  renderOverview() {
+    return this.renderSystemOverview()
+  }
+
+  /**
+   * Catch-all render methods for device panels
+   * These handle device0, device1, device2, etc.
+   */
+  renderDevice0() { return this.renderDeviceByIndex(0) }
+  renderDevice1() { return this.renderDeviceByIndex(1) }
+  renderDevice2() { return this.renderDeviceByIndex(2) }
+  renderDevice3() { return this.renderDeviceByIndex(3) }
+  renderDevice4() { return this.renderDeviceByIndex(4) }
+  renderDevice5() { return this.renderDeviceByIndex(5) }
+  renderDevice6() { return this.renderDeviceByIndex(6) }
+  renderDevice7() { return this.renderDeviceByIndex(7) }
+  renderDevice8() { return this.renderDeviceByIndex(8) }
+  renderDevice9() { return this.renderDeviceByIndex(9) }
+
+  /**
+   * Render a device panel by its index in discoveredDevices array
+   */
+  renderDeviceByIndex(index) {
+    if (!this.state.discoveredDevices || !this.state.discoveredDevices[index]) {
+      return this.html`
+        <div class="panel-message">
+          <p>Device not found (index: ${index})</p>
+        </div>
+      `
+    }
+
+    const device = this.state.discoveredDevices[index]
+    this.state.selectedDeviceSerial = device.serial
+    this.state.selectedNodeId = device.nodeId
+    
+    // Connect to device if not already connected
+    if (!this.state.oiDeviceConnected || this.state.currentDeviceSerial !== device.serial) {
+      // Set connected state for mock devices
+      if (device.nodeId > 127) {
+        this.state.oiDeviceConnected = true
+        this.state.currentDeviceSerial = device.serial
+        
+        // Auto-fetch spot values from ESP32 (OI_helpers.py has demo data)
+        if (!this.state.oiSpotValues && !this.state.isLoadingOiSpotValues) {
+          setTimeout(() => this.refreshSpotValues(), 0)
+        }
+      }
+    }
+    
+    return this.renderDevicePanel()
+  }
+
+  /**
+   * Render system overview (all devices as cards)
+   */
+  renderSystemOverview() {
+    return this.html`
+      <div class="system-panel">
+        <div class="panel-header" style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+          <h2 style="margin: 0; font-size: 24px; color: var(--scheme-primary);">System Overview</h2>
+          <p style="margin: 8px 0 0; color: var(--text-secondary); font-size: 14px;">
+            Scan and manage OpenInverter devices on your CAN bus
+          </p>
+        </div>
+        
+        <div style="padding: 20px;">
+          ${this.state.discoveredDevices && this.state.discoveredDevices.length > 0 ? this.html`
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+              ${this.state.discoveredDevices.map(device => this.html`
+                <div 
+                  style="
+                    background: var(--bg-secondary);
+                    border: 2px solid var(--border-color);
+                    border-radius: 8px;
+                    padding: 20px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                  "
+                  onclick=${() => this.selectDeviceFromOverview(device)}
+                  onmouseover=${(e) => { e.currentTarget.style.borderColor = 'var(--oi-blue)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onmouseout=${(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.transform = 'translateY(0)' }}>
+                  
+                  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: ${device.online ? '#4caf50' : '#999'};"></div>
+                    <h3 style="margin: 0; font-size: 18px; color: var(--text-primary);">
+                      ${device.name || `Device ${device.nodeId}`}
+                    </h3>
+                  </div>
+                  
+                  <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                    <div><strong>Serial:</strong> ${device.serial ? device.serial.substring(0, 16) + '...' : 'Unknown'}</div>
+                    <div><strong>Node ID:</strong> ${device.nodeId}</div>
+                    <div><strong>Firmware:</strong> ${device.firmware || 'Unknown'}</div>
+                    <div style="margin-top: 8px;">
+                      <span style="
+                        display: inline-block;
+                        padding: 4px 12px;
+                        border-radius: 12px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        background: ${device.online ? 'rgba(76, 175, 80, 0.1)' : 'rgba(153, 153, 153, 0.1)'};
+                        color: ${device.online ? '#4caf50' : '#999'};
+                      ">
+                        ${device.online ? 'Online' : 'Offline'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              `)}
+            </div>
+          ` : this.html`
+            <div class="panel-message">
+              <p style="font-size: 16px; margin-bottom: 16px;">No devices found</p>
+              <p style="font-size: 14px; color: var(--text-secondary);">
+                Use the <strong>Device Selector</strong> to scan for OpenInverter devices on the CAN bus
+              </p>
+            </div>
+          `}
+        </div>
+      </div>
+    `
+  }
+
+  /**
+   * Select device from overview page - different from sidebar selection
+   */
+  selectDeviceFromOverview(device) {
+    this.state.selectedDeviceSerial = device.serial
+    this.state.selectedNodeId = device.nodeId
+    this.state.activeDeviceTab = 'overview'
+    
+    // Connect to device if not already connected
+    if (!this.state.oiDeviceConnected || this.state.currentDeviceSerial !== device.serial) {
+      this.connectToDevice(device.nodeId, device.serial)
+    }
+    
+    this.emit('render')
+  }
+
+  /**
+   * Render Device Selector panel
+   * Modern device connection and selection interface
+   */
+  renderDeviceselector() {
+    // Initialize state
+    if (!this.state.canScanResults) {
+      this.state.canScanResults = []
+    }
+    if (!this.state.selectedNodeId) {
+      this.state.selectedNodeId = 1
+    }
+    if (this.state.oiDeviceConnected === undefined) {
+      this.state.oiDeviceConnected = false
+    }
+    if (this.state.isScanning === undefined) {
+      this.state.isScanning = false
+    }
+    if (!this.state.savedDevices) {
+      this.state.savedDevices = []
+    }
+
+    return this.html`
+      <div class="system-panel">
+        <div class="panel-header" style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+          <h2 style="margin: 0; font-size: 24px; color: var(--scheme-primary);">Device Connection</h2>
+          <p style="margin: 8px 0 0; color: var(--text-secondary); font-size: 14px;">
+            Connect to an OpenInverter device via CAN bus
+          </p>
+        </div>
+        
+        <div style="padding: 20px;">
+          <!-- Connection Status -->
+          <div style="background: var(--bg-secondary); border: 2px solid ${this.state.oiDeviceConnected ? '#4ade80' : '#ef4444'}; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 16px; height: 16px; border-radius: 50%; background: ${this.state.oiDeviceConnected ? '#4ade80' : '#ef4444'};"></div>
+                <div>
+                  <div style="font-weight: 600; font-size: 16px; color: ${this.state.oiDeviceConnected ? '#4ade80' : '#ef4444'};">
+                    ${this.state.oiDeviceConnected ? 'Connected' : 'Disconnected'}
+                  </div>
+                  ${this.state.oiDeviceConnected ? this.html`
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                      Node ID: ${this.state.selectedNodeId}
+                      ${this.state.currentDeviceSerial ? this.html` • Serial: ${this.state.currentDeviceSerial}` : ''}
+                    </div>
+                  ` : this.html`
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                      No OpenInverter device connected
+                    </div>
+                  `}
+                </div>
+              </div>
+              
+              ${this.state.oiDeviceConnected ? this.html`
+                <button 
+                  class="secondary-button" 
+                  onclick=${() => this.disconnectDevice()}
+                  style="padding: 8px 16px;">
+                  Disconnect
+                </button>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- CAN Bus Scanner -->
+          ${!this.state.oiDeviceConnected ? this.html`
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; margin: 0; color: var(--text-primary);">Scan for Devices</h3>
+                <div style="display: flex; gap: 8px;">
+                  <button 
+                    class="secondary-button" 
+                    onclick=${() => this.scanCanBus(false)}
+                    disabled=${!this.state.isConnected || this.state.isScanning}
+                    style="padding: 8px 16px; font-size: 13px;">
+                    ${this.state.isScanning ? 'Scanning...' : 'Quick Scan (1-10)'}
+                  </button>
+                  <button 
+                    class="secondary-button" 
+                    onclick=${() => this.scanCanBus(true)}
+                    disabled=${!this.state.isConnected || this.state.isScanning}
+                    style="padding: 8px 16px; font-size: 13px;">
+                    Full Scan (1-127)
+                  </button>
+                </div>
+              </div>
+              
+              ${!this.state.isConnected ? this.html`
+                <div style="text-align: center; padding: 24px; color: #ef4444; font-size: 14px; background: rgba(239, 68, 68, 0.1); border-radius: 4px;">
+                  <p style="margin: 0;">⚠️ Please connect to ESP32 device via WebREPL first</p>
+                  <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary);">
+                    Use the Connection panel to connect to your ESP32
+                  </p>
+                </div>
+              ` : this.state.isScanning ? this.html`
+                <div style="padding: 24px;">
+                  <div style="text-align: center; color: var(--text-secondary); font-size: 14px;">
+                    <p style="margin: 0;">Scanning CAN bus for devices...</p>
+                    <p style="font-size: 12px; margin: 8px 0 0;">This may take a few seconds</p>
+                  </div>
+                </div>
+              ` : this.state.scanMessage ? this.html`
+                <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 14px; background: var(--bg-tertiary); border-radius: 4px;">
+                  <p style="margin: 0;">${this.state.scanMessage}</p>
+                </div>
+              ` : this.state.canScanResults.length === 0 ? this.html`
+                <div style="text-align: center; padding: 24px; color: var(--text-secondary); font-size: 14px;">
+                  <p style="margin: 0;">No scan results yet</p>
+                  <p style="font-size: 12px; margin: 8px 0 0;">Click Quick Scan or Full Scan to find devices</p>
+                </div>
+              ` : this.html`
+                <div style="border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden;">
+                  <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                      <tr style="background: var(--scheme-primary); color: white;">
+                        <th style="padding: 10px 12px; text-align: left; font-weight: 600;">Node ID</th>
+                        <th style="padding: 10px 12px; text-align: left; font-weight: 600;">Serial Number</th>
+                        <th style="padding: 10px 12px; text-align: right; font-weight: 600;">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${this.state.canScanResults.map(device => this.html`
+                        <tr style="border-top: 1px solid var(--border-color); transition: background 0.2s;" onmouseover=${(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'} onmouseout=${(e) => e.currentTarget.style.background = 'transparent'}>
+                          <td style="padding: 12px;">${device.nodeId}</td>
+                          <td style="padding: 12px; font-family: monospace; font-size: 12px;">${device.serialNumber || '—'}</td>
+                          <td style="padding: 12px; text-align: right;">
+                            <button 
+                              class="primary-button" 
+                              onclick=${() => this.connectToDevice(device.nodeId, device.serialNumber)}
+                              style="padding: 6px 16px; font-size: 13px;">
+                              Connect
+                            </button>
+                          </td>
+                        </tr>
+                      `)}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+            </div>
+          ` : ''}
+
+          <!-- Manual Connection -->
+          ${!this.state.oiDeviceConnected ? this.html`
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+              <h3 style="font-size: 16px; margin: 0 0 16px 0; color: var(--text-primary);">Manual Connection</h3>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px;">
+                    Node ID
+                  </label>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    max="255"
+                    value="${this.state.selectedNodeId || 1}"
+                    oninput=${(e) => { this.state.selectedNodeId = parseInt(e.target.value) || 1 }}
+                    style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;"
+                  />
+                </div>
+                <div style="flex: 2;">
+                  <label style="display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px;">
+                    Serial Number (optional)
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g., ABC123..."
+                    value="${this.state.manualSerial || ''}"
+                    oninput=${(e) => { this.state.manualSerial = e.target.value }}
+                    style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;"
+                  />
+                </div>
+                <button 
+                  class="primary-button" 
+                  onclick=${() => this.connectToDevice(this.state.selectedNodeId, this.state.manualSerial)}
+                  disabled=${this.state.selectedNodeId <= 127 && !this.state.isConnected}
+                  style="margin-top: 20px; min-width: 120px;">
+                  Connect
+                </button>
+              </div>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 12px 0 0;">
+                Enter a Node ID (1-127) to connect to a real device, or >127 (e.g., 200, 201) for mock/demo devices.
+              </p>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `
   }
 
   /**
@@ -136,76 +836,184 @@ class OpenInverterExtension {
   }
 
   renderParametersContent() {
-    if (!this.state.isConnected) {
+    if (!this.state.oiDeviceConnected) {
       return this.html`
-        <div class="panel-message">
-          <p>Connect to device to view parameters</p>
+        <div style="padding: 60px 20px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">⚙️</div>
+          <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+            Connect to a device to view parameters
+          </p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+            Use the Device Connection panel to scan and connect
+          </p>
         </div>
       `
     }
 
     if (this.state.isLoadingOiParameters) {
       return this.html`
-        <div class="panel-message">
-          <p>Loading parameters...</p>
+        <div style="padding: 60px 20px; text-align: center;">
+          <p style="font-size: 16px; color: var(--text-secondary);">Loading parameters...</p>
         </div>
       `
     }
 
     if (!this.state.oiParameters || Object.keys(this.state.oiParameters).length === 0) {
       return this.html`
-        <div class="panel-message">
-          <p>No parameters available. Click "Load from Device" to fetch parameters.</p>
+        <div style="padding: 60px 20px; text-align: center;">
+          <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+            No parameters available
+          </p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+            Click "Load from Device" to fetch parameters
+          </p>
         </div>
       `
+    }
+
+    // Initialize collapsed categories state
+    if (!this.state.collapsedCategories) {
+      this.state.collapsedCategories = new Set()
     }
 
     // Group parameters by category
     const categories = {}
     Object.entries(this.state.oiParameters).forEach(([name, param]) => {
-      const cat = param.category || 'Uncategorized'
-      if (!categories[cat]) categories[cat] = []
-      categories[cat].push({ name, ...param })
+      // Only include actual parameters (isparam = true)
+      if (param.isparam) {
+        const cat = param.category || 'Uncategorized'
+        if (!categories[cat]) categories[cat] = []
+        categories[cat].push({ name, ...param })
+      }
     })
 
     return this.html`
-      <div class="oi-parameters-container">
-        ${Object.entries(categories).map(([category, params]) => this.html`
-          <div class="oi-category-section">
-            <h3 class="oi-category-title">${category}</h3>
-            <div class="oi-parameters-table">
-              <div class="oi-table-header">
-                <div class="oi-col-name">Parameter</div>
-                <div class="oi-col-value">Value</div>
-                <div class="oi-col-unit">Unit</div>
-                <div class="oi-col-range">Range</div>
-                <div class="oi-col-default">Default</div>
-              </div>
-              ${params.map(param => this.renderParameter(param))}
+      <div style="padding: 20px;">
+        <!-- Import/Export Actions -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3 style="margin: 0; font-size: 14px; color: var(--text-primary);">Parameter Management</h3>
+              <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary);">
+                Export/Import parameters or save to device flash
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button 
+                class="secondary-button" 
+                onclick=${() => this.exportParametersToJSON()}
+                disabled=${!this.state.oiParameters}
+                style="padding: 8px 16px; font-size: 13px;">
+                Export to JSON
+              </button>
+              <button 
+                class="secondary-button" 
+                onclick=${() => this.importParametersFromJSON()}
+                disabled=${!this.state.oiParameters}
+                style="padding: 8px 16px; font-size: 13px;">
+                Import from JSON
+              </button>
+              <button 
+                class="primary-button" 
+                onclick=${() => this.saveParametersToFlash()}
+                disabled=${!this.state.oiDeviceConnected}
+                style="padding: 8px 16px; font-size: 13px;">
+                Save to Flash
+              </button>
             </div>
           </div>
-        `)}
+        </div>
+
+        <!-- Parameters by Category -->
+        ${Object.entries(categories).map(([category, params]) => {
+          const isCollapsed = this.state.collapsedCategories.has(category)
+          return this.html`
+            <div style="margin-bottom: 24px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;">
+              <!-- Category Header (clickable to collapse/expand) -->
+              <div 
+                onclick=${() => this.toggleCategory(category)}
+                style="
+                  padding: 16px 20px;
+                  background: var(--scheme-primary);
+                  color: white;
+                  cursor: pointer;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  user-select: none;
+                ">
+                <div>
+                  <span style="font-size: 16px; font-weight: 600;">${category}</span>
+                  <span style="font-size: 13px; opacity: 0.9; margin-left: 8px;">(${params.length})</span>
+                </div>
+                <div style="font-size: 20px; transition: transform 0.2s; transform: rotate(${isCollapsed ? 0 : 180}deg);">
+                  ▼
+                </div>
+              </div>
+
+              <!-- Category Parameters -->
+              ${!isCollapsed ? this.html`
+                <div style="padding: 4px;">
+                  ${params.map(param => this.renderParameterRow(param))}
+                </div>
+              ` : ''}
+            </div>
+          `
+        })}
       </div>
     `
   }
 
-  renderParameter(param) {
+  renderParameterRow(param) {
     const hasEnum = param.enums && Object.keys(param.enums).length > 0
     const hasRange = param.minimum !== undefined || param.maximum !== undefined
 
     return this.html`
-      <div class="oi-table-row" data-param="${param.name}">
-        <div class="oi-col-name">
-          <strong>${param.name}</strong>
+      <div 
+        style="
+          display: grid;
+          grid-template-columns: 2fr 1.5fr 0.8fr 1.2fr;
+          gap: 16px;
+          padding: 12px 16px;
+          align-items: center;
+          border-bottom: 1px solid var(--border-color);
+          transition: background 0.2s;
+        "
+        onmouseover=${(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'}
+        onmouseout=${(e) => e.currentTarget.style.background = 'transparent'}
+        data-param="${param.name}">
+        
+        <!-- Parameter Name & Description -->
+        <div>
+          <div style="font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 2px;">
+            ${param.name}
+          </div>
+          ${param.description ? this.html`
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+              ${param.description}
+            </div>
+          ` : ''}
         </div>
-        <div class="oi-col-value">
+
+        <!-- Value Input/Select -->
+        <div>
           ${hasEnum ? this.renderEnumSelect(param) : this.renderValueInput(param)}
         </div>
-        <div class="oi-col-unit">${param.unit || '-'}</div>
-        <div class="oi-col-range">
-          ${hasRange ? `${param.minimum ?? '?'} - ${param.maximum ?? '?'}` : '-'}
+
+        <!-- Unit -->
+        <div style="font-size: 13px; color: var(--text-secondary); text-align: center;">
+          ${param.unit || '—'}
         </div>
-        <div class="oi-col-default">${param.default !== undefined ? param.default : '-'}</div>
+
+        <!-- Range & Default -->
+        <div style="font-size: 12px; color: var(--text-secondary);">
+          ${hasRange ? this.html`
+            <div>Range: ${param.minimum ?? '?'} to ${param.maximum ?? '?'}</div>
+          ` : ''}
+          ${param.default !== undefined ? this.html`
+            <div>Default: ${param.default}</div>
+          ` : ''}
+        </div>
       </div>
     `
   }
@@ -220,6 +1028,7 @@ class OpenInverterExtension {
         min="${param.minimum}"
         max="${param.maximum}"
         onchange=${(e) => this.updateParameter(param.name, parseFloat(e.target.value))}
+        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;"
       />
     `
   }
@@ -228,11 +1037,11 @@ class OpenInverterExtension {
     return this.html`
       <select 
         class="oi-enum-select"
-        value="${param.value}"
+        value="${this.normalizeEnumValue(param.value)}"
         onchange=${(e) => this.updateParameter(param.name, parseInt(e.target.value))}
-      >
+        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;">
         ${Object.entries(param.enums).map(([value, label]) => this.html`
-          <option value="${value}" ${param.value == value ? 'selected' : ''}>
+          <option value="${value}" ${this.normalizeEnumValue(param.value) === value ? 'selected' : ''}>
             ${label}
           </option>
         `)}
@@ -240,14 +1049,28 @@ class OpenInverterExtension {
     `
   }
 
+  toggleCategory(category) {
+    if (this.state.collapsedCategories.has(category)) {
+      this.state.collapsedCategories.delete(category)
+    } else {
+      this.state.collapsedCategories.add(category)
+    }
+    this.emit('render')
+  }
+
   async updateParameter(name, value) {
     try {
       await this.setParameter({ NAME: name, VALUE: value })
-      // Refresh parameters to show updated value
-      await this.refreshParameters()
+      // Update local state immediately for better UX
+      if (this.state.oiParameters && this.state.oiParameters[name]) {
+        this.state.oiParameters[name].value = value
+        this.emit('render')
+      }
     } catch (error) {
       console.error('[OI App] Failed to update parameter:', error)
       alert(`Failed to update parameter: ${error.message}`)
+      // Refresh to show correct value
+      await this.refreshParameters()
     }
   }
 
@@ -273,18 +1096,748 @@ class OpenInverterExtension {
     }
   }
 
+  exportParametersToJSON() {
+    if (!this.state.oiParameters) {
+      alert('No parameters to export')
+      return
+    }
+
+    // Create export object with only parameter values (isparam = true)
+    const exportData = {}
+    Object.entries(this.state.oiParameters).forEach(([key, param]) => {
+      if (param.isparam) {
+        exportData[key] = param.value
+      }
+    })
+
+    // Create blob and download
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `openinverter_params_${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
+    console.log('[OI Parameters] Exported', Object.keys(exportData).length, 'parameters')
+  }
+
+  importParametersFromJSON() {
+    // Create hidden file input
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = async (e) => {
+      const file = e.target.files[0]
+      if (!file) return
+
+      try {
+        const text = await file.text()
+        const importedData = JSON.parse(text)
+
+        if (!this.state.oiParameters) {
+          alert('No parameter definitions loaded')
+          return
+        }
+
+        let validCount = 0
+        let invalidCount = 0
+        const errors = []
+
+        // Validate and update parameters
+        for (const [key, value] of Object.entries(importedData)) {
+          if (typeof value !== 'number') {
+            invalidCount++
+            errors.push(`${key}: value must be a number`)
+            continue
+          }
+
+          const param = this.state.oiParameters[key]
+          if (!param) {
+            invalidCount++
+            errors.push(`${key}: parameter not found`)
+            continue
+          }
+
+          if (!param.isparam) {
+            invalidCount++
+            errors.push(`${key}: not a settable parameter`)
+            continue
+          }
+
+          // Validate range
+          if (param.minimum !== undefined && value < param.minimum) {
+            invalidCount++
+            errors.push(`${key}: value ${value} below minimum ${param.minimum}`)
+            continue
+          }
+
+          if (param.maximum !== undefined && value > param.maximum) {
+            invalidCount++
+            errors.push(`${key}: value ${value} above maximum ${param.maximum}`)
+            continue
+          }
+
+          // Update parameter
+          try {
+            await this.updateParameter(key, value)
+            validCount++
+            // Small delay to avoid overwhelming the device
+            await new Promise(resolve => setTimeout(resolve, 50))
+          } catch (error) {
+            invalidCount++
+            errors.push(`${key}: ${error.message}`)
+          }
+        }
+
+        let message = `Import complete: ${validCount} parameters updated`
+        if (invalidCount > 0) {
+          message += `\n${invalidCount} errors:\n` + errors.slice(0, 5).join('\n')
+          if (errors.length > 5) {
+            message += `\n...and ${errors.length - 5} more`
+          }
+        }
+        alert(message)
+
+        // Refresh to ensure UI is in sync
+        await this.refreshParameters()
+      } catch (error) {
+        alert(`Failed to import: ${error.message}`)
+      }
+    }
+    input.click()
+  }
+
+  async saveParametersToFlash() {
+    if (!this.state.oiDeviceConnected) {
+      alert('Not connected to device')
+      return
+    }
+
+    try {
+      const result = await this.device.execute('from lib.OI_helpers import saveToFlash; saveToFlash()')
+      const parsed = this.device.parseJSON(result)
+      
+      if (parsed && parsed.success) {
+        alert('Parameters saved to flash successfully')
+      } else {
+        alert('Failed to save parameters to flash')
+      }
+    } catch (error) {
+      console.error('[OI Parameters] Save to flash error:', error)
+      alert(`Failed to save to flash: ${error.message}`)
+    }
+  }
+
   loadParametersFromFile() {
-    // TODO: Implement file loading
-    alert('Load from file not yet implemented')
+    // Alias to importParametersFromJSON for backward compatibility
+    this.importParametersFromJSON()
   }
 
   saveParametersToFile() {
-    // TODO: Implement file saving
-    alert('Save to file not yet implemented')
+    // Alias to exportParametersToJSON for backward compatibility
+    this.exportParametersToJSON()
   }
 
   /**
-   * Render Spot Values panel
+   * Render Overview panel
+   * Modern spot values display with inline charts
+   */
+  renderOverview() {
+    // Initialize state
+    if (!this.state.spotValues) {
+      this.state.spotValues = {}
+    }
+    if (!this.state.spotValueHistory) {
+      this.state.spotValueHistory = {}
+    }
+    if (!this.state.selectedChartParams) {
+      this.state.selectedChartParams = new Set()
+    }
+    if (this.state.spotValueInterval === undefined) {
+      this.state.spotValueInterval = 1000 // Default 1 second
+    }
+    if (this.state.isStreamingSpotValues === undefined) {
+      this.state.isStreamingSpotValues = false
+    }
+
+    // Auto-load spot values when connected
+    if (!this.state.oiSpotValues && !this.state.isLoadingOiSpotValues && this.state.oiDeviceConnected) {
+      setTimeout(() => this.refreshSpotValues(), 0)
+    }
+
+    return this.html`
+      <div class="system-panel">
+        <div class="panel-header" style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="margin: 0; font-size: 24px; color: var(--scheme-primary);">Overview</h2>
+              <p style="margin: 8px 0 0; color: var(--text-secondary); font-size: 14px;">
+                Live spot values and performance metrics
+              </p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <label style="font-size: 13px; color: var(--text-secondary);">Refresh Interval:</label>
+                <select 
+                  onchange=${(e) => { this.state.spotValueInterval = parseInt(e.target.value); this.emit('render') }}
+                  style="padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary);">
+                  <option value="500" ${this.state.spotValueInterval === 500 ? 'selected' : ''}>500ms</option>
+                  <option value="1000" ${this.state.spotValueInterval === 1000 ? 'selected' : ''}>1s</option>
+                  <option value="2000" ${this.state.spotValueInterval === 2000 ? 'selected' : ''}>2s</option>
+                  <option value="5000" ${this.state.spotValueInterval === 5000 ? 'selected' : ''}>5s</option>
+                </select>
+              </div>
+              <button 
+                class="${this.state.isStreamingSpotValues ? 'secondary-button' : 'primary-button'}" 
+                onclick=${() => this.toggleSpotValueStreaming()}
+                disabled=${!this.state.oiDeviceConnected}
+                style="padding: 8px 16px;">
+                ${this.state.isStreamingSpotValues ? 'Stop' : 'Start'} Streaming
+              </button>
+              <button 
+                class="secondary-button" 
+                onclick=${() => this.refreshSpotValues()}
+                disabled=${!this.state.oiDeviceConnected || this.state.isStreamingSpotValues}
+                style="padding: 8px 16px;">
+                Refresh Now
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        ${this.renderOverviewContent()}
+      </div>
+    `
+  }
+
+  renderOverviewContent() {
+    // Initialize auto-refresh state if needed
+    if (typeof this.state.autoRefreshInterval === 'undefined') {
+      this.state.autoRefreshInterval = 1000 // Default 1000ms
+    }
+    
+    // Ensure selectedChartParams is initialized
+    if (!this.state.selectedChartParams) {
+      this.state.selectedChartParams = new Set()
+    }
+
+    // Auto-start refresh when connected and tab is active
+    if (this.state.oiDeviceConnected && this.state.activeDeviceTab === 'overview') {
+      // Auto-load spot values when connected (but not already loading)
+      if (!this.state.oiSpotValues && !this.state.isLoadingOiSpotValues) {
+        setTimeout(() => this.refreshSpotValues(), 0)
+      }
+      
+      // Start auto-refresh if not already running
+      if (!this.autoRefreshTimer) {
+        this.autoRefreshTimer = setInterval(() => {
+          if (this.state.oiDeviceConnected && this.state.activeDeviceTab === 'overview' && !this.state.isLoadingOiSpotValues) {
+            this.refreshSpotValues()
+          }
+        }, this.state.autoRefreshInterval)
+      }
+    } else if (this.autoRefreshTimer) {
+      // Stop auto-refresh if tab changed or device disconnected
+      clearInterval(this.autoRefreshTimer)
+      this.autoRefreshTimer = null
+    }
+
+    if (!this.state.oiDeviceConnected) {
+      return this.html`
+        <div style="padding: 60px 20px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📊</div>
+          <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+            Connect to a device to view spot values
+          </p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+            Use the Device Connection panel to scan and connect
+          </p>
+        </div>
+      `
+    }
+
+    if (this.state.isLoadingOiSpotValues) {
+      return this.html`
+        <div style="padding: 60px 20px; text-align: center;">
+          <p style="font-size: 16px; color: var(--text-secondary);">Loading spot values...</p>
+        </div>
+      `
+    }
+
+    if (!this.state.oiSpotValues || Object.keys(this.state.oiSpotValues).length === 0) {
+      return this.html`
+        <div style="padding: 60px 20px; text-align: center;">
+          <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+            No spot values available
+          </p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+            Refreshing automatically every ${this.state.autoRefreshInterval}ms...
+          </p>
+        </div>
+      `
+    }
+
+    // Group spot values by category
+    const categories = {}
+    Object.entries(this.state.oiSpotValues).forEach(([name, spot]) => {
+      const cat = spot.category || 'Uncategorized'
+      if (!categories[cat]) categories[cat] = []
+      categories[cat].push({ name, ...spot })
+    })
+
+    return this.html`
+      <div style="display: flex; flex-direction: column; height: 100%;">
+        <!-- Controls Header -->
+        <div style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 16px 20px;">
+          <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <!-- Update interval input -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label style="font-size: 14px; color: var(--text-secondary); white-space: nowrap;">
+                Update Interval:
+              </label>
+              <input 
+                type="number"
+                value=${this.state.autoRefreshInterval}
+                onchange=${(e) => this.updateRefreshInterval(e.target.value)}
+                min="100"
+                max="10000"
+                step="100"
+                style="
+                  width: 80px;
+                  padding: 8px;
+                  border: 1px solid var(--border-color);
+                  border-radius: 4px;
+                  font-size: 14px;
+                  font-family: 'Monaco', 'Courier New', monospace;
+                "
+              />
+              <span style="font-size: 14px; color: var(--text-secondary);">ms</span>
+            </div>
+            
+            <!-- Clear data button -->
+            <button 
+              class="secondary-button"
+              onclick=${() => this.clearSpotValueHistory()}
+              style="background: var(--oi-orange); padding: 8px 16px; margin-left: auto;">
+              Clear Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Spot Values Content -->
+        <div style="flex: 1; overflow-y: auto; padding: 20px;">
+          <div class="spot-values-categories">
+            ${Object.entries(categories).map(([category, spots]) => this.html`
+              <div class="parameter-category">
+                <h3 class="category-title">
+                  ${category}
+                  <span class="param-count">(${spots.length})</span>
+                </h3>
+                <div class="parameters-list">
+                  ${spots.map(spot => this.renderSpotValueCard(spot))}
+                </div>
+              </div>
+            `)}
+          </div>
+        </div>
+      </div>
+    `
+  }
+
+  renderSpotValueCard(spot) {
+    // Ensure selectedChartParams is initialized
+    if (!this.state.selectedChartParams) {
+      this.state.selectedChartParams = new Set()
+    }
+    
+    const isSelected = this.state.selectedChartParams.has(spot.name)
+    const converted = this.convertSpotValue(spot.value, spot.unit)
+    const formatted = this.formatParameterValue(spot, converted.value)
+    
+    // Get historical data for this parameter
+    const history = this.state.spotValueHistory[spot.name] || []
+    
+    // Create a safe ID for the card (replace special chars)
+    const cardId = `spot-card-${spot.name.replace(/[^a-zA-Z0-9]/g, '-')}`
+    
+    // Create click handler function
+    const handleClick = () => {
+      console.log('[OI] Clicked spot value card:', spot.name)
+      this.toggleChartForParam(spot.name)
+    }
+    
+    return this.html`
+      <div 
+        id="${cardId}"
+        data-param-name="${spot.name}"
+        role="button"
+        tabindex="0"
+        onclick=${handleClick}
+        onkeydown=${(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            handleClick()
+          }
+        }}
+        style="
+          background: ${isSelected ? 'var(--bg-tertiary)' : 'var(--bg-secondary)'};
+          border: 2px solid ${isSelected ? 'var(--scheme-primary)' : 'var(--border-color)'};
+          border-radius: 8px;
+          padding: 16px;
+          cursor: pointer;
+          user-select: none;
+          transition: all 0.2s;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        "
+        onmouseover=${(e) => { 
+          e.currentTarget.style.cursor = 'pointer'
+          if (!isSelected) e.currentTarget.style.borderColor = 'var(--scheme-primary)' 
+        }}
+        onmouseout=${(e) => { 
+          e.currentTarget.style.cursor = 'pointer'
+          if (!isSelected) e.currentTarget.style.borderColor = 'var(--border-color)' 
+        }}>
+        
+        <!-- Spot Value Header -->
+        <div style="pointer-events: none;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--scheme-primary); margin-bottom: 8px;">
+            ${spot.name}
+          </div>
+          <div class="spot-value-display" style="font-size: 20px; font-weight: 600; font-family: 'Monaco', 'Courier New', monospace; color: var(--text-primary);">
+            ${formatted}
+          </div>
+        </div>
+        
+        <!-- Mini Chart (if selected and has history) -->
+        <div class="mini-chart-container" style="pointer-events: none;">
+          ${isSelected && history.length > 1 ? this.renderMiniChart(spot.name, history, converted.unit) : ''}
+        </div>
+        
+        <!-- Click hint -->
+        <div style="font-size: 11px; color: var(--text-secondary); text-align: center; opacity: 0.7; pointer-events: none;">
+          ${isSelected ? 'Click to hide chart' : 'Click to show chart'}
+        </div>
+      </div>
+    `
+  }
+
+  /**
+   * Render inline mini-chart using SVG
+   * Ported from MultiLineChart.tsx with full axis labels and grid lines
+   */
+  renderMiniChart(paramName, history, unit) {
+    // Base dimensions for coordinate system (will scale responsively)
+    // Using larger base width to better fill card width when scaled
+    const baseWidth = 500
+    const height = 150
+    const padding = { top: 10, right: 10, bottom: 40, left: 35 }
+    const chartWidth = baseWidth - padding.left - padding.right
+    const chartHeight = height - padding.top - padding.bottom
+
+    if (history.length < 2) {
+      return this.html`
+        <div style="width: 100%; height: ${height}px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 12px;">
+          Collecting data...
+        </div>
+      `
+    }
+
+    // Extract values and timestamps
+    const values = history.map(d => d.value)
+    const timestamps = history.map(d => d.timestamp)
+
+    const minValue = Math.min(...values)
+    const maxValue = Math.max(...values)
+    const minTime = Math.min(...timestamps)
+    const maxTime = Math.max(...timestamps)
+
+    const valueRange = maxValue - minValue || 1
+    const timeRange = maxTime - minTime || 1
+
+    // Scale functions (use baseWidth for coordinate calculations)
+    const scaleX = (timestamp) => {
+      return padding.left + ((timestamp - minTime) / timeRange) * chartWidth
+    }
+
+    const scaleY = (value) => {
+      return padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight
+    }
+
+    // Generate Y-axis ticks (5 ticks)
+    const yTicks = 5
+    const yTickValues = Array.from({ length: yTicks }, (_, i) => {
+      return minValue + (valueRange * i) / (yTicks - 1)
+    })
+
+    // Generate X-axis ticks (6 ticks)
+    const xTicks = 6
+    const xTickValues = Array.from({ length: xTicks }, (_, i) => {
+      return minTime + (timeRange * i) / (xTicks - 1)
+    })
+
+    // Generate SVG path
+    const linePath = history.map((point, index) => {
+      const x = scaleX(point.timestamp)
+      const y = scaleY(point.value)
+      return `${index === 0 ? 'M' : 'L'} ${x} ${y}`
+    }).join(' ')
+
+    // Color based on parameter name (consistent hashing)
+    const color = this.getColorForParam(paramName)
+
+    return this.html`
+      <svg width="100%" height="${height}" viewBox="0 0 ${baseWidth} ${height}" preserveAspectRatio="none" style="display: block; width: 100%;">
+        <!-- Y-axis line -->
+        <line
+          x1="${padding.left}"
+          y1="${padding.top}"
+          x2="${padding.left}"
+          y2="${height - padding.bottom}"
+          stroke="#ccc"
+          stroke-width="1"
+        />
+
+        <!-- X-axis line -->
+        <line
+          x1="${padding.left}"
+          y1="${height - padding.bottom}"
+          x2="${baseWidth - padding.right}"
+          y2="${height - padding.bottom}"
+          stroke="#ccc"
+          stroke-width="1"
+        />
+
+        <!-- Y-axis ticks, labels, and grid lines -->
+        ${yTickValues.map((value, i) => {
+          const y = scaleY(value)
+          return this.html`
+            <g>
+              <!-- Tick mark -->
+              <line
+                x1="${padding.left - 5}"
+                y1="${y}"
+                x2="${padding.left}"
+                y2="${y}"
+                stroke="#ccc"
+                stroke-width="1"
+              />
+              <!-- Grid line (horizontal, dashed) -->
+              <line
+                x1="${padding.left}"
+                y1="${y}"
+                x2="${baseWidth - padding.right}"
+                y2="${y}"
+                stroke="#eee"
+                stroke-width="1"
+                stroke-dasharray="2,2"
+              />
+              <!-- Y-axis label -->
+              <text
+                x="${padding.left - 10}"
+                y="${y}"
+                text-anchor="end"
+                dominant-baseline="middle"
+                font-size="12"
+                fill="#666"
+              >
+                ${this.formatValue(value)}
+              </text>
+            </g>
+          `
+        })}
+
+        <!-- X-axis ticks and labels -->
+        ${xTickValues.map((timestamp, i) => {
+          const x = scaleX(timestamp)
+          return this.html`
+            <g>
+              <!-- Tick mark -->
+              <line
+                x1="${x}"
+                y1="${height - padding.bottom}"
+                x2="${x}"
+                y2="${height - padding.bottom + 5}"
+                stroke="#ccc"
+                stroke-width="1"
+              />
+              <!-- X-axis label -->
+              <text
+                x="${x}"
+                y="${height - padding.bottom + 20}"
+                text-anchor="middle"
+                font-size="12"
+                fill="#666"
+              >
+                ${this.formatTime(timestamp)}
+              </text>
+            </g>
+          `
+        })}
+
+        <!-- Data line -->
+        <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2" opacity="0.8"/>
+        
+        <!-- Data points -->
+        ${history.map(point => {
+          const cx = scaleX(point.timestamp)
+          const cy = scaleY(point.value)
+          return this.html`<circle cx="${cx}" cy="${cy}" r="3" fill="${color}"/>`
+        })}
+      </svg>
+    `
+  }
+
+  /**
+   * Format a numeric value for display in chart labels
+   * Handles edge cases with scientific notation
+   * 
+   * @param {number} value - The value to format
+   * @returns {string} Formatted value string
+   */
+  formatValue(value) {
+    if (Math.abs(value) < 0.01 && value !== 0) return value.toExponential(2)
+    if (Math.abs(value) > 10000) return value.toExponential(2)
+    return value.toFixed(2)
+  }
+
+  /**
+   * Format a timestamp for display in chart labels
+   * Converts milliseconds to seconds
+   * 
+   * @param {number} timestamp - Timestamp in milliseconds
+   * @returns {string} Formatted time string (e.g., "5s")
+   */
+  formatTime(timestamp) {
+    const seconds = Math.floor(timestamp / 1000)
+    return `${seconds}s`
+  }
+
+  /**
+   * Generate consistent color for a parameter name
+   */
+  getColorForParam(key) {
+    // Simple hash function to generate consistent RGB color
+    let hash = 0
+    for (let i = 0; i < key.length; i++) {
+      hash = ((hash << 5) - hash) + key.charCodeAt(i)
+      hash = hash & hash // Convert to 32-bit integer
+    }
+
+    // Generate RGB values from hash
+    const r = (hash & 0xFF0000) >>> 16
+    const g = (hash & 0x00FF00) >>> 8
+    const b = hash & 0x0000FF
+
+    // Map values to range 60-200 to avoid too light or too dark colors
+    const normalize = (val) => 60 + (val / 255) * 140
+
+    const values = [normalize(r), normalize(g), normalize(b)]
+
+    // If all values are too high (too light), darken the lowest one
+    if (values.every(v => v > 150)) {
+      const minIndex = values.indexOf(Math.min(...values))
+      values[minIndex] = Math.max(60, values[minIndex] - 80)
+    }
+
+    return `rgb(${Math.round(values[0])}, ${Math.round(values[1])}, ${Math.round(values[2])})`
+  }
+
+  /**
+   * Toggle chart visibility for a parameter
+   */
+  toggleChartForParam(paramName) {
+    // Ensure selectedChartParams is initialized
+    if (!this.state.selectedChartParams) {
+      this.state.selectedChartParams = new Set()
+    }
+    
+    console.log('[OI Overview] toggleChartForParam called for:', paramName)
+    console.log('[OI Overview] Current selectedChartParams:', Array.from(this.state.selectedChartParams))
+    
+    if (this.state.selectedChartParams.has(paramName)) {
+      this.state.selectedChartParams.delete(paramName)
+      console.log('[OI Overview] Hiding chart for:', paramName)
+    } else {
+      this.state.selectedChartParams.add(paramName)
+      const history = this.state.spotValueHistory[paramName] || []
+      console.log('[OI Overview] Showing chart for:', paramName, '- data points:', history.length)
+    }
+    
+    console.log('[OI Overview] Updated selectedChartParams:', Array.from(this.state.selectedChartParams))
+    this.emit('render')
+  }
+
+  /**
+   * Toggle spot value streaming on/off
+   */
+  toggleSpotValueStreaming() {
+    if (this.state.isStreamingSpotValues) {
+      // Stop streaming
+      if (this.state.spotValueStreamTimer) {
+        clearInterval(this.state.spotValueStreamTimer)
+        this.state.spotValueStreamTimer = null
+      }
+      this.state.isStreamingSpotValues = false
+    } else {
+      // Start streaming
+      this.state.isStreamingSpotValues = true
+      this.streamSpotValues()
+      this.state.spotValueStreamTimer = setInterval(() => {
+        this.streamSpotValues()
+      }, this.state.spotValueInterval)
+    }
+    this.emit('render')
+  }
+
+  /**
+   * Stream spot values (called by interval timer)
+   */
+  async streamSpotValues() {
+    if (!this.state.oiDeviceConnected || !this.state.isStreamingSpotValues) {
+      return
+    }
+
+    try {
+      const spots = await this.getSpotValues()
+      if (spots) {
+        this.state.oiSpotValues = spots
+        
+        // Update historical data
+        const timestamp = Date.now()
+        Object.entries(spots).forEach(([name, spot]) => {
+          if (!this.state.spotValueHistory[name]) {
+            this.state.spotValueHistory[name] = []
+          }
+          
+          // Convert value if needed
+          const converted = this.convertSpotValue(spot.value, spot.unit)
+          
+          // Add data point
+          this.state.spotValueHistory[name].push({
+            timestamp,
+            value: converted.value
+          })
+          
+          // Limit history to 100 points
+          if (this.state.spotValueHistory[name].length > 100) {
+            this.state.spotValueHistory[name] = this.state.spotValueHistory[name].slice(-100)
+          }
+        })
+        
+        this.emit('render')
+      }
+    } catch (error) {
+      console.error('[OI Overview] Stream error:', error)
+    }
+  }
+
+  /**
+   * Render Spot Values panel (legacy)
    * Displays read-only live values from the controller
    */
   renderSpotvalues() {
@@ -373,11 +1926,75 @@ class OpenInverterExtension {
   }
 
   renderSpotValueCard(spot) {
+    // Ensure selectedChartParams is initialized
+    if (!this.state.selectedChartParams) {
+      this.state.selectedChartParams = new Set()
+    }
+    
+    const isSelected = this.state.selectedChartParams.has(spot.name)
+    const converted = this.convertSpotValue(spot.value, spot.unit)
+    const formatted = this.formatParameterValue(spot, converted.value)
+    
+    // Get historical data for this parameter
+    const history = this.state.spotValueHistory[spot.name] || []
+    
+    // Create click handler function
+    const handleClick = () => {
+      console.log('[OI] Clicked spot value card:', spot.name)
+      this.toggleChartForParam(spot.name)
+    }
+    
     return this.html`
-      <div class="oi-spotvalue-card">
-        <div class="oi-spotvalue-name">${spot.name}</div>
-        <div class="oi-spotvalue-value">
-          ${spot.value} ${spot.unit || ''}
+      <div 
+        class="oi-spotvalue-card parameter-item"
+        role="button"
+        tabindex="0"
+        onclick=${handleClick}
+        onkeydown=${(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            handleClick()
+          }
+        }}
+        style="
+          background: ${isSelected ? 'var(--bg-secondary)' : 'transparent'};
+          padding: 0.75rem;
+          border-radius: 6px;
+          border: 2px solid ${isSelected ? 'var(--oi-blue)' : 'transparent'};
+          cursor: pointer;
+          user-select: none;
+          transition: all 0.2s;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        "
+        onmouseover=${(e) => { 
+          if (!isSelected) {
+            e.currentTarget.style.borderColor = 'var(--oi-blue)'
+            e.currentTarget.style.background = 'var(--oi-blue-light)'
+          }
+        }}
+        onmouseout=${(e) => { 
+          if (!isSelected) {
+            e.currentTarget.style.borderColor = 'transparent'
+            e.currentTarget.style.background = 'transparent'
+          }
+        }}>
+        <div class="parameter-header">
+          <label class="parameter-label oi-spotvalue-name" style="font-size: 0.9rem; font-weight: 500;">
+            ${spot.name}
+          </label>
+        </div>
+        <div class="parameter-value oi-spotvalue-value" style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); font-family: 'Monaco', 'Courier New', monospace;">
+          ${formatted}
+        </div>
+        ${isSelected && history.length > 1 ? this.html`
+          <div style="width: 100%; margin-top: 0.5rem; overflow: visible; pointer-events: none;">
+            ${this.renderMiniChart(spot.name, history, converted.unit)}
+          </div>
+        ` : ''}
+        <div style="font-size: 11px; color: var(--text-secondary); text-align: center; opacity: 0.7; margin-top: 4px; pointer-events: none;">
+          ${isSelected ? 'Click to hide chart' : 'Click to show chart'}
         </div>
       </div>
     `
@@ -390,12 +2007,37 @@ class OpenInverterExtension {
     }
 
     this.state.isLoadingOiSpotValues = true
-    this.emit('render')
 
     try {
       const spots = await this.getSpotValues()
+      
+      // Update historical data for charts
+      const timestamp = Date.now()
+      if (!this.state.spotValueHistory) {
+        this.state.spotValueHistory = {}
+      }
+      
+      Object.entries(spots).forEach(([name, spot]) => {
+        // Add to history for charts
+        if (!this.state.spotValueHistory[name]) {
+          this.state.spotValueHistory[name] = []
+        }
+        
+        this.state.spotValueHistory[name].push({
+          timestamp: timestamp,
+          value: spot.value
+        })
+        
+        // Keep only last 100 points
+        if (this.state.spotValueHistory[name].length > 100) {
+          this.state.spotValueHistory[name] = this.state.spotValueHistory[name].slice(-100)
+        }
+      })
+      
       this.state.oiSpotValues = spots
       this.state.isLoadingOiSpotValues = false
+      
+      // Always re-render (nanohtml is efficient with DOM diffing)
       this.emit('render')
     } catch (error) {
       console.error('[OI App] Failed to load spot values:', error)
@@ -403,6 +2045,45 @@ class OpenInverterExtension {
       this.emit('render')
       alert(`Failed to load spot values: ${error.message}`)
     }
+  }
+
+  /**
+   * Update spot values in the DOM without full re-render (for smooth auto-refresh)
+   */
+  /**
+   * Update the refresh interval and restart auto-refresh if needed
+   */
+  updateRefreshInterval(value) {
+    const interval = parseInt(value)
+    if (isNaN(interval) || interval < 100) {
+      console.warn('[OI Overview] Invalid interval, using minimum 100ms')
+      this.state.autoRefreshInterval = 100
+    } else if (interval > 10000) {
+      console.warn('[OI Overview] Invalid interval, using maximum 10000ms')
+      this.state.autoRefreshInterval = 10000
+    } else {
+      this.state.autoRefreshInterval = interval
+    }
+    
+    console.log('[OI Overview] Update interval changed to:', this.state.autoRefreshInterval, 'ms')
+    
+    // Restart auto-refresh with new interval
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer)
+      this.autoRefreshTimer = null
+      // The render cycle will restart it automatically
+    }
+    
+    this.emit('render')
+  }
+
+  /**
+   * Clear spot value history (for charts)
+   */
+  clearSpotValueHistory() {
+    console.log('[OI Overview] Clearing spot value history')
+    this.state.spotValueHistory = {}
+    this.emit('render')
   }
 
   /**
@@ -420,6 +2101,61 @@ class OpenInverterExtension {
           <p>CAN Mapping interface coming soon...</p>
           <p>This panel will allow you to configure CAN bus message mapping.</p>
         </div>
+      </div>
+    `
+  }
+
+  renderCanmappingContent() {
+    return this.html`
+      <div style="padding: 60px 20px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📡</div>
+        <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+          CAN Mapping interface coming soon
+        </p>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+          This panel will allow you to configure CAN bus message mapping
+        </p>
+      </div>
+    `
+  }
+
+  /**
+   * Render CAN Messages panel
+   * Send and monitor CAN bus messages
+   */
+  renderCanmessages() {
+    return this.html`
+      <div class="system-panel">
+        <div class="panel-header" style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+          <h2 style="margin: 0; font-size: 24px; color: white;">CAN Messages</h2>
+          <p style="margin: 8px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">
+            Send and monitor CAN bus traffic
+          </p>
+        </div>
+        
+        <div style="padding: 60px 20px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📨</div>
+          <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+            CAN Message interface coming soon
+          </p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+            This panel will allow you to send arbitrary CAN messages and monitor CAN bus traffic
+          </p>
+        </div>
+      </div>
+    `
+  }
+
+  renderCanmessagesContent() {
+    return this.html`
+      <div style="padding: 60px 20px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📨</div>
+        <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+          CAN Message interface coming soon
+        </p>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+          This panel will allow you to send arbitrary CAN messages and monitor CAN bus traffic
+        </p>
       </div>
     `
   }
@@ -979,6 +2715,165 @@ class OpenInverterExtension {
     this.emit('render')
   }
 
+  renderFirmwareContent() {
+    if (!this.state.firmwareUpgrade) {
+      this.state.firmwareUpgrade = {
+        selectedFile: null,
+        serialNumber: '',
+        recoveryMode: false,
+        inProgress: false,
+        progress: 0,
+        status: '',
+        error: null
+      }
+    }
+
+    const fw = this.state.firmwareUpgrade
+
+    return this.html`
+      <div style="padding: 20px;">
+        <!-- Warning Notice -->
+        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 16px; margin-bottom: 24px; color: #92400e;">
+          <strong>⚠️ Warning:</strong> Firmware upgrades are potentially dangerous. 
+          Do not interrupt the process once started. Ensure stable power supply.
+        </div>
+        
+        <!-- File Selection -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+          <h3 style="font-size: 16px; margin-bottom: 16px;">Firmware File</h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <input 
+              type="file" 
+              accept=".bin"
+              onchange=${(e) => this.selectFirmwareFile(e)}
+              disabled=${fw.inProgress}
+              style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary);"
+            />
+            
+            ${fw.selectedFile ? this.html`
+              <div style="font-size: 13px; color: var(--text-secondary);">
+                Selected: <span style="font-family: monospace; color: var(--text-primary);">${fw.selectedFile.name}</span>
+                (${(fw.selectedFile.size / 1024).toFixed(1)} KB)
+              </div>
+            ` : ''}
+          </div>
+        </div>
+        
+        <!-- Upgrade Options -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+          <h3 style="font-size: 16px; margin-bottom: 16px;">Upgrade Options</h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input 
+                type="checkbox" 
+                checked=${fw.recoveryMode}
+                onchange=${(e) => { fw.recoveryMode = e.target.checked; this.emit('render'); }}
+                disabled=${fw.inProgress}
+                style="width: 16px; height: 16px;"
+              />
+              <span>Recovery Mode (for bricked devices)</span>
+            </label>
+            
+            ${fw.recoveryMode ? this.html`
+              <label style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 13px; color: var(--text-secondary);">
+                  Device Serial Number (8 hex digits, optional)
+                </span>
+                <input 
+                  type="text" 
+                  placeholder="e.g. 1A2B3C4D"
+                  maxlength="8"
+                  value=${fw.serialNumber}
+                  oninput=${(e) => { fw.serialNumber = e.target.value.toUpperCase(); this.emit('render'); }}
+                  disabled=${fw.inProgress}
+                  style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-family: monospace; width: 200px;"
+                />
+                <span style="font-size: 12px; color: var(--text-secondary);">
+                  Leave empty to upgrade the first device that boots
+                </span>
+              </label>
+            ` : ''}
+            
+            ${!fw.recoveryMode && this.state.oiDeviceConnected ? this.html`
+              <div style="font-size: 13px; color: var(--text-secondary);">
+                Will upgrade device at Node ID ${this.state.selectedNodeId}. 
+                ${this.state.currentDeviceSerial ? `Serial: ${this.state.currentDeviceSerial}` : ''}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+        
+        <!-- Start/Cancel Buttons -->
+        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+          <button 
+            class="primary-button"
+            onclick=${() => this.startFirmwareUpgrade()}
+            disabled=${!fw.selectedFile || fw.inProgress || (!fw.recoveryMode && !this.state.oiDeviceConnected)}
+            style="flex: 1;"
+          >
+            ${fw.inProgress ? 'Upgrading...' : 'Start Upgrade'}
+          </button>
+          
+          ${fw.inProgress ? this.html`
+            <button 
+              class="secondary-button"
+              onclick=${() => this.cancelFirmwareUpgrade()}
+            >
+              Cancel
+            </button>
+          ` : ''}
+        </div>
+        
+        <!-- Progress/Status Display -->
+        ${fw.inProgress || fw.status || fw.error ? this.html`
+          <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+            ${fw.inProgress ? this.html`
+              <div>
+                <div style="margin-bottom: 12px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-weight: 600;">Progress</span>
+                    <span style="font-family: monospace;">${fw.progress}%</span>
+                  </div>
+                  <div style="width: 100%; height: 24px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden;">
+                    <div style="height: 100%; background: linear-gradient(90deg, #4ade80, #22c55e); width: ${fw.progress}%; transition: width 0.3s;"></div>
+                  </div>
+                </div>
+                ${fw.status ? this.html`
+                  <div style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+                    ${fw.status}
+                  </div>
+                ` : ''}
+              </div>
+            ` : fw.error ? this.html`
+              <div style="color: #ef4444;">
+                <strong>Error:</strong> ${fw.error}
+              </div>
+            ` : fw.status ? this.html`
+              <div style="color: #22c55e;">
+                <strong>Success:</strong> ${fw.status}
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+        
+        <!-- Help Text -->
+        ${!fw.inProgress ? this.html`
+          <div style="margin-top: 24px; padding: 16px; background: var(--bg-highlight); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--text-secondary);">
+            <h4 style="margin: 0 0 8px 0; color: var(--text-primary);">How to use:</h4>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Select a .bin firmware file from your computer</li>
+              <li>For normal upgrades: Connect to a device first, then click "Start Upgrade"</li>
+              <li>For recovery: Check "Recovery Mode", optionally enter device serial, then power cycle the device and click "Start Upgrade" immediately</li>
+              <li>Do NOT disconnect power or WebREPL during the upgrade</li>
+            </ul>
+          </div>
+        ` : ''}
+      </div>
+    `
+  }
+
   /**
    * Render Commands panel
    * Device control commands: save/load parameters, start/stop, reset
@@ -1364,6 +3259,18 @@ class OpenInverterExtension {
       } else if (parsed.devices) {
         this.state.canScanResults = parsed.devices
 
+        // Update discovered devices list for sidebar
+        this.state.discoveredDevices = parsed.devices.map(device => ({
+          nodeId: device.nodeId,
+          serial: device.serial || `Node_${device.nodeId}`,
+          name: device.name || `OpenInverter ${device.nodeId}`,
+          firmware: device.firmware || 'Unknown',
+          online: true // Devices from scan are considered online
+        }))
+
+        // Update extension menu with discovered devices
+        this.updateExtensionMenu()
+
         if (this.state.canScanResults.length === 0) {
           // Show helpful message when no devices found
           this.state.scanMessage = fullScan
@@ -1386,14 +3293,65 @@ class OpenInverterExtension {
     }
   }
 
-  async connectToDevice() {
+  async connectToDevice(nodeId, serial) {
     try {
+      // Update selected node ID if provided
+      if (nodeId !== undefined) {
+        this.state.selectedNodeId = nodeId
+      }
+      
+      // Handle mock device mode (node ID > 127)
+      if (this.state.selectedNodeId > 127) {
+        // Create/update mock device for this node ID
+        const mockSerial = serial || `MOCK-${String(this.state.selectedNodeId).padStart(3, '0')}-${Date.now().toString(36).slice(-4).toUpperCase()}`
+        const mockDevice = {
+          nodeId: this.state.selectedNodeId,
+          serial: mockSerial,
+          name: `Test Inverter ${this.state.selectedNodeId}`,
+          firmware: 'v4.2.0-mock',
+          online: true
+        }
+        
+        // Add to discovered devices if not already there
+        if (!this.state.discoveredDevices) {
+          this.state.discoveredDevices = []
+        }
+        
+        // Check if device with this nodeId already exists
+        const existingIndex = this.state.discoveredDevices.findIndex(d => d.nodeId === this.state.selectedNodeId)
+        if (existingIndex >= 0) {
+          // Update existing device
+          this.state.discoveredDevices[existingIndex] = mockDevice
+        } else {
+          // Add new device
+          this.state.discoveredDevices.push(mockDevice)
+        }
+        
+        // Update extension menu to include this device
+        this.updateExtensionMenu()
+        
+        this.state.oiDeviceConnected = true
+        this.state.currentDeviceSerial = mockSerial
+        console.log('[OI Connection] Mock device created:', mockDevice)
+        this.emit('render')
+        return
+      }
+      
+      // Store serial if provided
+      if (serial) {
+        this.state.currentDeviceSerial = serial
+      }
+      
       const args = JSON.stringify({ node_id: this.state.selectedNodeId })
       const result = await this.device.execute(`from lib.OI_helpers import initializeDevice; initializeDevice(${args})`)
       const parsed = this.device.parseJSON(result)
 
       if (parsed.success) {
         this.state.oiDeviceConnected = true
+        console.log('[OI Connection] Connected to device:', {
+          nodeId: this.state.selectedNodeId,
+          serial: this.state.currentDeviceSerial
+        })
       } else {
         console.error('[OI Connection] Connection failed:', parsed)
         alert('Failed to connect to device. Check console for details.')
@@ -1406,6 +3364,45 @@ class OpenInverterExtension {
     this.emit('render')
   }
 
+  /**
+   * Update the extension menu to include discovered devices
+   * This modifies the menu in Scripto Studio's state to show devices as submenu items
+   */
+  updateExtensionMenu() {
+    // Find this extension in installed extensions
+    const extensions = this.state.installedExtensions || []
+    const thisExtension = extensions.find(ext => ext.id === 'openinverter')
+    
+    if (!thisExtension) return
+    
+    // Start with base menu items
+    const baseMenu = [
+      { id: 'overview', label: 'Overview' },
+      { id: 'deviceselector', label: 'Device Selector' }
+    ]
+    
+    // Add devices section header if we have devices
+    if (this.state.discoveredDevices && this.state.discoveredDevices.length > 0) {
+      baseMenu.push({ id: 'devices-header', label: '--- DEVICES ---', disabled: true })
+      
+      // Add each device as a menu item with normalized ID
+      this.state.discoveredDevices.forEach((device, index) => {
+        baseMenu.push({
+          id: `device${index}`,  // Normalized ID: device0, device1, device2, etc.
+          label: `${device.name || device.serial}`,
+          deviceSerial: device.serial,  // Store serial for routing
+          deviceIndex: index  // Store index for easy lookup
+        })
+      })
+    }
+    
+    // Update the extension's menu
+    thisExtension.menu = baseMenu
+    
+    // Force a re-render of the entire app to update the sidebar
+    this.emit('render')
+  }
+
   async connectToNode(nodeId) {
     this.state.selectedNodeId = nodeId
     await this.connectToDevice()
@@ -1415,6 +3412,7 @@ class OpenInverterExtension {
     try {
       await this.device.execute('from lib.OI_helpers import disconnectDevice; disconnectDevice()')
       this.state.oiDeviceConnected = false
+      this.state.currentDeviceSerial = null
     } catch (error) {
       console.error('[OI Connection] Disconnect error:', error)
     }

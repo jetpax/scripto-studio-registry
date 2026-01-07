@@ -71,10 +71,26 @@ streaming_active = False
 # --- Global Parameters/Spot Values Store (Demo Data or from device) ---
 # This will be replaced with actual device data when connected
 parameters = {
-    'udc': {
-        'value': 350.5, 'unit': 'V', 'isparam': False, 'category': 'Inputs',
+    # Spot values (isparam=False) - matching reference mock-server.js
+    'voltage': {
+        'value': 350.5, 'unit': 'V', 'isparam': False, 'category': 'Electrical',
         'canId': 500, 'canPosition': 0, 'canBits': 16, 'canGain': 0.1, 'isTx': True
     },
+    'current': {
+        'value': 45.2, 'unit': 'A', 'isparam': False, 'category': 'Electrical'
+    },
+    'power': {
+        'value': 15850, 'unit': 'W', 'isparam': False, 'category': 'Electrical'
+    },
+    'rpm': {
+        'value': 3000, 'unit': 'rpm', 'isparam': False, 'category': 'Motor'
+    },
+    'temp': {
+        'value': 65, 'unit': '°C', 'isparam': False, 'category': 'Thermal',
+        'canId': 500, 'canPosition': 16, 'canBits': 8, 'canGain': 1.0, 'isTx': True
+    },
+    
+    # Parameters (isparam=True) - common OpenInverter parameters
     'fslipspnt': {
         'value': 2.0, 'unit': 'Hz', 'isparam': True, 'category': 'Motor',
         'minimum': 0, 'maximum': 10, 'default': 1.5
@@ -82,20 +98,6 @@ parameters = {
     'opmode': {
         'value': 1, 'unit': '', 'isparam': True, 'category': 'Control',
         'enums': {0: 'Off', 1: 'Manual', 2: 'Auto'}, 'default': 0
-    },
-    'fout': {
-        'value': 50.1, 'unit': 'Hz', 'isparam': False, 'category': 'Outputs'
-    },
-    'id': {
-        'value': 10.0, 'unit': 'A', 'isparam': False, 'category': 'Outputs',
-        'canId': 501, 'canPosition': 0, 'canBits': 16, 'canGain': 1.0, 'isTx': False
-    },
-    'iq': {
-        'value': 25.0, 'unit': 'A', 'isparam': False, 'category': 'Outputs'
-    },
-    'tmpm': {
-        'value': 45, 'unit': 'C', 'isparam': False, 'category': 'Temps',
-        'canId': 500, 'canPosition': 16, 'canBits': 8, 'canGain': 1.0, 'isTx': True
     },
     'kp': {
         'value': 100, 'unit': '', 'isparam': True, 'category': 'Control',
@@ -123,11 +125,6 @@ def _send_error(message, cmd):
     """Internal helper to send error response via WebREPL Binary Protocol"""
     # WebREPL Binary Protocol: Send error as simple object
     print(json.dumps({'error': message}))
-
-
-# _send_success() removed - PRO messages automatically signal success/error
-# Operations should return data if needed, or nothing (PRO signals completion)
-
 
 # ============================================================================
 # CAN Device Initialization and Management
@@ -565,7 +562,7 @@ def getSpotValues():
     Sends the result directly to the WebREPL client as JSON.
     
     If connected to real device, reads current values via SDO.
-    Otherwise, returns demo data.
+    Otherwise, returns demo data with random variation.
     """
     spot_list = {}
     
@@ -593,10 +590,21 @@ def getSpotValues():
                 if item.get('isparam') != True:
                     spot_list[key] = item
     else:
-        # Use demo/cached data
+        # Use demo/cached data with random variation (simulates live values)
+        import random
         for key, item in parameters.items():
             if item.get('isparam') != True:
-                spot_list[key] = item
+                # Create a copy to avoid modifying the original
+                spot_value = item.copy()
+                
+                # Add small random variation to numeric values (±2%)
+                if isinstance(spot_value.get('value'), (int, float)):
+                    base_value = spot_value['value']
+                    if base_value != 0:
+                        variation = (random.random() - 0.5) * base_value * 0.02
+                        spot_value['value'] = base_value + variation
+                
+                spot_list[key] = spot_value
     
     _send_response('SPOT-VALUES-LIST', spot_list)
 
@@ -651,15 +659,21 @@ def getPlotData(args):
                         if isinstance(value, (int, float)):
                             response_values[var_name] = value
         else:
-            # Use demo/cached data
+            # Use demo/cached data with random variation (simulates live values)
+            import random
             for var_name in args:
                 if var_name in parameters:
                     item = parameters[var_name]
-                    value = item['value']
+                    value = item.get('value')
                     
                     # Make sure it's a number that can be plotted
                     if isinstance(value, (int, float)):
-                        response_values[var_name] = value
+                        # Add random variation (±5% for more visible changes in plots)
+                        if value != 0:
+                            variation = (random.random() - 0.5) * value * 0.05
+                            response_values[var_name] = value + variation
+                        else:
+                            response_values[var_name] = value
         
         # Construct the response payload
         response_payload = {

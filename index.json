@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1767417677,
+  "updated": 1767843929,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -855,40 +855,20 @@
       "filename": "OpenInverter.js",
       "version": [
         1,
-        0,
-        1
+        99,
+        0
       ],
       "author": "JetPax",
       "description": "Complete OpenInverter suite. Configure parameters, map CAN messages, view spot values, and plot real-time signals from OpenInverter motor controllers.",
       "icon": "sliders",
       "menu": [
         {
-          "id": "parameters",
-          "label": "Parameters"
+          "id": "overview",
+          "label": "Overview"
         },
         {
-          "id": "spotvalues",
-          "label": "Spot Values"
-        },
-        {
-          "id": "canmapping",
-          "label": "CAN Mapping"
-        },
-        {
-          "id": "commands",
-          "label": "Device Control"
-        },
-        {
-          "id": "errors",
-          "label": "Error Log"
-        },
-        {
-          "id": "plot",
-          "label": "Live Plot"
-        },
-        {
-          "id": "firmware",
-          "label": "Firmware Upgrade"
+          "id": "deviceselector",
+          "label": "Device Selector"
         }
       ],
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Extensions/OpenInverter/OpenInverter.js",

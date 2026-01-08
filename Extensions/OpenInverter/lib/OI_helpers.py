@@ -70,41 +70,51 @@ streaming_active = False
 
 # --- Global Parameters/Spot Values Store (Demo Data or from device) ---
 # This will be replaced with actual device data when connected
+# IDs are included from the start (matching reference mock-server.js pattern)
 parameters = {
     # Spot values (isparam=False) - matching reference mock-server.js
     'voltage': {
         'value': 350.5, 'unit': 'V', 'isparam': False, 'category': 'Electrical',
+        'id': 0x1001,  # ID included from start (like reference)
         'canId': 500, 'canPosition': 0, 'canBits': 16, 'canGain': 0.1, 'isTx': True
     },
     'current': {
-        'value': 45.2, 'unit': 'A', 'isparam': False, 'category': 'Electrical'
+        'value': 45.2, 'unit': 'A', 'isparam': False, 'category': 'Electrical',
+        'id': 0x1002  # ID included from start
     },
     'power': {
-        'value': 15850, 'unit': 'W', 'isparam': False, 'category': 'Electrical'
+        'value': 15850, 'unit': 'W', 'isparam': False, 'category': 'Electrical',
+        'id': 0x1003  # ID included from start
     },
     'rpm': {
-        'value': 3000, 'unit': 'rpm', 'isparam': False, 'category': 'Motor'
+        'value': 3000, 'unit': 'rpm', 'isparam': False, 'category': 'Motor',
+        'id': 0x1004  # ID included from start
     },
     'temp': {
         'value': 65, 'unit': '°C', 'isparam': False, 'category': 'Thermal',
+        'id': 0x1005,  # ID included from start
         'canId': 500, 'canPosition': 16, 'canBits': 8, 'canGain': 1.0, 'isTx': True
     },
     
     # Parameters (isparam=True) - common OpenInverter parameters
     'fslipspnt': {
         'value': 2.0, 'unit': 'Hz', 'isparam': True, 'category': 'Motor',
+        'id': 0x2001,  # ID included from start
         'minimum': 0, 'maximum': 10, 'default': 1.5
     },
     'opmode': {
         'value': 1, 'unit': '', 'isparam': True, 'category': 'Control',
+        'id': 0x2002,  # ID included from start
         'enums': {0: 'Off', 1: 'Manual', 2: 'Auto'}, 'default': 0
     },
     'kp': {
         'value': 100, 'unit': '', 'isparam': True, 'category': 'Control',
+        'id': 0x2003,  # ID included from start
         'minimum': 0, 'maximum': 1000, 'default': 150
     },
     'ki': {
         'value': 50, 'unit': '', 'isparam': True, 'category': 'Control',
+        'id': 0x2004,  # ID included from start
         'minimum': 0, 'maximum': 500, 'default': 80
     }
 }
@@ -136,6 +146,8 @@ def initializeDevice(args=None):
     
     Args (dict, optional):
         node_id: CANopen node ID (default: 1)
+            - Node ID > 127: Mock/demo device mode (no actual CAN hardware)
+            - Node ID 1-127: Real device mode (requires CAN hardware)
         bitrate: CAN bus bitrate (default: 500000)
         tx_pin: TX GPIO pin (default: 5)
         rx_pin: RX GPIO pin (default: 4)
@@ -146,16 +158,36 @@ def initializeDevice(args=None):
     """
     global can_dev, sdo_client, device_connected, device_node_id, device_bitrate
     
-    # Check if CAN module is available
-    if CAN is None:
-        _send_error("CAN module not available on this platform", 'INIT-DEVICE-ERROR')
-        return
-    
     # Parse arguments
     if args is None:
         args = {}
     
     node_id = args.get('node_id', 1)
+    
+    # Handle mock device mode (node ID > 127)
+    # Mock devices don't require CAN hardware - just set connected flag
+    if node_id > 127:
+        device_connected = True
+        device_node_id = node_id
+        device_bitrate = args.get('bitrate', 500000)
+        can_dev = None  # No actual CAN device for mock mode
+        sdo_client = None  # No SDO client for mock mode
+        
+        _send_response('DEVICE-INITIALIZED', {
+            'success': True,
+            'node_id': node_id,
+            'bitrate': device_bitrate,
+            'connected': True,
+            'mock': True
+        })
+        return
+    
+    # Real device mode (node ID 1-127) - requires CAN hardware
+    # Check if CAN module is available
+    if CAN is None:
+        _send_error("CAN module not available on this platform", 'INIT-DEVICE-ERROR')
+        return
+    
     mode = args.get('mode', CAN.NORMAL)
     
     # Read CAN configuration from /config/can.json (with fallback to main.py)
@@ -286,11 +318,28 @@ def fetchParameterDatabase():
     global param_db_cache, parameters
     
     if not device_connected or sdo_client is None:
-        _send_error("Device not connected", 'FETCH-PARAM-DB-ERROR')
+        # Return demo parameter database when not connected
+        # This ensures demo parameters have IDs for CAN mapping
+        # Don't send response here - this is an internal helper function
+        # The caller (getAllParamsWithIds) will send the final response
+        demo_db = {
+            'voltage': {'id': 0x1001, 'unit': 'V', 'isparam': False, 'category': 'Electrical'},
+            'current': {'id': 0x1002, 'unit': 'A', 'isparam': False, 'category': 'Electrical'},
+            'power': {'id': 0x1003, 'unit': 'W', 'isparam': False, 'category': 'Electrical'},
+            'rpm': {'id': 0x1004, 'unit': 'rpm', 'isparam': False, 'category': 'Motor'},
+            'temp': {'id': 0x1005, 'unit': '°C', 'isparam': False, 'category': 'Thermal'},
+            'fslipspnt': {'id': 0x2001, 'unit': 'Hz', 'isparam': True, 'category': 'Motor', 'minimum': 0, 'maximum': 10, 'default': 1.5},
+            'opmode': {'id': 0x2002, 'unit': '', 'isparam': True, 'category': 'Control', 'default': 0},
+            'kp': {'id': 0x2003, 'unit': '', 'isparam': True, 'category': 'Control', 'minimum': 0, 'maximum': 1000, 'default': 150},
+            'ki': {'id': 0x2004, 'unit': '', 'isparam': True, 'category': 'Control', 'minimum': 0, 'maximum': 500, 'default': 80}
+        }
+        param_db_cache = demo_db
+        loadParameterDatabase(demo_db)
+        # Silent return - don't send response for internal calls
         return
     
     try:
-                # Parameter database is at SDO 0x1021, subindex 0
+        # Parameter database is at SDO 0x1021, subindex 0
         # It's stored as a large JSON string, so we need to read it in chunks
         # For now, we'll use a simplified approach
         
@@ -325,44 +374,79 @@ def loadParameterDatabase(json_db):
     Args:
         json_db: Dictionary containing parameter definitions
     
-    Converts OpenInverter parameter database format to our internal format.
+    Merges parameter database metadata (IDs, units, categories, etc.) into existing parameters dictionary.
+    Preserves existing values and other fields.
     """
     global parameters, param_db_cache
     
     try:
-        parameters = {}
-        
+        # Merge database metadata into existing parameters (don't replace entirely)
         for param_name, param_def in json_db.items():
-            # Convert OpenInverter format to our format
-            param = {
-                'unit': param_def.get('unit', ''),
-                'isparam': param_def.get('isparam', False),
-                'category': param_def.get('category', 'Uncategorized'),
-                'id': param_def.get('id')
-            }
-            
-            # For parameters, add min/max/default
-            if param['isparam']:
-                param['minimum'] = param_def.get('minimum', 0)
-                param['maximum'] = param_def.get('maximum', 0)
-                param['default'] = param_def.get('default', 0)
-            
-            # Parse enumerations from unit string if present
-            # Format: "0=Off 1=On 2=Auto"
-            unit = param_def.get('unit', '')
-            if '=' in unit:
-                enums = {}
-                for part in unit.split():
-                    if '=' in part:
-                        try:
-                            val, name = part.split('=', 1)
-                            enums[int(val)] = name
-                        except:
-                            pass
-                if enums:
-                    param['enums'] = enums
-            
-            parameters[param_name] = param
+            if param_name in parameters:
+                # Update existing parameter with database metadata
+                if 'id' in param_def:
+                    parameters[param_name]['id'] = param_def['id']
+                if 'unit' in param_def:
+                    parameters[param_name]['unit'] = param_def['unit']
+                if 'category' in param_def:
+                    parameters[param_name]['category'] = param_def['category']
+                if 'isparam' in param_def:
+                    parameters[param_name]['isparam'] = param_def['isparam']
+                
+                # For parameters, update min/max/default if provided
+                if parameters[param_name].get('isparam'):
+                    if 'minimum' in param_def:
+                        parameters[param_name]['minimum'] = param_def['minimum']
+                    if 'maximum' in param_def:
+                        parameters[param_name]['maximum'] = param_def['maximum']
+                    if 'default' in param_def:
+                        parameters[param_name]['default'] = param_def['default']
+                
+                # Parse enumerations from unit string if present
+                # Format: "0=Off 1=On 2=Auto"
+                unit = param_def.get('unit', '')
+                if '=' in unit:
+                    enums = {}
+                    for part in unit.split():
+                        if '=' in part:
+                            try:
+                                val, name = part.split('=', 1)
+                                enums[int(val)] = name
+                            except:
+                                pass
+                    if enums:
+                        parameters[param_name]['enums'] = enums
+            else:
+                # New parameter not in existing dictionary - create it
+                param = {
+                    'unit': param_def.get('unit', ''),
+                    'isparam': param_def.get('isparam', False),
+                    'category': param_def.get('category', 'Uncategorized'),
+                    'id': param_def.get('id'),
+                    'value': param_def.get('default', 0) if param_def.get('isparam') else 0
+                }
+                
+                # For parameters, add min/max/default
+                if param['isparam']:
+                    param['minimum'] = param_def.get('minimum', 0)
+                    param['maximum'] = param_def.get('maximum', 0)
+                    param['default'] = param_def.get('default', 0)
+                
+                # Parse enumerations from unit string if present
+                unit = param_def.get('unit', '')
+                if '=' in unit:
+                    enums = {}
+                    for part in unit.split():
+                        if '=' in part:
+                            try:
+                                val, name = part.split('=', 1)
+                                enums[int(val)] = name
+                            except:
+                                pass
+                    if enums:
+                        param['enums'] = enums
+                
+                parameters[param_name] = param
         
         param_db_cache = json_db
         
@@ -495,6 +579,37 @@ def saveParameters():
     # import json
     # with open('/flash/oi_params.json', 'w') as f:
     #     json.dump({k: v for k, v in parameters.items() if v.get('isparam')}, f)
+
+
+def getAllParamsWithIds():
+    """
+    Get all parameters and spot values that have IDs (for CAN mapping).
+    Returns both parameters (isparam=True) and spot values (isparam=False) that have IDs.
+    
+    If parameter database hasn't been loaded yet, tries to fetch it first.
+    """
+    global parameters
+    
+    # If parameter database hasn't been loaded, try to fetch it
+    # This ensures spot values have IDs
+    # fetchParameterDatabase() now handles both connected and demo cases
+    if param_db_cache is None:
+        try:
+            # Try to fetch parameter database from device (or load demo cache)
+            # This will populate IDs for both parameters and spot values
+            fetchParameterDatabase()
+        except Exception:
+            # If fetch fails, continue with existing parameters
+            pass
+    
+    all_params = {}
+    
+    for key, item in parameters.items():
+        # Only include items that have an ID (required for CAN mapping)
+        if item.get('id') is not None:
+            all_params[key] = item
+    
+    _send_response('ALL-PARAMS-WITH-IDS', all_params)
 
 
 def getParametersForDownload():
@@ -699,8 +814,10 @@ def getCanMap(args=None):
     - TX map list: 0x3000 + n
     - RX map list: 0x3100 + n
     """
+    # If not connected to real device, return empty mappings (mock devices handled in JavaScript)
     if not device_connected or sdo_client is None:
-        _send_error("Device not connected", 'CAN-MAP-ERROR')
+        mappings = {'tx': [], 'rx': []}
+        _send_response('CAN-MAP-LIST', mappings)
         return
     
     direction = args.get('direction', 'both') if args else 'both'
@@ -849,9 +966,11 @@ def addCanMapping(args):
         is_tx: True for transmit, False for receive
         is_extended: True for 29-bit extended frame
     """
-    if not device_connected or sdo_client is None:
-        _send_error("Device not connected", 'CAN-MAP-ADD-ERROR')
-        return
+    # Handle JSON string from JavaScript (JSON uses lowercase true/false, Python needs True/False)
+    if isinstance(args, str):
+        args = json.loads(args)
+    elif args is None:
+        args = {}
     
     can_id = args.get('can_id')
     param_name = args.get('param_name')
@@ -876,7 +995,24 @@ def addCanMapping(args):
         _send_error(f"Parameter {param_name} has no ID", 'CAN-MAP-ADD-ERROR')
         return
     
+    # If not connected to real device, just acknowledge (mock devices handled in JavaScript)
+    if not device_connected or sdo_client is None:
+        _send_response('CAN-MAP-ADDED', {
+            'success': True,
+            'can_id': can_id,
+            'param_name': param_name,
+            'param_id': param_id,
+            'position': position,
+            'length': length,
+            'gain': gain,
+            'offset': offset,
+            'is_tx': is_tx,
+            'is_extended': is_extended
+        })
+        return
+    
     try:
+        # Real device mode - write via SDO
         # Use appropriate SDO index for TX (0x3200) or RX (0x3300)
         base_index = 0x3200 if is_tx else 0x3300
         
@@ -893,6 +1029,12 @@ def addCanMapping(args):
         gain_offset_value = gain_fixed | ((offset & 0xFF) << 24)
         sdo_client.write(base_index, 2, gain_offset_value)
         
+        _send_response('CAN-MAP-ADDED', {
+            'success': True,
+            'can_id': can_id,
+            'param_name': param_name,
+            'param_id': param_id
+        })
         
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'CAN-MAP-ADD-ERROR')
@@ -909,9 +1051,11 @@ def removeCanMapping(args):
         msg_index: Message index
         param_index: Parameter index within message
     """
-    if not device_connected or sdo_client is None:
-        _send_error("Device not connected", 'CAN-MAP-REMOVE-ERROR')
-        return
+    # Handle JSON string from JavaScript
+    if isinstance(args, str):
+        args = json.loads(args)
+    elif args is None:
+        args = {}
     
     direction = args.get('direction')
     msg_index = args.get('msg_index')
@@ -921,7 +1065,18 @@ def removeCanMapping(args):
         _send_error("Missing direction, msg_index, or param_index", 'CAN-MAP-REMOVE-ERROR')
         return
     
+    # If not connected to real device, just acknowledge (mock devices handled in JavaScript)
+    if not device_connected or sdo_client is None:
+        _send_response('CAN-MAP-REMOVED', {
+            'success': True,
+            'direction': direction,
+            'msg_index': msg_index,
+            'param_index': param_index
+        })
+        return
+    
     try:
+        # Real device mode - write via SDO
         base_index = 0x3000 if direction == 'tx' else 0x3100
         target_index = base_index + msg_index
         # Write 0 to the parameter subindex to remove it
@@ -929,6 +1084,7 @@ def removeCanMapping(args):
         target_subindex = 1 + (param_index * 2)
         sdo_client.write(target_index, target_subindex, 0)
         
+        _send_response('CAN-MAP-REMOVED', {'success': True})
         
     except (SDOTimeoutError, SDOAbortError) as e:
         _send_error(str(e), 'CAN-MAP-REMOVE-ERROR')

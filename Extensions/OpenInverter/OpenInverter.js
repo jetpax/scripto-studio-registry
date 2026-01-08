@@ -12,7 +12,7 @@
 //     { "id": "overview", "label": "Overview" },
 //     { "id": "deviceselector", "label": "Device Selector" }
 //   ],
-//   "styles": ":root { --oi-blue: #1e88e5; --oi-blue-dark: #1565c0; --oi-blue-light: #e3f2fd; --oi-orange: #ff8c00; --oi-orange-light: #ffa726; --oi-beige: #fef8f0; --oi-yellow: #ffd54f; --oi-status-success: #4caf50; --oi-status-warning: #ff9800; --oi-status-error: #f44336; --oi-status-info: #1e88e5; } .tabs-container { display: flex; flex-direction: column; height: 100%; } .tabs-header { border-bottom: 2px solid var(--border-color); background: var(--bg-secondary); } .tabs-nav { display: flex; gap: 0; overflow-x: auto; } .tab-button { background: transparent; border: none; padding: 16px 24px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; } .tab-button:hover:not(:disabled) { color: var(--oi-blue); background: var(--oi-blue-light); } .tab-button:disabled { opacity: 0.5; cursor: not-allowed; } .tabs-content { flex: 1; overflow-y: auto; } .system-panel { background: var(--bg-secondary); border-radius: 8px; overflow: hidden; margin-bottom: 24px; } .panel-header { background: var(--oi-blue); color: white; padding: 20px; border-bottom: 1px solid var(--border-color); } .panel-message { padding: 40px 20px; text-align: center; color: var(--text-secondary); } .primary-button { background: var(--oi-blue); color: white; border: 2px solid var(--oi-blue); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .primary-button:hover:not(:disabled) { background: var(--oi-blue-dark); border-color: var(--oi-blue-dark); } .primary-button:disabled { opacity: 0.5; cursor: not-allowed; } .secondary-button { background: var(--oi-orange); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .secondary-button:hover:not(:disabled) { background: #f0e4d0; border-color: var(--oi-blue); color: var(--oi-blue); } .secondary-button:disabled { opacity: 0.5; cursor: not-allowed; } .refresh-button { background: var(--oi-beige); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .refresh-button:hover:not(:disabled) { background: #f0e4d0; border-color: var(--oi-blue); color: var(--oi-blue); } .spot-values-categories { display: flex; flex-direction: column; gap: 2rem; } .spot-values-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; } .oi-category-section { margin-bottom: 2rem; } .oi-category-title { font-size: 1.1rem; font-weight: 600; color: var(--oi-blue); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--oi-blue); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalue-card { background: var(--bg-secondary); border: 2px solid transparent; border-radius: 6px; padding: 0.75rem; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 0.75rem; } .oi-spotvalue-card:hover { border-color: var(--oi-blue); background: var(--oi-blue-light); } .oi-spotvalue-name { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.25rem; } .oi-spotvalue-value { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; } .parameter-item { display: flex; flex-direction: column; gap: 0.5rem; } .parameter-header { display: flex; justify-content: space-between; align-items: baseline; } .parameter-label { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0; } .parameter-value { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; } .parameter-category { border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; background: var(--bg-secondary); transition: padding 0.2s; } .category-title { font-size: 1.1rem; font-weight: 600; color: var(--oi-blue); margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--oi-beige); display: flex; align-items: center; gap: 0.75rem; user-select: none; transition: all 0.2s; } .category-title:hover { color: var(--oi-blue-dark); } .param-count { margin-left: auto; font-size: 0.85rem; font-weight: normal; color: var(--text-secondary); } .parameters-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }"
+//   "styles": ":root { --oi-blue: #1e88e5; --oi-blue-dark: #1565c0; --oi-blue-light: #e3f2fd; --oi-orange: #ff8c00; --oi-orange-light: #ffa726; --oi-beige: #fef8f0; --oi-yellow: #ffd54f; --oi-status-success: #4caf50; --oi-status-warning: #ff9800; --oi-status-error: #f44336; --oi-status-info: #1e88e5; --text-muted: #999; } .tabs-container { display: flex; flex-direction: column; height: 100%; } .tabs-header { border-bottom: 2px solid var(--border-color); background: var(--bg-secondary); } .tabs-nav { display: flex; gap: 0; overflow-x: auto; } .tab-button { background: transparent; border: none; padding: 16px 24px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; } .tab-button:hover:not(:disabled) { color: var(--oi-blue); background: var(--oi-blue-light); } border-bottom-color: var(--oi-blue); } .tab-button:disabled { opacity: 0.5; cursor: not-allowed; } .tabs-content { flex: 1; overflow-y: auto; } .system-panel { background: var(--bg-secondary); border-radius: 8px; overflow: hidden; margin-bottom: 24px; } .panel-header { background: var(--oi-blue); color: white; padding: 20px; border-bottom: 1px solid var(--border-color); } .panel-message { padding: 40px 20px; text-align: center; color: var(--text-secondary); } .btn-primary { background: var(--oi-blue); color: white; border: 2px solid var(--oi-blue); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .btn-primary:hover:not(:disabled) { background: var(--oi-blue-dark); border-color: var(--oi-blue-dark); } .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; } .btn-secondary { background: var(--oi-beige); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .btn-secondary:hover:not(:disabled) { background: #f0e4d0; border-color: var(--oi-blue); color: var(--oi-blue); } .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; } .secondary-button { background: var(--oi-beige); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .secondary-button:hover:not(:disabled) { background: #f0e4d0; border-color: var(--oi-blue); color: var(--oi-blue); } .secondary-button:disabled { opacity: 0.5; cursor: not-allowed; } .primary-button { background: var(--oi-blue); color: white; border: 2px solid var(--oi-blue); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .primary-button:hover:not(:disabled) { background: var(--oi-blue-dark); border-color: var(--oi-blue-dark); } .primary-button:disabled { opacity: 0.5; cursor: not-allowed; } .refresh-button { background: var(--oi-beige); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .refresh-button:hover:not(:disabled) { background: #f0e4d0; border-color: var(--oi-blue); color: var(--oi-blue); } .spot-values-categories { display: flex; flex-direction: column; gap: 2rem; } .spot-values-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; } .oi-category-section { margin-bottom: 2rem; } .oi-category-title { font-size: 1.1rem; font-weight: 600; color: var(--oi-blue); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--oi-blue); } .oi-spotvalues-container { padding: 20px; } .oi-spotvalue-card { background: var(--bg-secondary); border: 2px solid transparent; border-radius: 6px; padding: 0.75rem; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 0.75rem; } .oi-spotvalue-card:hover { border-color: var(--oi-blue); background: var(--oi-blue-light); } .oi-spotvalue-name { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.25rem; } .oi-spotvalue-value { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; } #device-parameters { padding: 20px; } .parameters-grid { display: flex; flex-direction: column; gap: 1.5rem; } .parameter-category { border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; background: var(--bg-secondary); transition: padding 0.2s; } .parameter-category.collapsed { padding: 1.5rem; } .parameter-category.collapsed .category-title { margin-bottom: 0; padding-bottom: 0; border-bottom: none; } .category-title { font-size: 1.1rem; font-weight: 600; color: var(--oi-blue); margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--oi-beige); display: flex; align-items: center; gap: 0.75rem; user-select: none; transition: all 0.2s; cursor: pointer; } .category-title:hover { color: var(--oi-blue-dark); } .collapse-icon { display: inline-flex; align-items: center; justify-content: center; width: 20px; font-size: 0.8rem; color: var(--oi-blue); transition: transform 0.2s; } .param-count { margin-left: auto; font-size: 0.85rem; font-weight: normal; color: var(--text-muted); } .parameters-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; } .parameter-item { display: flex; flex-direction: column; gap: 0.5rem; } .parameter-header { display: flex; justify-content: space-between; align-items: baseline; } .parameter-label { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0; } .parameter-unit { color: var(--text-muted); font-weight: normal; font-size: 0.85rem; } .parameter-input-group { display: flex; flex-direction: column; gap: 0.25rem; } .parameter-input-group input[type=\"number\"], .parameter-input-group select { padding: 0.5rem 0.75rem; font-size: 0.95rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); width: 100%; } .parameter-input-group input[type=\"number\"]:focus, .parameter-input-group select:focus { outline: none; border-color: var(--oi-blue); } .parameter-hint { display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.3; } .form-group { margin-bottom: 1.5rem; } .form-group label { display: block; font-weight: 500; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.5rem; } .form-group input[type=\"text\"] { width: 100%; padding: 0.5rem 0.75rem; font-size: 0.95rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); } .form-group input[type=\"text\"]:focus { outline: none; border-color: var(--oi-blue); } .form-group .hint { display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; } .button-group { display: flex; gap: 0.75rem; flex-wrap: wrap; } .section-header { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1.5rem; cursor: pointer; } .can-mappings-container { display: flex; flex-direction: column; gap: 2rem; } .mapping-section { margin-bottom: 1.5rem; } .mapping-section h3 { margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-primary); } .no-mappings { color: var(--text-secondary); font-style: italic; padding: 1rem; background: var(--bg-secondary); border-radius: 4px; } .mappings-table { width: 100%; border-collapse: collapse; background: var(--bg-primary); border-radius: 8px; overflow: hidden; } .mappings-table thead { background: var(--bg-secondary); } .mappings-table th { padding: 0.75rem; text-align: left; font-weight: 600; color: var(--text-primary); border-bottom: 2px solid var(--border-color); } .mappings-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); } .mappings-table tbody tr:last-child td { border-bottom: none; } .mappings-table tbody tr:hover { background: var(--bg-secondary); } .btn-remove { background: var(--oi-status-error); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; } .btn-remove:hover { background: #c82333; } .add-mapping-section { margin-top: 2rem; } .btn-add { background: var(--oi-blue); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: background 0.2s; } .btn-add:hover { background: var(--oi-blue-dark); } .add-mapping-form { background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin-top: 1rem; } .add-mapping-form h3 { margin-top: 0; margin-bottom: 1.5rem; color: var(--text-primary); } .form-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; } .form-row label { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-primary); font-weight: 500; } .form-row input, .form-row select { padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 0.95rem; } .form-row input:focus, .form-row select:focus { outline: none; border-color: var(--oi-blue); } .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end; } .btn-cancel { background: #6c757d; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.95rem; transition: background 0.2s; } .btn-cancel:hover { background: #5a6268; } .btn-save { background: var(--oi-status-success); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: background 0.2s; } .btn-save:hover:not(:disabled) { background: #218838; } .btn-save:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; } .error-message { background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 4px; border: 1px solid #f5c6cb; } .oi-compact-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--border-color); } .oi-compact-header h2 { margin: 0; font-size: 24px; color: white; } .oi-button-row { display: flex; gap: 0.75rem; }"
 // }
 // === END_EXTENSION_CONFIG ===
 
@@ -44,6 +44,10 @@ class OpenInverterExtension {
     }
     if (!this.state.selectedDeviceSerial) {
       this.state.selectedDeviceSerial = null
+    }
+    // Initialize mock CAN mappings storage (for mock devices, nodeId > 127)
+    if (!this.state.mockCanMappings) {
+      this.state.mockCanMappings = { tx: [], rx: [] }
     }
     if (!this.state.activeDeviceTab) {
       this.state.activeDeviceTab = 'overview'
@@ -452,6 +456,51 @@ class OpenInverterExtension {
     return parsed
   }
 
+  async getCanMappings() {
+    const result = await this.device.execute('from lib.OI_helpers import getCanMap; getCanMap()')
+    console.log('[OI] getCanMappings raw result:', result)
+    const parsed = this.device.parseJSON(result)
+    console.log('[OI] getCanMappings parsed:', parsed)
+    return parsed
+  }
+
+  async getAllParamsWithIds() {
+    const result = await this.device.execute('from lib.OI_helpers import getAllParamsWithIds; getAllParamsWithIds()')
+    const parsed = this.device.parseJSON(result)
+    return parsed
+  }
+
+  async addCanMapping(args) {
+    // Pass as JSON string so Python can parse it (handles true/false -> True/False conversion)
+    const argsStr = JSON.stringify(args)
+    const result = await this.device.execute(`from lib.OI_helpers import addCanMapping; import json; addCanMapping(json.loads('${argsStr.replace(/'/g, "\\'")}'))`)
+    const parsed = this.device.parseJSON(result)
+    
+    // Check for error response
+    if (parsed && parsed.error) {
+      throw new Error(parsed.error)
+    }
+    
+    // Check for success response (now returned for mock devices)
+    if (parsed && parsed.success) {
+      return parsed
+    }
+    
+    // Fallback: assume success if no error
+    return { success: true }
+  }
+
+  async removeCanMapping(args) {
+    const argsStr = JSON.stringify(args)
+    const result = await this.device.execute(`from lib.OI_helpers import removeCanMapping; removeCanMapping(${argsStr})`)
+    const parsed = this.device.parseJSON(result)
+    // These functions only return errors, not success responses
+    if (parsed && parsed.error) {
+      throw new Error(parsed.error)
+    }
+    return { success: true }
+  }
+
   // === Render Methods ===
 
   /**
@@ -836,38 +885,53 @@ class OpenInverterExtension {
   }
 
   renderParametersContent() {
+    // Auto-load parameters if OpenInverter device is connected but parameters aren't loaded yet
+    if (this.state.oiDeviceConnected && !this.state.oiParameters && !this.state.isLoadingOiParameters) {
+      // Use setTimeout to avoid blocking render
+      setTimeout(() => this.refreshParameters(), 0)
+    }
+
     if (!this.state.oiDeviceConnected) {
       return this.html`
-        <div style="padding: 60px 20px; text-align: center;">
-          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">⚙️</div>
-          <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
-            Connect to a device to view parameters
-          </p>
-          <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
-            Use the Device Connection panel to scan and connect
-          </p>
-        </div>
+        <section id="device-parameters" class="card">
+          <h2 class="section-header">Device Parameters</h2>
+          <div style="padding: 60px 20px; text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">⚙️</div>
+            <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+              Connect to a device to view parameters
+            </p>
+            <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+              Use the Device Selector to scan and connect
+            </p>
+          </div>
+        </section>
       `
     }
 
     if (this.state.isLoadingOiParameters) {
       return this.html`
-        <div style="padding: 60px 20px; text-align: center;">
-          <p style="font-size: 16px; color: var(--text-secondary);">Loading parameters...</p>
-        </div>
+        <section id="device-parameters" class="card">
+          <h2 class="section-header">Device Parameters</h2>
+          <div style="padding: 60px 20px; text-align: center;">
+            <p style="font-size: 16px; color: var(--text-secondary);">Loading parameters...</p>
+          </div>
+        </section>
       `
     }
 
     if (!this.state.oiParameters || Object.keys(this.state.oiParameters).length === 0) {
       return this.html`
-        <div style="padding: 60px 20px; text-align: center;">
-          <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
-            No parameters available
-          </p>
-          <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
-            Click "Load from Device" to fetch parameters
-          </p>
-        </div>
+        <section id="device-parameters" class="card">
+          <h2 class="section-header">Device Parameters</h2>
+          <div style="padding: 60px 20px; text-align: center;">
+            <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+              No parameters available
+            </p>
+            <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+              Parameters will load automatically when connected
+            </p>
+          </div>
+        </section>
       `
     }
 
@@ -876,177 +940,192 @@ class OpenInverterExtension {
       this.state.collapsedCategories = new Set()
     }
 
-    // Group parameters by category
+    // Initialize Node ID state if not present
+    if (this.state.nodeId === undefined) {
+      this.state.nodeId = this.state.selectedNodeId?.toString() || '1'
+    }
+
+    // Group parameters by category and sort
     const categories = {}
     Object.entries(this.state.oiParameters).forEach(([name, param]) => {
       // Only include actual parameters (isparam = true)
       if (param.isparam) {
-        const cat = param.category || 'Uncategorized'
+        const cat = param.category || 'Spot Values'
         if (!categories[cat]) categories[cat] = []
-        categories[cat].push({ name, ...param })
+        categories[cat].push([name, param])
       }
     })
 
-    return this.html`
-      <div style="padding: 20px;">
-        <!-- Import/Export Actions -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-            <div>
-              <h3 style="margin: 0; font-size: 14px; color: var(--text-primary);">Parameter Management</h3>
-              <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-secondary);">
-                Export/Import parameters or save to device flash
-              </p>
-            </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button 
-                class="secondary-button" 
-                onclick=${() => this.exportParametersToJSON()}
-                disabled=${!this.state.oiParameters}
-                style="padding: 8px 16px; font-size: 13px;">
-                Export to JSON
-              </button>
-              <button 
-                class="secondary-button" 
-                onclick=${() => this.importParametersFromJSON()}
-                disabled=${!this.state.oiParameters}
-                style="padding: 8px 16px; font-size: 13px;">
-                Import from JSON
-              </button>
-              <button 
-                class="primary-button" 
-                onclick=${() => this.saveParametersToFlash()}
-                disabled=${!this.state.oiDeviceConnected}
-                style="padding: 8px 16px; font-size: 13px;">
-                Save to Flash
-              </button>
-            </div>
-          </div>
-        </div>
+    // Sort categories and parameters within categories
+    const sortedCategories = Object.entries(categories).sort((a, b) => a[0].localeCompare(b[0]))
+    sortedCategories.forEach(([_, params]) => {
+      params.sort((a, b) => a[0].localeCompare(b[0]))
+    })
 
-        <!-- Parameters by Category -->
-        ${Object.entries(categories).map(([category, params]) => {
-          const isCollapsed = this.state.collapsedCategories.has(category)
-          return this.html`
-            <div style="margin-bottom: 24px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;">
-              <!-- Category Header (clickable to collapse/expand) -->
-              <div 
-                onclick=${() => this.toggleCategory(category)}
-                style="
-                  padding: 16px 20px;
-                  background: var(--scheme-primary);
-                  color: white;
-                  cursor: pointer;
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  user-select: none;
-                ">
-                <div>
-                  <span style="font-size: 16px; font-weight: 600;">${category}</span>
-                  <span style="font-size: 13px; opacity: 0.9; margin-left: 8px;">(${params.length})</span>
-                </div>
-                <div style="font-size: 20px; transition: transform 0.2s; transform: rotate(${isCollapsed ? 0 : 180}deg);">
-                  ▼
-                </div>
+    return this.html`
+      <section id="device-parameters" class="card">
+        <h2 class="section-header" onclick=${(e) => {
+          const target = e.currentTarget.parentElement
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }}>
+          Device Parameters
+        </h2>
+
+        <div class="parameters-grid">
+          ${sortedCategories.map(([category, categoryParams]) => {
+            const isCollapsed = this.state.collapsedCategories.has(category)
+            return this.html`
+              <div class="parameter-category ${isCollapsed ? 'collapsed' : ''}">
+                <h3 class="category-title" onclick=${() => this.toggleCategory(category)}>
+                  <span class="collapse-icon">${isCollapsed ? '▶' : '▼'}</span>
+                  ${category}
+                  <span class="param-count">(${categoryParams.length})</span>
+                </h3>
+                ${!isCollapsed ? this.html`
+                  <div class="parameters-list">
+                    ${categoryParams.map(([key, param]) => this.renderParameterInput(key, param))}
+                  </div>
+                ` : ''}
               </div>
+            `
+          })}
+        </div>
 
-              <!-- Category Parameters -->
-              ${!isCollapsed ? this.html`
-                <div style="padding: 4px;">
-                  ${params.map(param => this.renderParameterRow(param))}
-                </div>
-              ` : ''}
-            </div>
-          `
-        })}
-      </div>
-    `
-  }
+        <div class="form-group" style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+          <label>Node ID</label>
+          <input
+            type="text"
+            value="${this.state.nodeId || '1'}"
+            oninput=${(e) => {
+              this.state.nodeId = e.target.value
+              this.emit('render')
+            }}
+            placeholder="Enter Node ID"
+          />
+          <small class="hint">CAN Node ID for this device (typically 1)</small>
+        </div>
 
-  renderParameterRow(param) {
-    const hasEnum = param.enums && Object.keys(param.enums).length > 0
-    const hasRange = param.minimum !== undefined || param.maximum !== undefined
+        <div class="button-group">
+          <button class="btn-primary" onclick=${() => this.saveNodeId()} disabled=${!this.state.oiDeviceConnected}>
+            Save Node ID
+          </button>
+          <button class="btn-secondary" onclick=${() => this.saveParametersToFlash()} disabled=${!this.state.oiDeviceConnected}>
+            Save All to Flash
+          </button>
+        </div>
 
-    return this.html`
-      <div 
-        style="
-          display: grid;
-          grid-template-columns: 2fr 1.5fr 0.8fr 1.2fr;
-          gap: 16px;
-          padding: 12px 16px;
-          align-items: center;
-          border-bottom: 1px solid var(--border-color);
-          transition: background 0.2s;
-        "
-        onmouseover=${(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'}
-        onmouseout=${(e) => e.currentTarget.style.background = 'transparent'}
-        data-param="${param.name}">
-        
-        <!-- Parameter Name & Description -->
-        <div>
-          <div style="font-weight: 600; font-size: 14px; color: var(--text-primary); margin-bottom: 2px;">
-            ${param.name}
+        <div class="form-group" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+          <label style="margin-bottom: 1rem;">Import/Export Parameters</label>
+          <div class="button-group" style="margin-top: 0;">
+            <button class="btn-secondary" onclick=${() => this.exportParametersToJSON()} disabled=${!this.state.oiParameters || this.state.isImporting}>
+              Export to JSON
+            </button>
+            <button class="btn-secondary" onclick=${() => this.importParametersFromJSON()} disabled=${!this.state.oiParameters || this.state.isImporting}>
+              ${this.state.isImporting ? `Importing... (${this.state.importProgress?.current || 0}/${this.state.importProgress?.total || 0})` : 'Import from JSON'}
+            </button>
           </div>
-          ${param.description ? this.html`
-            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-              ${param.description}
-            </div>
-          ` : ''}
+          <small class="hint" style="display: block; margin-top: 0.5rem;">
+            Export parameters to a JSON file or import from a previously exported file
+          </small>
+          <input
+            ref=${(el) => { this.fileInputRef = el }}
+            type="file"
+            accept=".json"
+            style="display: none;"
+            onchange=${(e) => this.handleFileSelected(e)}
+          />
+        </div>
+      </section>
+    `
+  }
+
+  /**
+   * Render a single parameter input matching the ParameterInput component structure
+   */
+  renderParameterInput(paramKey, param) {
+    const hasEnum = param.enums && Object.keys(param.enums).length > 0
+    const displayName = this.getDisplayName ? this.getDisplayName(paramKey) : paramKey
+    const normalizedValue = hasEnum ? this.normalizeEnumValue(param.value) : param.value
+
+    return this.html`
+      <div class="parameter-item">
+        <div class="parameter-header">
+          <label class="parameter-label" title="${param.description || ''}">
+            ${displayName}
+            ${param.unit ? this.html`<span class="parameter-unit"> (${param.unit})</span>` : ''}
+          </label>
         </div>
 
-        <!-- Value Input/Select -->
-        <div>
-          ${hasEnum ? this.renderEnumSelect(param) : this.renderValueInput(param)}
-        </div>
+        <div class="parameter-input-group">
+          ${hasEnum ? this.html`
+            <select
+              value="${normalizedValue}"
+              onchange=${(e) => this.handleParameterChange(paramKey, param, parseFloat(e.target.value))}
+              disabled=${!this.state.oiDeviceConnected}
+            >
+              ${Object.entries(param.enums).map(([value, label]) => this.html`
+                <option value="${value}" ${normalizedValue === value ? 'selected' : ''}>
+                  ${String(label)}
+                </option>
+              `)}
+            </select>
+          ` : this.html`
+            <input
+              type="number"
+              value="${param.value}"
+              min="${param.minimum !== undefined ? param.minimum : ''}"
+              max="${param.maximum !== undefined ? param.maximum : ''}"
+              step="${param.unit === 'Hz' || param.unit === 'A' ? '0.1' : '1'}"
+              onblur=${(e) => this.handleParameterBlur(paramKey, param, e)}
+              disabled=${!this.state.oiDeviceConnected}
+            />
+          `}
 
-        <!-- Unit -->
-        <div style="font-size: 13px; color: var(--text-secondary); text-align: center;">
-          ${param.unit || '—'}
-        </div>
-
-        <!-- Range & Default -->
-        <div style="font-size: 12px; color: var(--text-secondary);">
-          ${hasRange ? this.html`
-            <div>Range: ${param.minimum ?? '?'} to ${param.maximum ?? '?'}</div>
-          ` : ''}
-          ${param.default !== undefined ? this.html`
-            <div>Default: ${param.default}</div>
+          ${param.minimum !== undefined && param.maximum !== undefined && !hasEnum ? this.html`
+            <small class="parameter-hint">
+              Range: ${param.minimum} - ${param.maximum}
+              ${param.default !== undefined ? ` (Default: ${param.default})` : ''}
+            </small>
           ` : ''}
         </div>
       </div>
     `
   }
 
-  renderValueInput(param) {
-    return this.html`
-      <input 
-        class="oi-value-input"
-        type="number" 
-        value="${param.value}"
-        step="0.1"
-        min="${param.minimum}"
-        max="${param.maximum}"
-        onchange=${(e) => this.updateParameter(param.name, parseFloat(e.target.value))}
-        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;"
-      />
-    `
+  /**
+   * Handle parameter change for enum selects
+   */
+  handleParameterChange(paramKey, param, newValue) {
+    this.updateParameter(paramKey, newValue)
   }
 
-  renderEnumSelect(param) {
-    return this.html`
-      <select 
-        class="oi-enum-select"
-        value="${this.normalizeEnumValue(param.value)}"
-        onchange=${(e) => this.updateParameter(param.name, parseInt(e.target.value))}
-        style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 14px;">
-        ${Object.entries(param.enums).map(([value, label]) => this.html`
-          <option value="${value}" ${this.normalizeEnumValue(param.value) === value ? 'selected' : ''}>
-            ${label}
-          </option>
-        `)}
-      </select>
-    `
+  /**
+   * Handle parameter blur for number inputs (validates before updating)
+   */
+  handleParameterBlur(paramKey, param, e) {
+    const target = e.target
+    const newValue = parseFloat(target.value)
+
+    if (isNaN(newValue)) {
+      target.value = param.value
+      return
+    }
+
+    // Validate range
+    if (param.minimum !== undefined && newValue < param.minimum) {
+      alert(`Value must be at least ${param.minimum}`)
+      target.value = param.value
+      return
+    }
+    if (param.maximum !== undefined && newValue > param.maximum) {
+      alert(`Value must be at most ${param.maximum}`)
+      target.value = param.value
+      return
+    }
+
+    if (newValue !== param.value) {
+      this.updateParameter(paramKey, newValue)
+    }
   }
 
   toggleCategory(category) {
@@ -1110,104 +1189,203 @@ class OpenInverterExtension {
       }
     })
 
+    // Get device serial for filename
+    const serial = this.state.selectedDeviceSerial || 'device'
+    const dateStr = new Date().toISOString().split('T')[0]
+
     // Create blob and download
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `openinverter_params_${new Date().toISOString().split('T')[0]}.json`
+    a.download = `parameters_${serial}_${dateStr}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
 
     console.log('[OI Parameters] Exported', Object.keys(exportData).length, 'parameters')
+    alert(`Exported ${Object.keys(exportData).length} parameters`)
   }
 
   importParametersFromJSON() {
-    // Create hidden file input
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = '.json'
-    input.onchange = async (e) => {
-      const file = e.target.files[0]
-      if (!file) return
+    // Trigger file input click
+    if (this.fileInputRef) {
+      this.fileInputRef.click()
+    } else {
+      // Fallback: create temporary input if ref not available
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.json'
+      input.onchange = (e) => this.handleFileSelected(e)
+      input.click()
+    }
+  }
 
-      try {
-        const text = await file.text()
-        const importedData = JSON.parse(text)
+  async handleFileSelected(e) {
+    const target = e.target
+    const file = target.files?.[0]
+    if (!file) return
 
-        if (!this.state.oiParameters) {
-          alert('No parameter definitions loaded')
-          return
+    try {
+      const text = await file.text()
+      const importedData = JSON.parse(text)
+
+      if (!this.state.oiParameters) {
+        alert('No parameter definitions loaded')
+        return
+      }
+
+      let validCount = 0
+      let invalidCount = 0
+      const errors = []
+      const updates = []
+
+      // Validate all parameters first
+      for (const [key, value] of Object.entries(importedData)) {
+        if (typeof value !== 'number') {
+          invalidCount++
+          errors.push(`${key}: value must be a number`)
+          continue
         }
 
-        let validCount = 0
-        let invalidCount = 0
-        const errors = []
+        const param = this.state.oiParameters[key]
+        if (!param) {
+          invalidCount++
+          errors.push(`${key}: parameter not found`)
+          continue
+        }
 
-        // Validate and update parameters
-        for (const [key, value] of Object.entries(importedData)) {
-          if (typeof value !== 'number') {
-            invalidCount++
-            errors.push(`${key}: value must be a number`)
-            continue
+        if (!param.isparam) {
+          invalidCount++
+          errors.push(`${key}: not a settable parameter`)
+          continue
+        }
+
+        if (param.id === undefined) {
+          invalidCount++
+          errors.push(`${key}: parameter ID not defined`)
+          continue
+        }
+
+        // Validate range
+        if (param.minimum !== undefined && value < param.minimum) {
+          invalidCount++
+          errors.push(`${key}: value ${value} below minimum ${param.minimum}`)
+          continue
+        }
+
+        if (param.maximum !== undefined && value > param.maximum) {
+          invalidCount++
+          errors.push(`${key}: value ${value} above maximum ${param.maximum}`)
+          continue
+        }
+
+        // Add to updates list
+        validCount++
+        updates.push({ key, value, paramId: param.id })
+      }
+
+      // Clear file input
+      target.value = ''
+
+      // If we have valid updates, apply them with progress tracking
+      if (updates.length > 0) {
+        this.state.isImporting = true
+        this.state.importProgress = { current: 0, total: updates.length }
+        this.emit('render')
+
+        // Update local state first
+        updates.forEach(({ key, value }) => {
+          if (this.state.oiParameters && this.state.oiParameters[key]) {
+            this.state.oiParameters[key].value = value
           }
+        })
 
-          const param = this.state.oiParameters[key]
-          if (!param) {
-            invalidCount++
-            errors.push(`${key}: parameter not found`)
-            continue
-          }
+        // Send updates to device with rate limiting
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-          if (!param.isparam) {
-            invalidCount++
-            errors.push(`${key}: not a settable parameter`)
-            continue
-          }
-
-          // Validate range
-          if (param.minimum !== undefined && value < param.minimum) {
-            invalidCount++
-            errors.push(`${key}: value ${value} below minimum ${param.minimum}`)
-            continue
-          }
-
-          if (param.maximum !== undefined && value > param.maximum) {
-            invalidCount++
-            errors.push(`${key}: value ${value} above maximum ${param.maximum}`)
-            continue
-          }
-
-          // Update parameter
+        for (let i = 0; i < updates.length; i++) {
+          const { key, value, paramId } = updates[i]
           try {
-            await this.updateParameter(key, value)
-            validCount++
-            // Small delay to avoid overwhelming the device
-            await new Promise(resolve => setTimeout(resolve, 50))
+            await this.setParameter({ NAME: key, VALUE: value })
+            this.state.importProgress.current = i + 1
+            this.emit('render')
+            // Wait 50ms between each update to avoid overwhelming the ESP32
+            await delay(50)
           } catch (error) {
-            invalidCount++
+            console.error(`[OI Parameters] Failed to update ${key}:`, error)
             errors.push(`${key}: ${error.message}`)
           }
         }
 
-        let message = `Import complete: ${validCount} parameters updated`
+        this.state.isImporting = false
+        this.emit('render')
+
+        let message = `Import complete: ${validCount} parameter${validCount === 1 ? '' : 's'} updated`
         if (invalidCount > 0) {
-          message += `\n${invalidCount} errors:\n` + errors.slice(0, 5).join('\n')
-          if (errors.length > 5) {
-            message += `\n...and ${errors.length - 5} more`
-          }
+          const errorList = errors.slice(0, 5).join('\n') + (errors.length > 5 ? `\n...and ${errors.length - 5} more` : '')
+          message += `\n\n${invalidCount} error${invalidCount === 1 ? '' : 's'}:\n${errorList}`
         }
         alert(message)
-
-        // Refresh to ensure UI is in sync
-        await this.refreshParameters()
-      } catch (error) {
-        alert(`Failed to import: ${error.message}`)
       }
+
+      if (invalidCount > 0 && validCount === 0) {
+        const errorList = errors.slice(0, 5).join('\n') + (errors.length > 5 ? `\n...and ${errors.length - 5} more` : '')
+        alert(`Import failed: ${invalidCount} error${invalidCount === 1 ? '' : 's'}:\n${errorList}`)
+      }
+
+      if (validCount === 0 && invalidCount === 0) {
+        alert('No valid parameters found in file')
+      }
+    } catch (error) {
+      console.error('[OI Parameters] Import error:', error)
+      alert(`Failed to import: ${error.message}`)
+      target.value = ''
+      this.state.isImporting = false
+      this.emit('render')
     }
-    input.click()
+  }
+
+  async saveNodeId() {
+    if (!this.state.oiDeviceConnected) {
+      alert('Not connected to device')
+      return
+    }
+
+    const nodeId = parseInt(this.state.nodeId)
+    if (isNaN(nodeId) || nodeId < 1 || nodeId > 127) {
+      alert('Node ID must be a number between 1 and 127')
+      return
+    }
+
+    try {
+      // Update the selected device's node ID
+      const device = this.state.discoveredDevices.find(d => d.serial === this.state.selectedDeviceSerial)
+      if (device) {
+        device.nodeId = nodeId
+        this.state.selectedNodeId = nodeId
+      }
+
+      // Note: Node ID is typically set during device connection/scanning
+      // This method mainly updates the UI state
+      alert(`Node ID set to ${nodeId}`)
+      this.emit('render')
+    } catch (error) {
+      console.error('[OI Parameters] Save Node ID error:', error)
+      alert(`Failed to save Node ID: ${error.message}`)
+    }
+  }
+
+  /**
+   * Get display name for a parameter key (converts snake_case to Title Case)
+   */
+  getDisplayName(key) {
+    if (!key) return ''
+    return key
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
   }
 
   async saveParametersToFlash() {
@@ -2093,28 +2271,706 @@ class OpenInverterExtension {
   renderCanmapping() {
     return this.html`
       <div class="system-panel">
-        <div class="panel-header">
-          <h2>CAN Mapping</h2>
+        <div class="panel-header oi-compact-header">
+          <h2>CAN Mappings</h2>
+          <div class="panel-actions oi-button-row">
+            <button 
+              class="refresh-button" 
+              onclick=${() => this.refreshCanMappings()}
+              disabled=${!this.state.oiDeviceConnected}
+              title="Refresh CAN mappings from device"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
         
-        <div class="panel-message">
-          <p>CAN Mapping interface coming soon...</p>
-          <p>This panel will allow you to configure CAN bus message mapping.</p>
-        </div>
+        ${this.renderCanmappingContent()}
       </div>
     `
   }
 
+  /**
+   * Flatten CAN mappings structure from device format to table format
+   * Device format: { tx: [{ canId, params: [...] }], rx: [...] }
+   * Table format: [{ id, paramid, position, length, gain, offset, isrx, msgIndex, paramIndex }]
+   */
+  flattenCanMappings(messages, isrx) {
+    if (!Array.isArray(messages)) {
+      return []
+    }
+    const flattened = []
+    messages.forEach((message, msgIndex) => {
+      if (!message || !Array.isArray(message.params)) {
+        return // Skip invalid messages
+      }
+      message.params.forEach((param, paramIndex) => {
+        if (param && param.paramId !== undefined) {
+          flattened.push({
+            id: message.canId,
+            paramid: param.paramId,
+            position: param.position,
+            length: param.length,
+            gain: param.gain,
+            offset: param.offset,
+            isrx: isrx,
+            msgIndex: msgIndex,
+            paramIndex: paramIndex,
+          })
+        }
+      })
+    })
+    return flattened
+  }
+
+  /**
+   * Get parameter display name by key and param object
+   * Matches the reference implementation from openinverter-web-interface
+   */
+  getParameterDisplayName(key, param) {
+    if (!param) {
+      return key || 'Unknown'
+    }
+    // Use param.name if available, otherwise use the key
+    return param.name || key
+  }
+
+  /**
+   * Get parameter display name by ID (for backwards compatibility)
+   */
+  getParameterDisplayNameById(paramId, params) {
+    if (!params || paramId === 0) {
+      return `Param ${paramId}`
+    }
+
+    for (const [key, param] of Object.entries(params)) {
+      if (param.id === paramId) {
+        return this.getParameterDisplayName(key, param)
+      }
+    }
+    return `Param ${paramId}`
+  }
+
+  /**
+   * Refresh all params with IDs (for CAN mapping dropdown)
+   */
+  async refreshAllParamsWithIds() {
+    if (this.state.isLoadingAllParamsWithIds) {
+      console.log('[OI] Already loading all params with IDs, skipping')
+      return
+    }
+
+    this.state.isLoadingAllParamsWithIds = true
+    this.emit('render')
+
+    try {
+      const allParams = await this.getAllParamsWithIds()
+      this.state.allParamsWithIds = allParams
+      this.state.isLoadingAllParamsWithIds = false
+      this.emit('render')
+    } catch (error) {
+      console.error('[OI] Failed to load all params with IDs:', error)
+      this.state.isLoadingAllParamsWithIds = false
+      this.emit('render')
+    }
+  }
+
+  /**
+   * Refresh CAN mappings from device
+   */
+  async refreshCanMappings() {
+    if (this.state.isLoadingCanMappings) {
+      console.log('[OI] Already loading CAN mappings, skipping')
+      return
+    }
+
+    this.state.isLoadingCanMappings = true
+    this.state.canMappingError = null
+    this.emit('render')
+
+    try {
+      // Check if mock device (nodeId > 127) - use mock storage
+      const isMockDevice = this.state.selectedNodeId > 127
+      
+      if (isMockDevice) {
+        // Mock device - use local storage
+        this.state.canMappings = {
+          tx: [...(this.state.mockCanMappings?.tx || [])],
+          rx: [...(this.state.mockCanMappings?.rx || [])]
+        }
+        this.state.isLoadingCanMappings = false
+        this.emit('render')
+        return
+      }
+      
+      // Real device - fetch from Python backend
+      const mappings = await this.getCanMappings()
+      console.log('[OI] Loaded CAN mappings:', mappings)
+      // Ensure mappings has the expected structure
+      if (mappings && (mappings.tx !== undefined || mappings.rx !== undefined)) {
+        this.state.canMappings = {
+          tx: mappings.tx || [],
+          rx: mappings.rx || []
+        }
+      } else {
+        // If response is not in expected format, initialize empty
+        console.warn('[OI] Unexpected CAN mappings format:', mappings)
+        this.state.canMappings = { tx: [], rx: [] }
+      }
+      this.state.isLoadingCanMappings = false
+      this.emit('render')
+    } catch (error) {
+      console.error('[OI] Failed to load CAN mappings:', error)
+      this.state.isLoadingCanMappings = false
+      this.state.canMappingError = error.message || 'Failed to load CAN mappings'
+      this.emit('render')
+      alert(`Failed to load CAN mappings: ${error.message}`)
+    }
+  }
+
+  /**
+   * Handle adding a CAN mapping
+   */
+  async handleAddCanMapping() {
+    const formData = this.state.canMappingFormData || {}
+    
+    if (formData.paramid === 0) {
+      alert('Please select a parameter')
+      return
+    }
+
+    // Find parameter name by ID - search in both parameters and spot values
+    // Use allParamsWithIds if available (has both), otherwise search both separately
+    let paramName = null
+    
+    // Try allParamsWithIds first (most complete)
+    const allParamsWithIds = this.state.allParamsWithIds || {}
+    for (const [key, param] of Object.entries(allParamsWithIds)) {
+      if (param && param.id === formData.paramid) {
+        paramName = key
+        break
+      }
+    }
+    
+    // Fallback: search in oiParameters
+    if (!paramName) {
+      const params = this.state.oiParameters || {}
+      for (const [key, param] of Object.entries(params)) {
+        if (param && param.id === formData.paramid) {
+          paramName = key
+          break
+        }
+      }
+    }
+    
+    // Fallback: search in oiSpotValues
+    if (!paramName) {
+      const spotValues = this.state.oiSpotValues || {}
+      for (const [key, spotValue] of Object.entries(spotValues)) {
+        if (spotValue && spotValue.id === formData.paramid) {
+          paramName = key
+          break
+        }
+      }
+    }
+
+    if (!paramName) {
+      alert('Parameter not found')
+      return
+    }
+
+    this.state.canMappingError = null
+
+    try {
+      // Check if mock device (nodeId > 127) - handle locally
+      const isMockDevice = this.state.selectedNodeId > 127
+      
+      if (isMockDevice) {
+        // Mock device - store locally
+        const direction = formData.isrx ? 'rx' : 'tx'
+        if (!this.state.mockCanMappings) {
+          this.state.mockCanMappings = { tx: [], rx: [] }
+        }
+        const msgList = this.state.mockCanMappings[direction] || []
+        
+        // Find or create message entry for this CAN ID
+        let msgIndex = null
+        for (let i = 0; i < msgList.length; i++) {
+          if (msgList[i].canId === formData.id) {
+            msgIndex = i
+            break
+          }
+        }
+        
+        if (msgIndex === null) {
+          // Create new message entry
+          msgList.push({
+            canId: formData.id,
+            isExtended: false,
+            params: []
+          })
+          msgIndex = msgList.length - 1
+        }
+        
+        // Add parameter mapping to message
+        msgList[msgIndex].params.push({
+          paramId: formData.paramid,
+          position: formData.position,
+          length: formData.length,
+          gain: formData.gain,
+          offset: formData.offset
+        })
+        
+        // Update state
+        this.state.mockCanMappings[direction] = msgList
+      } else {
+        // Real device - call Python backend
+        this.state.isLoadingCanMappings = true
+        this.emit('render')
+        
+        await this.addCanMapping({
+          can_id: formData.id,
+          param_name: paramName,
+          position: formData.position,
+          length: formData.length,
+          gain: formData.gain,
+          offset: formData.offset,
+          is_tx: !formData.isrx,
+          is_extended: false, // TODO: Add extended frame support
+        })
+        
+        // Reset loading flag so refreshCanMappings can run
+        this.state.isLoadingCanMappings = false
+      }
+
+      // Reset form and reload mappings
+      this.state.showCanMappingForm = false
+      this.state.canMappingFormData = {
+        isrx: false,
+        id: 0,
+        paramid: 0,
+        position: 0,
+        length: 16,
+        gain: 1.0,
+        offset: 0,
+      }
+      
+      // Refresh mappings (will handle loading state itself)
+      await this.refreshCanMappings()
+      alert('CAN mapping added successfully')
+    } catch (error) {
+      console.error('[OI] Failed to add CAN mapping:', error)
+      this.state.isLoadingCanMappings = false
+      this.state.canMappingError = error.message || 'Failed to add CAN mapping'
+      this.emit('render')
+      alert(`Failed to add CAN mapping: ${error.message}`)
+    }
+  }
+
+  /**
+   * Handle removing a CAN mapping
+   */
+  async handleRemoveCanMapping(mapping) {
+    const direction = mapping.isrx ? 'rx' : 'tx'
+    const paramName = this.getParameterDisplayName(mapping.paramid, this.state.oiParameters || {})
+    const canId = `0x${mapping.id.toString(16).toUpperCase()}`
+
+    if (!confirm(`Remove ${direction.toUpperCase()} mapping for ${paramName} (CAN ID ${canId})?`)) {
+      return
+    }
+
+    this.state.canMappingError = null
+
+    try {
+      // Check if mock device (nodeId > 127) - handle locally
+      const isMockDevice = this.state.selectedNodeId > 127
+      
+      if (isMockDevice) {
+        // Mock device - remove from local storage
+        const msgList = this.state.mockCanMappings[direction] || []
+        if (mapping.msgIndex < msgList.length) {
+          const msg = msgList[mapping.msgIndex]
+          if (mapping.paramIndex < msg.params.length) {
+            // Remove the parameter mapping
+            msg.params.splice(mapping.paramIndex, 1)
+            // If message has no more params, remove the message
+            if (msg.params.length === 0) {
+              msgList.splice(mapping.msgIndex, 1)
+            }
+          }
+        }
+      } else {
+        // Real device - call Python backend
+        this.state.isLoadingCanMappings = true
+        this.emit('render')
+        
+        await this.removeCanMapping({
+          direction: direction,
+          msg_index: mapping.msgIndex,
+          param_index: mapping.paramIndex,
+        })
+        
+        // Reset loading flag so refreshCanMappings can run
+        this.state.isLoadingCanMappings = false
+      }
+
+      // Refresh mappings (will handle loading state itself)
+      await this.refreshCanMappings()
+      alert('CAN mapping removed successfully')
+    } catch (error) {
+      console.error('[OI] Failed to remove CAN mapping:', error)
+      this.state.isLoadingCanMappings = false
+      this.state.canMappingError = error.message || 'Failed to remove CAN mapping'
+      this.emit('render')
+      alert(`Failed to remove CAN mapping: ${error.message}`)
+    }
+  }
+
   renderCanmappingContent() {
+    // Auto-load CAN mappings if device is connected but mappings aren't loaded yet
+    if (!this.state.canMappings && !this.state.isLoadingCanMappings && this.state.oiDeviceConnected) {
+      setTimeout(() => this.refreshCanMappings(), 0)
+    }
+
+    // Auto-load all params with IDs (for dropdown) - includes both parameters and spot values
+    if (!this.state.allParamsWithIds && !this.state.isLoadingAllParamsWithIds && this.state.oiDeviceConnected) {
+      setTimeout(() => this.refreshAllParamsWithIds(), 0)
+    }
+
+    if (!this.state.oiDeviceConnected) {
+      return this.html`
+        <div style="padding: 60px 20px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📡</div>
+          <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
+            Connect to a device to view CAN mappings
+          </p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
+            Use the Device Selector to scan and connect
+          </p>
+        </div>
+      `
+    }
+
+    if (this.state.isLoadingCanMappings) {
+      return this.html`
+        <div style="padding: 60px 20px; text-align: center;">
+          <p style="font-size: 16px; color: var(--text-secondary);">Loading CAN mappings...</p>
+        </div>
+      `
+    }
+
+    const mappings = this.state.canMappings || { tx: [], rx: [] }
+    const txMappings = this.flattenCanMappings(mappings.tx || [], false)
+    const rxMappings = this.flattenCanMappings(mappings.rx || [], true)
+    const showAddForm = this.state.showCanMappingForm || false
+    const formData = this.state.canMappingFormData || {
+      isrx: false,
+      id: 0,
+      paramid: 0,
+      position: 0,
+      length: 16,
+      gain: 1.0,
+      offset: 0,
+    }
+
+    // Combine all parameters and spot values into a single object (like reference code)
+    // This matches the reference pattern where useParams() returns all params/spot values together
+    const allParams = {}
+    
+    // Add parameters (isparam=True)
+    const oiParams = this.state.oiParameters || {}
+    Object.entries(oiParams).forEach(([key, param]) => {
+      if (param) {
+        allParams[key] = param
+      }
+    })
+    
+    // Add spot values (isparam=False)
+    const oiSpotValues = this.state.oiSpotValues || {}
+    Object.entries(oiSpotValues).forEach(([key, spotValue]) => {
+      if (spotValue) {
+        allParams[key] = spotValue
+      }
+    })
+    
+    // Prefer allParamsWithIds if available (has IDs from parameter database)
+    // Otherwise use combined allParams (may not have IDs yet)
+    const paramsForDropdown = Object.keys(this.state.allParamsWithIds || {}).length > 0
+      ? this.state.allParamsWithIds
+      : allParams
+    
+    // For display names in tables, use combined params
+    const params = allParams
+
     return this.html`
-      <div style="padding: 60px 20px; text-align: center;">
-        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📡</div>
-        <p style="font-size: 16px; color: var(--text-secondary); margin: 0;">
-          CAN Mapping interface coming soon
-        </p>
-        <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">
-          This panel will allow you to configure CAN bus message mapping
-        </p>
+      <div style="padding: 20px;">
+        <h2 class="section-header" style="margin-bottom: 1.5rem;">CAN Mappings</h2>
+
+        ${this.state.canMappingError ? this.html`
+          <div class="error-message" style="margin-bottom: 1.5rem;">
+            <p>Error: ${this.state.canMappingError}</p>
+          </div>
+        ` : ''}
+
+        <div class="can-mappings-container">
+          <!-- TX Mappings -->
+          <div class="mapping-section">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-primary);">
+              TX Mappings (Transmit)
+            </h3>
+            ${txMappings.length === 0 ? this.html`
+              <p class="no-mappings">No TX mappings configured</p>
+            ` : this.html`
+              <table class="mappings-table">
+                <thead>
+                  <tr>
+                    <th>CAN ID</th>
+                    <th>Parameter</th>
+                    <th>Position</th>
+                    <th>Length</th>
+                    <th>Gain</th>
+                    <th>Offset</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${txMappings.map((mapping, idx) => this.html`
+                    <tr>
+                      <td>0x${mapping.id.toString(16).toUpperCase()}</td>
+                      <td>${this.getParameterDisplayNameById(mapping.paramid, params)}</td>
+                      <td>${mapping.position}</td>
+                      <td>${mapping.length} bits</td>
+                      <td>${mapping.gain}</td>
+                      <td>${mapping.offset}</td>
+                      <td>
+                        <button
+                          class="btn-remove"
+                          onclick=${() => this.handleRemoveCanMapping(mapping)}
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  `)}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <!-- RX Mappings -->
+          <div class="mapping-section">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-primary);">
+              RX Mappings (Receive)
+            </h3>
+            ${rxMappings.length === 0 ? this.html`
+              <p class="no-mappings">No RX mappings configured</p>
+            ` : this.html`
+              <table class="mappings-table">
+                <thead>
+                  <tr>
+                    <th>CAN ID</th>
+                    <th>Parameter</th>
+                    <th>Position</th>
+                    <th>Length</th>
+                    <th>Gain</th>
+                    <th>Offset</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rxMappings.map((mapping, idx) => this.html`
+                    <tr>
+                      <td>0x${mapping.id.toString(16).toUpperCase()}</td>
+                      <td>${this.getParameterDisplayNameById(mapping.paramid, params)}</td>
+                      <td>${mapping.position}</td>
+                      <td>${mapping.length} bits</td>
+                      <td>${mapping.gain}</td>
+                      <td>${mapping.offset}</td>
+                      <td>
+                        <button
+                          class="btn-remove"
+                          onclick=${() => this.handleRemoveCanMapping(mapping)}
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  `)}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <!-- Add Mapping Section -->
+          <div class="add-mapping-section">
+            ${!showAddForm ? this.html`
+              <button class="btn-add" onclick=${() => { this.state.showCanMappingForm = true; this.emit('render') }}>
+                Add CAN Mapping
+              </button>
+            ` : this.html`
+              <div class="add-mapping-form">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--text-primary);">
+                  Add New CAN Mapping
+                </h3>
+                <div class="form-row">
+                  <label>
+                    Direction:
+                    <select
+                      onchange=${(e) => {
+                        this.state.canMappingFormData = { ...formData, isrx: e.target.value === 'rx' }
+                        this.emit('render')
+                      }}
+                    >
+                      <option value="tx" ${!formData.isrx ? 'selected' : ''}>TX (Transmit)</option>
+                      <option value="rx" ${formData.isrx ? 'selected' : ''}>RX (Receive)</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    CAN ID (hex):
+                    <input
+                      type="text"
+                      placeholder="0x180"
+                      value=${`0x${formData.id.toString(16).toUpperCase()}`}
+                      onchange=${(e) => {
+                        const value = e.target.value
+                        const parsed = parseInt(value, 16)
+                        if (!isNaN(parsed)) {
+                          this.state.canMappingFormData = { ...formData, id: parsed }
+                          this.emit('render')
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    Parameter:
+                    <select
+                      onchange=${(e) => {
+                        this.state.canMappingFormData = { ...formData, paramid: parseInt(e.target.value) || 0 }
+                        this.emit('render')
+                      }}
+                    >
+                      <option value="0" ${formData.paramid === 0 ? 'selected' : ''}>Select parameter...</option>
+                      ${(() => {
+                        // Show all params/spot values that have IDs (for CAN mapping)
+                        // Match reference code pattern: iterate over all params, show those with IDs
+                        const seenIds = new Set()
+                        const entries = Object.entries(paramsForDropdown)
+                          .filter(([key, param]) => {
+                            // Only show entries that have an ID (required for CAN mapping)
+                            if (!param) return false
+                            if (!param.id) return false
+                            if (seenIds.has(param.id)) return false
+                            seenIds.add(param.id)
+                            return true
+                          })
+                          .sort(([keyA, paramA], [keyB, paramB]) => {
+                            // Sort by ID for consistent ordering
+                            return (paramA.id || 0) - (paramB.id || 0)
+                          })
+                        
+                        if (entries.length === 0) {
+                          return this.html`
+                            <option value="0" disabled>No parameters with IDs available</option>
+                          `
+                        }
+                        
+                        return entries.map(([key, param]) => this.html`
+                          <option value="${param.id}" ${formData.paramid === param.id ? 'selected' : ''}>
+                            ${this.getParameterDisplayName(key, param)} (ID: ${param.id})
+                          </option>
+                        `)
+                      })()}
+                    </select>
+                  </label>
+
+                  <label>
+                    Bit Position:
+                    <input
+                      type="number"
+                      min="0"
+                      max="63"
+                      value=${formData.position}
+                      onchange=${(e) => {
+                        this.state.canMappingFormData = { ...formData, position: parseInt(e.target.value) || 0 }
+                        this.emit('render')
+                      }}
+                    />
+                  </label>
+
+                  <label>
+                    Bit Length:
+                    <input
+                      type="number"
+                      min="1"
+                      max="32"
+                      value=${formData.length}
+                      onchange=${(e) => {
+                        this.state.canMappingFormData = { ...formData, length: parseInt(e.target.value) || 16 }
+                        this.emit('render')
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    Gain:
+                    <input
+                      type="number"
+                      step="0.001"
+                      value=${formData.gain}
+                      onchange=${(e) => {
+                        this.state.canMappingFormData = { ...formData, gain: parseFloat(e.target.value) || 1.0 }
+                        this.emit('render')
+                      }}
+                    />
+                  </label>
+
+                  <label>
+                    Offset:
+                    <input
+                      type="number"
+                      value=${formData.offset}
+                      onchange=${(e) => {
+                        this.state.canMappingFormData = { ...formData, offset: parseInt(e.target.value) || 0 }
+                        this.emit('render')
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <div class="form-actions">
+                  <button class="btn-cancel" onclick=${() => {
+                    this.state.showCanMappingForm = false
+                    this.state.canMappingFormData = {
+                      isrx: false,
+                      id: 0,
+                      paramid: 0,
+                      position: 0,
+                      length: 16,
+                      gain: 1.0,
+                      offset: 0,
+                    }
+                    this.emit('render')
+                  }}>
+                    Cancel
+                  </button>
+                  <button
+                    class="btn-save"
+                    onclick=${() => this.handleAddCanMapping()}
+                    disabled=${formData.paramid === 0}
+                  >
+                    Add Mapping
+                  </button>
+                </div>
+              </div>
+            `}
+          </div>
+        </div>
       </div>
     `
   }
@@ -3330,9 +4186,23 @@ class OpenInverterExtension {
         // Update extension menu to include this device
         this.updateExtensionMenu()
         
-        this.state.oiDeviceConnected = true
-        this.state.currentDeviceSerial = mockSerial
-        console.log('[OI Connection] Mock device created:', mockDevice)
+        // Initialize mock device in Python backend (sets device_connected = True)
+        const mockArgs = JSON.stringify({ node_id: this.state.selectedNodeId })
+        const mockResult = await this.device.execute(`from lib.OI_helpers import initializeDevice; initializeDevice(${mockArgs})`)
+        const mockParsed = this.device.parseJSON(mockResult)
+        
+        if (mockParsed && mockParsed.success) {
+          this.state.oiDeviceConnected = true
+          this.state.currentDeviceSerial = mockSerial
+          // Initialize mock CAN mappings storage if not already initialized
+          if (!this.state.mockCanMappings) {
+            this.state.mockCanMappings = { tx: [], rx: [] }
+          }
+          console.log('[OI Connection] Mock device initialized:', mockDevice)
+        } else {
+          console.error('[OI Connection] Mock device initialization failed:', mockParsed)
+        }
+        
         this.emit('render')
         return
       }

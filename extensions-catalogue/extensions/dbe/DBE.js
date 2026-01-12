@@ -11,7 +11,8 @@
 //   "menu": [
 //     { "id": "config", "label": "Configuration" },
 //     { "id": "status", "label": "Status" },
-//     { "id": "metrics", "label": "Metrics" }
+//     { "id": "metrics", "label": "Metrics" },
+//     { "id": "mqtt", "label": "MQTT" }
 //   ],
 //   "styles": ":root { --dbe-blue: #1e88e5; --dbe-blue-dark: #1565c0; --dbe-blue-light: #e3f2fd; --dbe-green: #4caf50; --dbe-red: #f44336; --dbe-orange: #ff9800; --dbe-beige: #fef8f0; } .dbe-section { margin-bottom: 24px; } .dbe-section h3 { font-size: 18px; font-weight: 600; color: var(--dbe-blue); margin-bottom: 12px; } .dbe-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; } .dbe-field label { font-size: 14px; font-weight: 600; color: var(--text-primary); } .dbe-field input, .dbe-field select { padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 6px; background: var(--input-bg); color: var(--text-primary); font-size: 14px; } .dbe-field input:focus, .dbe-field select:focus { outline: none; border-color: var(--dbe-blue); box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2); } .dbe-button { text-transform: uppercase; letter-spacing: 0.5px; width: auto; padding: 10px 20px; border: none; border-radius: 6px; background: var(--dbe-blue); color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; } .dbe-button:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); } .dbe-button:disabled { opacity: 0.5; cursor: not-allowed; } .dbe-button.secondary { background: var(--bg-tertiary); color: var(--text-primary); } .dbe-button.start { background: var(--dbe-green); color: white; } .dbe-button.start:hover:not(:disabled) { background: #45a049; } .dbe-button.stop { background: var(--dbe-red); color: white; } .dbe-button.stop:hover:not(:disabled) { background: #da190b; } .dbe-metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; padding: 20px; } .dbe-metric-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; } .dbe-metric-name { font-weight: 600; color: var(--dbe-blue); font-size: 13px; margin-bottom: 8px; } .dbe-metric-value { font-size: 24px; font-weight: 700; font-family: 'Menlo', Monaco, 'Courier New', monospace; color: var(--text-primary); } .dbe-metric-unit { font-size: 12px; color: var(--text-secondary); margin-top: 4px; } .dbe-status-panel { padding: 20px; } .dbe-status-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); } .dbe-status-item:last-child { border-bottom: none; } .dbe-status-label { font-weight: 600; color: var(--text-primary); } .dbe-status-value { color: var(--text-secondary); } .dbe-status-value.running { color: var(--dbe-green); } .dbe-status-value.error { color: var(--dbe-red); } .dbe-soc-gauge { width: 100%; height: 40px; background: var(--bg-tertiary); border-radius: 20px; overflow: hidden; position: relative; margin: 16px 0; } .dbe-soc-fill { height: 100%; background: linear-gradient(90deg, var(--dbe-green), var(--dbe-blue)); transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; } .dbe-alarm-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin: 4px; } .dbe-alarm-badge.warning { background: var(--dbe-orange); color: white; } .dbe-alarm-badge.error { background: var(--dbe-red); color: white; }"
 // }
@@ -37,6 +38,24 @@ class DBEExtension {
           available_batteries: {},
           available_inverters: {}
         },
+        mqttConfig: {
+          enabled: false,
+          server: '',
+          port: 1883,
+          username: '',
+          password: '',
+          topic_prefix: 'BE',
+          publish_interval: 5,
+          publish_cell_voltages: true,
+          publish_balancing: true,
+          ha_autodiscovery: true
+        },
+        mqttStatus: {
+          connected: false,
+          messages_published: 0,
+          commands_received: 0,
+          last_publish_ms: 0
+        },
         metrics: {},
         status: {
           state: 'stopped',
@@ -49,7 +68,8 @@ class DBEExtension {
           last_update_ms: 0
         },
         isLoading: false,
-        configLoaded: false
+        configLoaded: false,
+        mqttConfigLoaded: false
       }
     }
   }
@@ -163,6 +183,100 @@ class DBEExtension {
       this.emit('render')
       return { error: e.message }
     }
+  }
+
+  // === MQTT Helper Methods ===
+
+  async getMqttConfig() {
+    if (this.state.dbe.isLoading) {
+      console.log('[DBE MQTT] Config already loading, skipping')
+      return this.state.dbe.mqttConfig || {}
+    }
+
+    try {
+      this.state.dbe.isLoading = true
+      const result = await this.device.execute('from lib.DBE.DBE_helpers import getMqttConfig; getMqttConfig()')
+      const parsed = this.device.parseJSON(result)
+      if (parsed && typeof parsed === 'object') {
+        this.state.dbe.mqttConfig = parsed
+      }
+      this.state.dbe.mqttConfigLoaded = true
+      this.state.dbe.isLoading = false
+      this.emit('render')
+      return this.state.dbe.mqttConfig || {}
+    } catch (e) {
+      console.error('[DBE MQTT] Error getting config:', e)
+      this.state.dbe.isLoading = false
+      this.state.dbe.mqttConfigLoaded = true
+      return this.state.dbe.mqttConfig || {}
+    }
+  }
+
+  async saveMqttConfig() {
+    try {
+      this.state.dbe.isLoading = true
+      this.emit('render')
+      
+      const config = this.state.dbe.mqttConfig
+      const result = await this.device.execute(`from lib.DBE.DBE_helpers import setMqttConfig; setMqttConfig(${JSON.stringify(config)})`)
+      const parsed = this.device.parseJSON(result)
+      
+      this.state.dbe.isLoading = false
+      
+      if (parsed && parsed.success) {
+        alert('✓ MQTT configuration saved successfully!')
+      } else {
+        alert('✗ Failed to save MQTT configuration: ' + (parsed?.error || 'Unknown error'))
+      }
+      
+      this.emit('render')
+    } catch (e) {
+      this.state.dbe.isLoading = false
+      alert('✗ Failed to save MQTT configuration: ' + e.message)
+      this.emit('render')
+    }
+  }
+
+  async testMqttConnection() {
+    try {
+      this.state.dbe.isLoading = true
+      this.emit('render')
+      
+      const result = await this.device.execute('from lib.DBE.DBE_helpers import testMqtt; testMqtt()')
+      const parsed = this.device.parseJSON(result)
+      
+      this.state.dbe.isLoading = false
+      
+      if (parsed && parsed.success) {
+        alert('✓ MQTT connection successful!')
+      } else {
+        alert('✗ MQTT connection failed: ' + (parsed?.error || 'Unknown error'))
+      }
+      
+      this.emit('render')
+    } catch (e) {
+      this.state.dbe.isLoading = false
+      alert('✗ MQTT test failed: ' + e.message)
+      this.emit('render')
+    }
+  }
+
+  async refreshMqttStatus() {
+    try {
+      const result = await this.device.execute('from lib.DBE.DBE_helpers import getMqttStatus; getMqttStatus()')
+      const parsed = this.device.parseJSON(result)
+      if (parsed && typeof parsed === 'object') {
+        this.state.dbe.mqttStatus = parsed
+        this.emit('render')
+      }
+    } catch (e) {
+      console.error('[DBE MQTT] Error getting status:', e)
+    }
+  }
+
+  handleMqttConfigChange(key, value) {
+    this.state.dbe.mqttConfig[key] = value
+    this.emit('render')
   }
 
   // === Panel Renderers ===
@@ -533,6 +647,190 @@ class DBEExtension {
     `
   }
 
+  renderMqtt() {
+    // Load MQTT config if needed
+    const needsLoad = !this.state.dbe.mqttConfigLoaded && !this.state.dbe.isLoading && this.state.isConnected
+    
+    if (needsLoad) {
+      setTimeout(() => {
+        this.getMqttConfig().catch(err => {
+          console.error('[DBE MQTT] getMqttConfig() error:', err);
+        });
+      }, 0)
+    }
+    
+    // Auto-refresh MQTT status periodically
+    if (this.state.isConnected && !this.state.dbe.isLoading) {
+      const now = Date.now()
+      if (!this.state.dbe.lastMqttStatusRefresh || (now - this.state.dbe.lastMqttStatusRefresh) > 3000) {
+        setTimeout(() => {
+          this.refreshMqttStatus()
+          this.state.dbe.lastMqttStatusRefresh = Date.now()
+        }, 0)
+      }
+    }
+
+    const mqttConfig = this.state.dbe.mqttConfig || {}
+    const mqttStatus = this.state.dbe.mqttStatus || {}
+
+    return this.html`
+      <div class="system-panel">
+        <div class="panel-header">
+          <h2>MQTT Configuration</h2>
+          <button 
+            class="dbe-button"
+            onclick=${() => this.saveMqttConfig()}
+            disabled=${!this.state.isConnected || this.state.dbe.isLoading}
+            style="min-width: 120px;"
+          >
+            Save
+          </button>
+        </div>
+        
+        <div class="dbe-section" style="padding: 20px;">
+          <div class="dbe-field">
+            <label>
+              <input 
+                type="checkbox" 
+                checked=${mqttConfig.enabled}
+                onchange=${(e) => this.handleMqttConfigChange('enabled', e.target.checked)}
+              />
+              Enable MQTT Publishing
+            </label>
+          </div>
+
+          <div class="dbe-field">
+            <label>MQTT Broker</label>
+            <input 
+              type="text" 
+              value="${mqttConfig.server || ''}"
+              placeholder="mqtt.example.com"
+              oninput=${(e) => this.handleMqttConfigChange('server', e.target.value)}
+              disabled=${!this.state.isConnected}
+            />
+          </div>
+
+          <div class="dbe-field">
+            <label>Port</label>
+            <input 
+              type="number" 
+              value="${mqttConfig.port || 1883}"
+              oninput=${(e) => this.handleMqttConfigChange('port', parseInt(e.target.value))}
+              disabled=${!this.state.isConnected}
+            />
+          </div>
+
+          <div class="dbe-field">
+            <label>Username (optional)</label>
+            <input 
+              type="text" 
+              value="${mqttConfig.username || ''}"
+              oninput=${(e) => this.handleMqttConfigChange('username', e.target.value)}
+              disabled=${!this.state.isConnected}
+            />
+          </div>
+
+          <div class="dbe-field">
+            <label>Password (optional)</label>
+            <input 
+              type="password" 
+              value="${mqttConfig.password || ''}"
+              oninput=${(e) => this.handleMqttConfigChange('password', e.target.value)}
+              disabled=${!this.state.isConnected}
+            />
+          </div>
+
+          <div class="dbe-field">
+            <label>Topic Prefix</label>
+            <input 
+              type="text" 
+              value="${mqttConfig.topic_prefix || 'BE'}"
+              placeholder="BE"
+              oninput=${(e) => this.handleMqttConfigChange('topic_prefix', e.target.value)}
+              disabled=${!this.state.isConnected}
+            />
+          </div>
+
+          <div class="dbe-field">
+            <label>Publish Interval (seconds)</label>
+            <input 
+              type="number" 
+              value="${mqttConfig.publish_interval || 5}"
+              min="1" max="60"
+              oninput=${(e) => this.handleMqttConfigChange('publish_interval', parseInt(e.target.value))}
+              disabled=${!this.state.isConnected}
+            />
+          </div>
+
+          <div class="dbe-field">
+            <label>
+              <input 
+                type="checkbox" 
+                checked=${mqttConfig.publish_cell_voltages}
+                onchange=${(e) => this.handleMqttConfigChange('publish_cell_voltages', e.target.checked)}
+              />
+              Publish All Cell Voltages
+            </label>
+          </div>
+
+          <div class="dbe-field">
+            <label>
+              <input 
+                type="checkbox" 
+                checked=${mqttConfig.ha_autodiscovery}
+                onchange=${(e) => this.handleMqttConfigChange('ha_autodiscovery', e.target.checked)}
+              />
+              Home Assistant Autodiscovery
+            </label>
+          </div>
+        </div>
+
+        <!-- MQTT Status Section -->
+        <div class="dbe-section" style="padding: 20px;">
+          <h3>MQTT Status</h3>
+          <div class="dbe-status-item">
+            <span class="dbe-status-label">Connection</span>
+            <span class="dbe-status-value ${mqttStatus.connected ? 'running' : ''}">
+              ${mqttStatus.connected ? 'Connected' : 'Disconnected'}
+            </span>
+          </div>
+          <div class="dbe-status-item">
+            <span class="dbe-status-label">Messages Published</span>
+            <span class="dbe-status-value">${mqttStatus.messages_published || 0}</span>
+          </div>
+          <div class="dbe-status-item">
+            <span class="dbe-status-label">Commands Received</span>
+            <span class="dbe-status-value">${mqttStatus.commands_received || 0}</span>
+          </div>
+          <div class="dbe-status-item">
+            <span class="dbe-status-label">Last Publish</span>
+            <span class="dbe-status-value">
+              ${mqttStatus.last_publish_ms ? new Date(mqttStatus.last_publish_ms).toLocaleTimeString() : 'Never'}
+            </span>
+          </div>
+        </div>
+
+        <!-- Test Buttons -->
+        <div style="padding: 20px; display: flex; gap: 12px;">
+          <button 
+            class="dbe-button start" 
+            onclick=${() => this.testMqttConnection()}
+            disabled=${!this.state.isConnected || this.state.dbe.isLoading}
+          >
+            Test Connection
+          </button>
+          <button 
+            class="dbe-button secondary" 
+            onclick=${() => this.refreshMqttStatus()}
+            disabled=${!this.state.isConnected || this.state.dbe.isLoading}
+          >
+            Refresh Status
+          </button>
+        </div>
+      </div>
+    `
+  }
+
   // === Event Handlers ===
 
   handleConfigChange(key, value) {
@@ -582,6 +880,8 @@ class DBEExtension {
         return this.renderStatus()
       case 'metrics':
         return this.renderMetrics()
+      case 'mqtt':
+        return this.renderMqtt()
       default:
         return this.renderConfig()
     }

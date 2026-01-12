@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1768192094,
+  "updated": 1768194536,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -820,6 +820,10 @@
         {
           "id": "metrics",
           "label": "Metrics"
+        },
+        {
+          "id": "mqtt",
+          "label": "MQTT"
         }
       ],
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Extensions/DBE/DBE.js",

@@ -11,6 +11,10 @@ Client-callable functions:
 - stopDBE()               - Stop bridge
 - getDBEStatus()          - Get connection status
 - getDBEMetrics()         - Get current battery metrics
+- getMqttConfig()         - Get MQTT configuration
+- setMqttConfig(config)   - Set MQTT configuration
+- getMqttStatus()         - Get MQTT connection status
+- testMqtt()              - Test MQTT connection
 """
 
 import json
@@ -20,6 +24,7 @@ from lib import settings
 
 # Global state
 _dbe_running = False
+_dbe_paused = False
 _dbe_can_handle = None
 _dbe_battery = None
 _dbe_inverter = None
@@ -27,6 +32,7 @@ _dbe_loop_task = None
 _dbe_status = {
     'state': 'stopped',
     'running': False,
+    'paused': False,
     'error': '',
     'battery_type': '',
     'inverter_protocol': '',
@@ -34,6 +40,13 @@ _dbe_status = {
     'frames_tx': 0,
     'last_update_ms': 0
 }
+
+# MQTT state
+_mqtt_enabled = False
+_mqtt_last_publish_ms = 0
+_mqtt_publish_interval_ms = 5000
+_mqtt_reconnect_last_attempt_ms = 0
+_mqtt_reconnect_interval_ms = 5000
 
 
 def getDBEConfig():
@@ -141,6 +154,44 @@ def startDBE():
         _dbe_status['inverter_protocol'] = inverter_protocol
         _dbe_status['error'] = ''
         
+        # Initialize MQTT command handlers
+        _init_mqtt_commands()
+        
+        # Initialize MQTT if enabled
+        global _mqtt_enabled, _mqtt_publish_interval_ms
+        _mqtt_enabled = settings.get('dbe.mqtt_enabled', False)
+        _mqtt_publish_interval_ms = settings.get('dbe.mqtt_publish_interval', 5) * 1000
+        
+        if _mqtt_enabled:
+            try:
+                from lib.DBE import mqtt_client, mqtt_commands, mqtt_ha_discovery
+                
+                if mqtt_client.init_mqtt():
+                    if mqtt_client.connect():
+                        print("[DBE] MQTT connected")
+                        
+                        # Subscribe to commands
+                        mqtt_commands.subscribe_to_commands()
+                        
+                        # Publish Home Assistant discovery (if enabled)
+                        if settings.get('dbe.mqtt_ha_autodiscovery', True):
+                            num_cells = 0
+                            if _dbe_battery:
+                                battery_data = _dbe_battery.get_data()
+                                cell_voltages = battery_data.get('cell_voltages_mV', [])
+                                num_cells = len(cell_voltages)
+                            
+                            mqtt_ha_discovery.publish_discovery(
+                                num_cells=num_cells,
+                                publish_cell_voltages=settings.get('dbe.mqtt_publish_cell_voltages', True)
+                            )
+                    else:
+                        print("[DBE] MQTT connection failed, will retry in background")
+                else:
+                    print("[DBE] MQTT initialization failed")
+            except Exception as e:
+                print(f"[DBE] MQTT setup error: {e}")
+        
         # Start background loop
         _dbe_running = True
         import _thread
@@ -171,40 +222,78 @@ def _dbe_loop():
     BIDIRECTIONAL BRIDGE:
     - Battery → Inverter: Forward battery data (voltage, SOC, limits, alarms)
     - Inverter → Battery: Forward control messages (enable charge/discharge, limits)
+    - MQTT: Publish telemetry and handle commands
     
     NOTE: CAN RX handled by CAN manager callback (battery_rx_callback)
     """
-    global _dbe_running, _dbe_battery, _dbe_inverter, _dbe_can_handle, _dbe_status
+    global _dbe_running, _dbe_paused, _dbe_battery, _dbe_inverter, _dbe_can_handle, _dbe_status
+    global _mqtt_enabled, _mqtt_last_publish_ms, _mqtt_publish_interval_ms
+    global _mqtt_reconnect_last_attempt_ms, _mqtt_reconnect_interval_ms
     
     while _dbe_running:
         try:
             current_time_ms = time.ticks_ms()
             
+            # === MQTT Connection Management ===
+            
+            if _mqtt_enabled:
+                from lib.DBE import mqtt_client
+                
+                # Check if connected, attempt reconnect if needed
+                if not mqtt_client.is_connected():
+                    # Only attempt reconnect every 5 seconds
+                    if time.ticks_diff(current_time_ms, _mqtt_reconnect_last_attempt_ms) > _mqtt_reconnect_interval_ms:
+                        _mqtt_reconnect_last_attempt_ms = current_time_ms
+                        mqtt_client.connect()
+                else:
+                    # Check for incoming MQTT commands (non-blocking)
+                    mqtt_client.check_msg()
+            
             # === Battery → Inverter Path ===
             
             # 1. CAN RX handled by CAN manager callback (no polling needed!)
             
-            # 2. Send keep-alive to battery (if needed by protocol)
+            # 2. Send keep-alive to battery (if needed by protocol and not paused)
             #    Battery protocol uses CAN.can_transmit(handle, id, data)
-            _dbe_battery.transmit_can(current_time_ms)
+            if not _dbe_paused:
+                _dbe_battery.transmit_can(current_time_ms)
             
             # 3. Update derived values (power, etc.)
             _dbe_battery.update_values()
             
-            # 4. Forward battery data to inverter via RS485
+            # 4. Forward battery data to inverter via RS485 (if not paused)
             battery_data = _dbe_battery.get_data()
-            _dbe_inverter.transmit(battery_data, current_time_ms)
+            if not _dbe_paused:
+                _dbe_inverter.transmit(battery_data, current_time_ms)
             
             # === Inverter → Battery Path ===
             
-            # 5. Check for incoming RS485 messages from inverter
-            inverter_commands = _dbe_inverter.receive()
-            if inverter_commands:
-                # Forward control messages to battery (if supported)
-                _dbe_battery.handle_inverter_commands(inverter_commands)
+            # 5. Check for incoming RS485 messages from inverter (if not paused)
+            if not _dbe_paused:
+                inverter_commands = _dbe_inverter.receive()
+                if inverter_commands:
+                    # Forward control messages to battery (if supported)
+                    _dbe_battery.handle_inverter_commands(inverter_commands)
+            
+            # === MQTT Publishing ===
+            
+            if _mqtt_enabled and mqtt_client.is_connected():
+                # Publish telemetry at configured interval
+                if time.ticks_diff(current_time_ms, _mqtt_last_publish_ms) > _mqtt_publish_interval_ms:
+                    from lib.DBE import mqtt_publisher
+                    
+                    # Get publish settings
+                    publish_cell_voltages = settings.get('dbe.mqtt_publish_cell_voltages', True)
+                    publish_balancing = settings.get('dbe.mqtt_publish_balancing', True)
+                    
+                    # Publish all data
+                    mqtt_publisher.publish_all(battery_data, publish_cell_voltages, publish_balancing)
+                    
+                    _mqtt_last_publish_ms = current_time_ms
             
             # Update status
             _dbe_status['last_update_ms'] = current_time_ms
+            _dbe_status['paused'] = _dbe_paused
             
             # Sleep to avoid busy-wait
             time.sleep_ms(10)
@@ -220,6 +309,7 @@ def stopDBE():
     Returns JSON string with success status
     """
     global _dbe_running, _dbe_can_handle, _dbe_battery, _dbe_inverter, _dbe_loop_task, _dbe_status
+    global _mqtt_enabled
     
     try:
         # Stop background loop
@@ -227,6 +317,16 @@ def stopDBE():
             _dbe_running = False
             time.sleep(0.3)  # Give loop time to exit
             _dbe_loop_task = None
+        
+        # === MQTT Cleanup ===
+        
+        if _mqtt_enabled:
+            try:
+                from lib.DBE import mqtt_client
+                mqtt_client.disconnect()
+                print("[DBE] MQTT disconnected")
+            except Exception as e:
+                print(f"[DBE] MQTT disconnect error: {e}")
         
         # === CAN Manager Cleanup ===
         
@@ -246,6 +346,7 @@ def stopDBE():
         # Update status
         _dbe_status['state'] = 'stopped'
         _dbe_status['running'] = False
+        _dbe_status['paused'] = False
         _dbe_status['error'] = ''
         
         print(json.dumps({'success': True, 'status': 'stopped'}))
@@ -290,3 +391,210 @@ def getDBEMetrics():
             
     except Exception as e:
         print(json.dumps({'error': str(e)}))
+
+
+# ============================================================================
+# MQTT Functions
+# ============================================================================
+
+def getMqttConfig():
+    """Get MQTT configuration from settings
+    
+    Returns JSON string with configuration
+    """
+    config = {
+        'enabled': settings.get('dbe.mqtt_enabled', False),
+        'server': settings.get('mqtt.server', ''),
+        'port': settings.get('mqtt.port', 1883),
+        'username': settings.get('mqtt.username', ''),
+        'password': settings.get('mqtt.password', ''),
+        'topic_prefix': settings.get('mqtt.topic_prefix', 'BE'),
+        'publish_interval': settings.get('dbe.mqtt_publish_interval', 5),
+        'publish_cell_voltages': settings.get('dbe.mqtt_publish_cell_voltages', True),
+        'publish_balancing': settings.get('dbe.mqtt_publish_balancing', True),
+        'ha_autodiscovery': settings.get('dbe.mqtt_ha_autodiscovery', True)
+    }
+    print(json.dumps(config))
+
+
+def setMqttConfig(config_dict):
+    """Set MQTT configuration via settings module
+    
+    Args:
+        config_dict: Dictionary with configuration values
+    
+    Returns JSON string with success status
+    """
+    try:
+        # Update DBE MQTT settings
+        if 'enabled' in config_dict:
+            settings.set('dbe.mqtt_enabled', config_dict['enabled'])
+        if 'publish_interval' in config_dict:
+            settings.set('dbe.mqtt_publish_interval', config_dict['publish_interval'])
+        if 'publish_cell_voltages' in config_dict:
+            settings.set('dbe.mqtt_publish_cell_voltages', config_dict['publish_cell_voltages'])
+        if 'publish_balancing' in config_dict:
+            settings.set('dbe.mqtt_publish_balancing', config_dict['publish_balancing'])
+        if 'ha_autodiscovery' in config_dict:
+            settings.set('dbe.mqtt_ha_autodiscovery', config_dict['ha_autodiscovery'])
+        
+        # Update global MQTT settings (if provided)
+        if 'server' in config_dict:
+            settings.set('mqtt.server', config_dict['server'])
+        if 'port' in config_dict:
+            settings.set('mqtt.port', config_dict['port'])
+        if 'username' in config_dict:
+            settings.set('mqtt.username', config_dict['username'])
+        if 'password' in config_dict:
+            settings.set('mqtt.password', config_dict['password'])
+        if 'topic_prefix' in config_dict:
+            settings.set('mqtt.topic_prefix', config_dict['topic_prefix'])
+        
+        # Save to disk
+        if settings.save():
+            # Update runtime variables
+            global _mqtt_enabled, _mqtt_publish_interval_ms
+            _mqtt_enabled = config_dict.get('enabled', False)
+            _mqtt_publish_interval_ms = config_dict.get('publish_interval', 5) * 1000
+            
+            # If MQTT is being enabled, initialize it
+            if _mqtt_enabled and _dbe_running:
+                from lib.DBE import mqtt_client, mqtt_commands, mqtt_ha_discovery
+                
+                if mqtt_client.init_mqtt():
+                    if mqtt_client.connect():
+                        # Subscribe to commands
+                        mqtt_commands.subscribe_to_commands()
+                        
+                        # Publish Home Assistant discovery (if enabled)
+                        if config_dict.get('ha_autodiscovery', True):
+                            num_cells = 0
+                            if _dbe_battery:
+                                battery_data = _dbe_battery.get_data()
+                                cell_voltages = battery_data.get('cell_voltages_mV', [])
+                                num_cells = len(cell_voltages)
+                            
+                            mqtt_ha_discovery.publish_discovery(
+                                num_cells=num_cells,
+                                publish_cell_voltages=config_dict.get('publish_cell_voltages', True)
+                            )
+            
+            print(json.dumps({'success': True}))
+        else:
+            print(json.dumps({'success': False, 'error': 'Failed to save settings'}))
+    except Exception as e:
+        print(json.dumps({'success': False, 'error': str(e)}))
+
+
+def getMqttStatus():
+    """Get MQTT connection status
+    
+    Returns JSON string with status information
+    """
+    try:
+        from lib.DBE import mqtt_client
+        stats = mqtt_client.get_stats()
+        print(json.dumps(stats))
+    except Exception as e:
+        print(json.dumps({'error': str(e), 'connected': False}))
+
+
+def testMqtt():
+    """Test MQTT connection
+    
+    Returns JSON string with test result
+    """
+    try:
+        from lib.DBE import mqtt_client
+        
+        # Initialize if needed
+        if not mqtt_client.init_mqtt():
+            print(json.dumps({'success': False, 'error': 'Failed to initialize MQTT client'}))
+            return
+        
+        # Attempt connection
+        if mqtt_client.connect():
+            # Publish test message
+            if mqtt_client.publish("test", "Connection test successful", retain=False, qos=0):
+                print(json.dumps({'success': True, 'message': 'MQTT connection successful'}))
+            else:
+                print(json.dumps({'success': False, 'error': 'Failed to publish test message'}))
+            
+            # Disconnect
+            mqtt_client.disconnect()
+        else:
+            print(json.dumps({'success': False, 'error': 'Failed to connect to MQTT broker'}))
+            
+    except Exception as e:
+        print(json.dumps({'success': False, 'error': str(e)}))
+
+
+# ============================================================================
+# Pause/Resume Functions (for MQTT commands)
+# ============================================================================
+
+def pauseDBE():
+    """Pause battery operation (stop CAN TX, keep monitoring)"""
+    global _dbe_paused
+    _dbe_paused = True
+    print("[DBE] Paused - CAN TX stopped, monitoring continues")
+
+
+def resumeDBE():
+    """Resume battery operation"""
+    global _dbe_paused
+    _dbe_paused = False
+    print("[DBE] Resumed - CAN TX restarted")
+
+
+def restartDBE():
+    """Restart DBE bridge"""
+    print("[DBE] Restarting...")
+    stopDBE()
+    time.sleep(1)
+    startDBE()
+
+
+def bmsResetDBE():
+    """Reset BMS (if supported by battery protocol)"""
+    global _dbe_battery
+    if _dbe_battery and hasattr(_dbe_battery, 'reset_bms'):
+        _dbe_battery.reset_bms()
+        print("[DBE] BMS reset triggered")
+    else:
+        print("[DBE] BMS reset not supported by current battery protocol")
+
+
+def setLimitsDBE(limits):
+    """Set temporary charge/discharge limits
+    
+    Args:
+        limits (dict): Dictionary with 'max_charge', 'max_discharge', 'timeout'
+    """
+    global _dbe_battery
+    if _dbe_battery and hasattr(_dbe_battery, 'set_limits'):
+        _dbe_battery.set_limits(limits)
+        print(f"[DBE] Limits set: {limits}")
+    else:
+        print("[DBE] Set limits not supported by current battery protocol")
+
+
+# Initialize MQTT command handlers
+def _init_mqtt_commands():
+    """Initialize MQTT command handlers (called by startDBE)"""
+    try:
+        from lib.DBE import mqtt_commands
+        
+        # Set control functions for MQTT commands
+        control_functions = {
+            'pause': pauseDBE,
+            'resume': resumeDBE,
+            'restart': restartDBE,
+            'stop': stopDBE,
+            'bms_reset': bmsResetDBE,
+            'set_limits': setLimitsDBE
+        }
+        
+        mqtt_commands.set_dbe_control(control_functions)
+    except Exception as e:
+        print(f"[DBE] Failed to initialize MQTT commands: {e}")

@@ -2,6 +2,10 @@
   "urls": [
     ["DBE/__init__.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/__init__.py"],
     ["DBE/DBE_helpers.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/DBE_helpers.py"],
+    ["DBE/mqtt_client.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/mqtt_client.py"],
+    ["DBE/mqtt_publisher.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/mqtt_publisher.py"],
+    ["DBE/mqtt_commands.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/mqtt_commands.py"],
+    ["DBE/mqtt_ha_discovery.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/mqtt_ha_discovery.py"],
     ["DBE/battery/__init__.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/battery/__init__.py"],
     ["DBE/battery/battery_base.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/battery/battery_base.py"],
     ["DBE/battery/nissan_leaf.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/battery/nissan_leaf.py"],
@@ -10,5 +14,8 @@
     ["DBE/inverter/pylon_can.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/inverter/pylon_can.py"],
     ["DBE/charger/__init__.py", "github:jetpax/scripto-studio-registry/Extensions/DBE/lib/DBE/charger/__init__.py"]
   ],
-  "version": "0.1.0"
+  "deps": [
+    ["umqtt.simple", "latest"]
+  ],
+  "version": "0.2.0"
 }

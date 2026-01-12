@@ -49,6 +49,110 @@ Battery (CAN) ⟷ ESP32 (DBE Extension) ⟷ Inverter (RS485/Pylon Protocol)
 - Enable/disable charge/discharge
 - Requested power limits
 
+## MQTT Integration
+
+DBE supports MQTT telemetry publishing and remote control, enabling integration with Home Assistant and other home automation platforms.
+
+### MQTT Features
+
+- **Telemetry Publishing**: Battery metrics (SOC, voltage, current, temperature, cell voltages, etc.)
+- **Remote Commands**: PAUSE, RESUME, RESTART, STOP, BMSRESET
+- **Home Assistant Autodiscovery**: Automatic entity creation
+- **Cell Voltage Publishing**: All individual cell voltages (optional, 96+ for Nissan LEAF)
+
+### MQTT Configuration
+
+1. Configure MQTT broker in **System → Networks → MQTT** panel (or use DBE → MQTT panel)
+2. Enable MQTT in **DBE → MQTT** panel
+3. Set topic prefix (default: `BE`)
+4. Enable Home Assistant autodiscovery (optional)
+5. Start DBE bridge
+
+### MQTT Topics
+
+**Telemetry** (published every 5 seconds by default):
+- `BE/status` - Online/offline status (LWT)
+- `BE/info` - Main battery info (JSON)
+- `BE/spec_data` - Cell voltages (JSON array)
+- `BE/balancing_data` - Cell balancing status (JSON array)
+- `BE/events` - Events/alarms (JSON)
+
+**Commands** (subscribe):
+- `BE/command/PAUSE` - Pause charge/discharge
+- `BE/command/RESUME` - Resume operation
+- `BE/command/RESTART` - Restart DBE bridge
+- `BE/command/STOP` - Stop DBE bridge
+- `BE/command/BMSRESET` - Reset BMS
+- `BE/command/SET_LIMITS` - Set temporary limits (JSON payload)
+
+### Home Assistant Example
+
+**Autodiscovery** (automatic):
+All sensors and buttons are created automatically in Home Assistant when autodiscovery is enabled.
+
+**Manual Configuration** (if autodiscovery disabled):
+
+```yaml
+# configuration.yaml
+mqtt: !include mqtt.yaml
+
+# mqtt.yaml
+sensor:
+  - name: "Battery SOC"
+    state_topic: "BE/info"
+    unit_of_measurement: "%"
+    value_template: "{{ value_json.SOC }}"
+    device_class: "battery"
+    
+  - name: "Battery Voltage"
+    state_topic: "BE/info"
+    unit_of_measurement: "V"
+    value_template: "{{ value_json.battery_voltage }}"
+    device_class: "voltage"
+    
+  - name: "Battery Current"
+    state_topic: "BE/info"
+    unit_of_measurement: "A"
+    value_template: "{{ value_json.battery_current }}"
+    device_class: "current"
+
+button:
+  - name: "Pause Battery"
+    command_topic: "BE/command/PAUSE"
+    
+  - name: "Resume Battery"
+    command_topic: "BE/command/RESUME"
+```
+
+### Remote Control Examples
+
+**Using mosquitto_pub**:
+```bash
+# Pause battery
+mosquitto_pub -h mqtt.example.com -t BE/command/PAUSE -m ""
+
+# Resume battery
+mosquitto_pub -h mqtt.example.com -t BE/command/RESUME -m ""
+
+# Set temporary limits
+mosquitto_pub -h mqtt.example.com -t BE/command/SET_LIMITS -m '{"max_charge": 50, "max_discharge": 100, "timeout": 30}'
+```
+
+**Using Node-RED**:
+```json
+[
+  {
+    "id": "pause_battery",
+    "type": "mqtt out",
+    "topic": "BE/command/PAUSE",
+    "qos": "0",
+    "broker": "mqtt_broker"
+  }
+]
+```
+
+See [`MQTT_SETUP.md`](MQTT_SETUP.md) for detailed MQTT setup guide.
+
 ## Configuration
 
 ### CAN Settings
@@ -59,6 +163,16 @@ CAN bus configuration is managed globally in Scripto Studio System panel. DBE us
 - **RS485 Baudrate**: Match your inverter (typically 9600)
 - **Inverter Protocol**: Select protocol (Pylon CAN)
 - **Enable/Disable**: Toggle bridge operation
+
+### MQTT Settings
+- **Enable MQTT**: Toggle MQTT publishing
+- **Broker**: MQTT broker hostname/IP
+- **Port**: MQTT broker port (default: 1883)
+- **Username/Password**: Optional authentication
+- **Topic Prefix**: MQTT topic prefix (default: `BE`)
+- **Publish Interval**: Telemetry publish interval (default: 5 seconds)
+- **Publish Cell Voltages**: Enable/disable individual cell voltage publishing
+- **Home Assistant Autodiscovery**: Enable/disable HA autodiscovery
 
 ## Installation
 

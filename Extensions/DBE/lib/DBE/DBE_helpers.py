@@ -400,14 +400,12 @@ def getDBEMetrics():
 def getMqttConfig():
     """Get MQTT configuration from settings
     
-    Returns JSON string with configuration
+    Returns JSON string with DBE-specific MQTT configuration.
+    Note: Broker settings (server, port, credentials) are managed globally
+    in System → Networks → MQTT panel.
     """
     config = {
         'enabled': settings.get('dbe.mqtt_enabled', False),
-        'server': settings.get('mqtt.server', ''),
-        'port': settings.get('mqtt.port', 1883),
-        'username': settings.get('mqtt.username', ''),
-        'password': settings.get('mqtt.password', ''),
         'topic_prefix': settings.get('mqtt.topic_prefix', 'BE'),
         'publish_interval': settings.get('dbe.mqtt_publish_interval', 5),
         'publish_cell_voltages': settings.get('dbe.mqtt_publish_cell_voltages', True),
@@ -421,9 +419,12 @@ def setMqttConfig(config_dict):
     """Set MQTT configuration via settings module
     
     Args:
-        config_dict: Dictionary with configuration values
+        config_dict: Dictionary with DBE-specific configuration values
     
     Returns JSON string with success status
+    
+    Note: Broker settings (server, port, credentials) are managed globally
+    in System → Networks → MQTT panel and should not be set here.
     """
     try:
         # Update DBE MQTT settings
@@ -438,15 +439,7 @@ def setMqttConfig(config_dict):
         if 'ha_autodiscovery' in config_dict:
             settings.set('dbe.mqtt_ha_autodiscovery', config_dict['ha_autodiscovery'])
         
-        # Update global MQTT settings (if provided)
-        if 'server' in config_dict:
-            settings.set('mqtt.server', config_dict['server'])
-        if 'port' in config_dict:
-            settings.set('mqtt.port', config_dict['port'])
-        if 'username' in config_dict:
-            settings.set('mqtt.username', config_dict['username'])
-        if 'password' in config_dict:
-            settings.set('mqtt.password', config_dict['password'])
+        # Update topic prefix (shared setting, but configurable per extension)
         if 'topic_prefix' in config_dict:
             settings.set('mqtt.topic_prefix', config_dict['topic_prefix'])
         

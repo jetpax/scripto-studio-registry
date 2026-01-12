@@ -62,11 +62,17 @@ DBE supports MQTT telemetry publishing and remote control, enabling integration 
 
 ### MQTT Configuration
 
-1. Configure MQTT broker in **System → Networks → MQTT** panel (or use DBE → MQTT panel)
-2. Enable MQTT in **DBE → MQTT** panel
-3. Set topic prefix (default: `BE`)
-4. Enable Home Assistant autodiscovery (optional)
-5. Start DBE bridge
+1. **Configure MQTT broker** in **System → Networks → MQTT** panel:
+   - Server hostname/IP
+   - Port (default: 1883)
+   - Username/password (if required)
+2. **Enable MQTT** in **DBE → MQTT** panel:
+   - Check "Enable MQTT Publishing"
+   - Set topic prefix (default: `BE`)
+   - Configure publish interval (default: 5 seconds)
+   - Enable cell voltage publishing (optional)
+   - Enable Home Assistant autodiscovery (optional)
+3. **Start DBE bridge** to begin publishing
 
 ### MQTT Topics
 
@@ -165,10 +171,15 @@ CAN bus configuration is managed globally in Scripto Studio System panel. DBE us
 - **Enable/Disable**: Toggle bridge operation
 
 ### MQTT Settings
-- **Enable MQTT**: Toggle MQTT publishing
+
+**Global Settings** (System → Networks → MQTT):
 - **Broker**: MQTT broker hostname/IP
 - **Port**: MQTT broker port (default: 1883)
 - **Username/Password**: Optional authentication
+- **TLS**: Enable encrypted connection (optional)
+
+**DBE-Specific Settings** (DBE → MQTT):
+- **Enable MQTT**: Toggle MQTT publishing for DBE
 - **Topic Prefix**: MQTT topic prefix (default: `BE`)
 - **Publish Interval**: Telemetry publish interval (default: 5 seconds)
 - **Publish Cell Voltages**: Enable/disable individual cell voltage publishing

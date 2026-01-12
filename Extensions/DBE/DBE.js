@@ -2,7 +2,7 @@
 // {
 //   "name": "DBE",
 //   "id": "dbe",
-//   "version": [0, 2, 0],
+//   "version": [0, 2, 1],
 //   "author": "JetPax",
 //   "description": "Dala The Great's Battery Emulator - CAN-to-RS485 bridge for battery management systems. Bridges EV battery packs to solar inverters.",
 //   "icon": "battery-charging",
@@ -40,10 +40,6 @@ class DBEExtension {
         },
         mqttConfig: {
           enabled: false,
-          server: '',
-          port: 1883,
-          username: '',
-          password: '',
           topic_prefix: 'BE',
           publish_interval: 5,
           publish_cell_voltages: true,
@@ -688,6 +684,13 @@ class DBEExtension {
         </div>
         
         <div class="dbe-section" style="padding: 20px;">
+          <div style="margin-bottom: 20px; padding: 16px; background: var(--dbe-blue-light); border-radius: 8px; border-left: 4px solid var(--dbe-blue);">
+            <p style="margin: 0; font-size: 14px; color: var(--text-primary);">
+              <strong>Note:</strong> MQTT broker settings (server, port, credentials) are configured in <strong>System → Networks → MQTT</strong> panel. 
+              This panel configures DBE-specific MQTT settings only.
+            </p>
+          </div>
+
           <div class="dbe-field">
             <label>
               <input 
@@ -700,47 +703,6 @@ class DBEExtension {
           </div>
 
           <div class="dbe-field">
-            <label>MQTT Broker</label>
-            <input 
-              type="text" 
-              value="${mqttConfig.server || ''}"
-              placeholder="mqtt.example.com"
-              oninput=${(e) => this.handleMqttConfigChange('server', e.target.value)}
-              disabled=${!this.state.isConnected}
-            />
-          </div>
-
-          <div class="dbe-field">
-            <label>Port</label>
-            <input 
-              type="number" 
-              value="${mqttConfig.port || 1883}"
-              oninput=${(e) => this.handleMqttConfigChange('port', parseInt(e.target.value))}
-              disabled=${!this.state.isConnected}
-            />
-          </div>
-
-          <div class="dbe-field">
-            <label>Username (optional)</label>
-            <input 
-              type="text" 
-              value="${mqttConfig.username || ''}"
-              oninput=${(e) => this.handleMqttConfigChange('username', e.target.value)}
-              disabled=${!this.state.isConnected}
-            />
-          </div>
-
-          <div class="dbe-field">
-            <label>Password (optional)</label>
-            <input 
-              type="password" 
-              value="${mqttConfig.password || ''}"
-              oninput=${(e) => this.handleMqttConfigChange('password', e.target.value)}
-              disabled=${!this.state.isConnected}
-            />
-          </div>
-
-          <div class="dbe-field">
             <label>Topic Prefix</label>
             <input 
               type="text" 
@@ -749,6 +711,9 @@ class DBEExtension {
               oninput=${(e) => this.handleMqttConfigChange('topic_prefix', e.target.value)}
               disabled=${!this.state.isConnected}
             />
+            <small style="color: var(--text-secondary); font-size: 12px;">
+              MQTT topics will be: ${mqttConfig.topic_prefix || 'BE'}/info, ${mqttConfig.topic_prefix || 'BE'}/command/*, etc.
+            </small>
           </div>
 
           <div class="dbe-field">
@@ -760,6 +725,9 @@ class DBEExtension {
               oninput=${(e) => this.handleMqttConfigChange('publish_interval', parseInt(e.target.value))}
               disabled=${!this.state.isConnected}
             />
+            <small style="color: var(--text-secondary); font-size: 12px;">
+              How often to publish battery telemetry (default: 5 seconds)
+            </small>
           </div>
 
           <div class="dbe-field">
@@ -771,6 +739,9 @@ class DBEExtension {
               />
               Publish All Cell Voltages
             </label>
+            <small style="color: var(--text-secondary); font-size: 12px;">
+              Publishes individual cell voltages (96+ cells for Nissan LEAF). Disable to reduce bandwidth.
+            </small>
           </div>
 
           <div class="dbe-field">
@@ -782,6 +753,9 @@ class DBEExtension {
               />
               Home Assistant Autodiscovery
             </label>
+            <small style="color: var(--text-secondary); font-size: 12px;">
+              Automatically creates sensors and buttons in Home Assistant
+            </small>
           </div>
         </div>
 
@@ -793,6 +767,14 @@ class DBEExtension {
             <span class="dbe-status-value ${mqttStatus.connected ? 'running' : ''}">
               ${mqttStatus.connected ? 'Connected' : 'Disconnected'}
             </span>
+          </div>
+          <div class="dbe-status-item">
+            <span class="dbe-status-label">Broker</span>
+            <span class="dbe-status-value">${mqttStatus.server || 'Not configured'}:${mqttStatus.port || 1883}</span>
+          </div>
+          <div class="dbe-status-item">
+            <span class="dbe-status-label">Topic Prefix</span>
+            <span class="dbe-status-value">${mqttStatus.topic_prefix || 'BE'}</span>
           </div>
           <div class="dbe-status-item">
             <span class="dbe-status-label">Messages Published</span>

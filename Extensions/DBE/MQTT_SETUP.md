@@ -43,9 +43,10 @@ Use a cloud MQTT service like:
 
 ## Configuration Steps
 
-### Step 1: Configure MQTT Broker in Scripto Studio
+### Step 1: Configure MQTT Broker (Global Settings)
 
-**Option A: System → Networks → MQTT Panel**
+**Configure in System → Networks → MQTT Panel**:
+
 1. Open Scripto Studio
 2. Go to **System → Networks**
 3. Select **MQTT** panel
@@ -54,23 +55,26 @@ Use a cloud MQTT service like:
    - **Port**: `1883` (default) or `8883` (TLS)
    - **Username**: (if required)
    - **Password**: (if required)
+   - **TLS**: Enable if using port 8883
 5. Click **Save**
 
-**Option B: DBE → MQTT Panel**
+**Note**: These settings are shared across all extensions that use MQTT (not just DBE).
+
+### Step 2: Enable MQTT in DBE (Extension-Specific Settings)
+
+**Configure in DBE → MQTT Panel**:
+
 1. Open **DBE** extension
 2. Select **MQTT** panel
-3. Enter same broker details as above
-4. Click **Save**
-
-### Step 2: Enable MQTT in DBE
-
-1. In **DBE → MQTT** panel:
+3. Configure DBE-specific settings:
    - Check **Enable MQTT Publishing**
    - Set **Topic Prefix** (default: `BE`)
    - Set **Publish Interval** (default: 5 seconds)
    - Check **Publish All Cell Voltages** (if needed)
    - Check **Home Assistant Autodiscovery** (if using HA)
-2. Click **Save**
+4. Click **Save**
+
+**Note**: The broker connection info (server, port, credentials) is read from the global MQTT settings configured in Step 1.
 
 ### Step 3: Test MQTT Connection
 

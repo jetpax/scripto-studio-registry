@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1768195159,
+  "updated": 1768196964,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -803,7 +803,7 @@
       "version": [
         0,
         2,
-        0
+        1
       ],
       "author": "JetPax",
       "description": "Dala The Great's Battery Emulator - CAN-to-RS485 bridge for battery management systems. Bridges EV battery packs to solar inverters.",

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DBE - Extensions Catalogue</title>
+    <title>CAN Speed Test - ScriptO Registry</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #008184 0%, #00a8ab 100%);
+            background: linear-gradient(135deg, #db5201 0%, #ff6b35 100%);
             color: white;
             padding: 1.5rem 2rem;
         }
@@ -49,25 +49,13 @@
         }
         
         .detail-header {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
             border-bottom: 2px solid #f0f0f0;
             padding-bottom: 1.5rem;
             margin-bottom: 1.5rem;
         }
         
-        .detail-icon {
-            font-size: 4rem;
-            flex-shrink: 0;
-        }
-        
-        .detail-title {
-            flex: 1;
-        }
-        
-        .detail-title h1 {
-            color: #008184;
+        .detail-header h1 {
+            color: #db5201;
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }
@@ -75,13 +63,28 @@
         .detail-meta {
             color: #666;
             font-size: 0.9rem;
+            margin-bottom: 1rem;
         }
         
         .detail-description {
             margin: 1.5rem 0;
             line-height: 1.8;
             color: #444;
-            font-size: 1.05rem;
+        }
+        
+        .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .scripto-tag {
+            padding: 0.5rem 1rem;
+            background: #ffe8e0;
+            color: #db5201;
+            border-radius: 12px;
+            font-size: 0.9rem;
         }
         
         .detail-info {
@@ -110,65 +113,12 @@
             color: #333;
         }
         
-        .detail-section {
-            margin: 2rem 0;
-        }
-        
-        .detail-section h3 {
-            color: #008184;
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-        }
-        
-        .feature-list {
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .feature-list li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-        
-        .feature-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #008184;
-            font-weight: bold;
-        }
-        
-        .code-block {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-        
-        .code-block code {
-            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-            font-size: 0.9rem;
-        }
-        
-        .note {
-            background: #e8f5f5;
-            border-left: 4px solid #008184;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-            font-size: 0.95rem;
-        }
-        
         .detail-actions {
             display: flex;
             gap: 1rem;
             margin-top: 2rem;
             padding-top: 2rem;
             border-top: 2px solid #f0f0f0;
-            flex-wrap: wrap;
         }
         
         .btn {
@@ -183,12 +133,12 @@
         }
         
         .btn-primary {
-            background: #008184;
+            background: #db5201;
             color: white;
         }
         
         .btn-primary:hover {
-            background: #006668;
+            background: #b84401;
         }
         
         .btn-secondary {
@@ -213,67 +163,54 @@
 </head>
 <body>
     <div class="header">
-        <a href="../index.html">← Back to Extensions Catalogue</a>
+        <a href="../index.html">← Back to ScriptO Registry</a>
     </div>
     
     <div class="container">
         <div class="detail-card">
             <div class="detail-header">
-                <div class="detail-icon">🔌</div>
-                <div class="detail-title">
-                    <h1>DBE</h1>
-                    <div class="detail-meta">
-                        by JetPax • Version 0.2.2
-                    </div>
+                <h1>CAN Speed Test</h1>
+                <div class="detail-meta">
+                    by jetpax • Version 1.0.0 • License: MIT
                 </div>
             </div>
             
             <div class="detail-description">
-                Dala The Great's Battery Emulator - CAN-to-RS485 bridge for battery management systems. Bridges EV battery packs to solar inverters.
+                Measures CAN bus throughput using loopback mode.
+                         Tests transmission and reception speed with various frame sizes.
+                         Useful for benchmarking CAN performance and validating hardware setup.
+                      
+            </div>
+            
+            <div class="detail-tags">
+                <span class="scripto-tag">diagnostics</span>
             </div>
             
             <div class="detail-info">
                 <div class="info-item">
                     <span class="info-label">Author</span>
-                    <span class="info-value">JetPax</span>
+                    <span class="info-value">jetpax</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Version</span>
-                    <span class="info-value">0.2.2</span>
+                    <span class="info-value">1.0.0</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Extension ID</span>
-                    <span class="info-value">dbe</span>
+                    <span class="info-label">License</span>
+                    <span class="info-value">MIT</span>
                 </div>
+                <div class="info-item"><span class="info-label">Documentation</span><span class="info-value"><a href="https://github.com/jetpax/mpDirect" target="_blank">View Docs</a></span></div>
             </div>
-            
-            
-            <div class="detail-section">
-                <h3>Features & Tabs</h3>
-                <ul class="feature-list">
-                    <li><strong>Configuration</strong></li><li><strong>Status</strong></li><li><strong>Metrics</strong></li><li><strong>MQTT</strong></li>
-                </ul>
-            </div>
-        
-            
-            <div class="detail-section">
-                <h3>Device-Side Library</h3>
-                <p>This extension includes Python libraries that run on your ESP32 device.</p>
-                <div class="code-block">
-                    <code>github:jetpax/scripto-studio-registry/Extensions/DBE/lib</code>
-                </div>
-                <p class="note">The library will be automatically installed when you add this extension.</p>
-            </div>
-        
             
             <div class="detail-actions">
-                <a href="https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/Extensions/DBE/DBE.js" target="_blank" class="btn btn-primary">View Source Code</a>
-                <a href="../../index.html" class="btn btn-secondary">Back to Catalogue</a>
+                <a href="http://localhost:5174/?configure=https%3A//raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/CAN%2520Speed%2520Test.py" class="btn btn-primary">Open in ScriptO Studio</a>
+                <a href="https://github.com/jetpax/mpDirect" target="_blank" class="btn btn-secondary">Documentation</a>
+                <a href="https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/CAN%20Speed%20Test.py" target="_blank" class="btn btn-secondary">View Source</a>
             </div>
             
             <div class="install-note">
-                <strong>Installation:</strong> Open ScriptO Studio, click the Extensions button (or the + next to EXTENSIONS in the sidebar), 
-                search for "DBE", and click Install. The extension and any device-side libraries will be installed automatically.
+                <strong>Note:</strong> The "Open in ScriptO Studio" button will only work if ScriptO Studio is running on localhost:5174. 
+                Otherwise, copy the ScriptO URL and paste it into ScriptO Studio manually to configure it.
             </div>
         </div>
     </div>

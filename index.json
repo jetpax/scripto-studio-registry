@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": 1768196964,
+  "updated": 1768274301,
   "scriptos": [
     {
       "name": "1-Wire Devices Scan",
@@ -91,6 +91,24 @@
       "license": "MIT",
       "docs": "https://github.com/jetpax",
       "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/CAN%20Loopback%20Test.py"
+    },
+    {
+      "name": "CAN Speed Test",
+      "filename": "CAN Speed Test.py",
+      "version": [
+        1,
+        0,
+        0
+      ],
+      "author": "jetpax",
+      "description": "Measures CAN bus throughput using loopback mode.\n                         Tests transmission and reception speed with various frame sizes.\n                         Useful for benchmarking CAN performance and validating hardware setup.\n                      ",
+      "category": "Diagnostics",
+      "tags": [
+        "diagnostics"
+      ],
+      "license": "MIT",
+      "docs": "https://github.com/jetpax/mpDirect",
+      "url": "https://raw.githubusercontent.com/jetpax/scripto-studio-registry/main/ScriptOs/CAN%20Speed%20Test.py"
     },
     {
       "name": "CANopen Bus Scanner",
@@ -803,7 +821,7 @@
       "version": [
         0,
         2,
-        1
+        2
       ],
       "author": "JetPax",
       "description": "Dala The Great's Battery Emulator - CAN-to-RS485 bridge for battery management systems. Bridges EV battery packs to solar inverters.",

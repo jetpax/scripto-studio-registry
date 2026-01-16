@@ -1,0 +1,7 @@
+{
+  "name": "CCS",
+  "version": "0.1.0",
+  "description": "CCS/NACS DC Fast Charging EVSE Emulator",
+  "main": "CCS.js",
+  "dependencies": {}
+}
